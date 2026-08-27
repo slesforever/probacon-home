@@ -27,7 +27,7 @@
         .event-horizon {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 50%, #000 15%, rgba(20, 0, 40, 0.3) 50%, rgba(80, 0, 140, 0.4) 90%, #05000a 100%);
+            background: radial-gradient(circle at 50% 50%, #000 10%, rgba(15, 0, 30, 0.4) 40%, rgba(70, 0, 130, 0.3) 80%, #030005 100%);
             z-index: 2;
             pointer-events: none;
         }
@@ -170,7 +170,7 @@
             {
                 title: "NULLSCAPE",
                 subtitle: "ENTITY_VOID",
-                desc: "[ 第一頁內容。 ]<br>[ 鎖定 720px 寬度、半透明毛玻璃、左右青藍色菱形按鈕與黑洞吸入動態。 ]"
+                desc: "[ 第一頁內容。 ]<br>[ 背景已加入紫黑色棋盤網格無限向中心收縮的隧道特效。 ]"
             },
             {
                 title: "LORE // 01",
@@ -216,7 +216,7 @@
         
         let width, height, cx, cy;
         let particles = [];
-        const PARTICLE_COUNT = 160;
+        const PARTICLE_COUNT = 120;
         const MAX_RADIUS = 1300;
 
         function resize() {
@@ -228,6 +228,58 @@
 
         window.addEventListener('resize', resize);
         resize();
+
+        // 紫黑棋盤網格動畫變數
+        let gridOffset = 0;
+        let rotationAngle = 0;
+
+        function drawCheckerboardTunnel() {
+            gridOffset = (gridOffset + 1.2) % 90;       // 控制往內收縮的速度
+            rotationAngle += 0.003;                    // 緩慢旋轉角度
+
+            const rings = 12;                          // 網格同心圓環數
+            const segments = 20;                       // 放射狀區段數 (決定棋盤方格密度)
+
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(rotationAngle);
+
+            for (let i = rings; i > 0; i--) {
+                // 計算每一圈向內縮放的半徑
+                let rOuter = (i * 90 - gridOffset);
+                let rInner = ((i - 1) * 90 - gridOffset);
+                
+                if (rOuter < 0) continue;
+
+                // 越靠近中心透明度越低，製造消逝在黑洞裡的感覺
+                let fadeAlpha = Math.min(1, rOuter / (rings * 90));
+
+                for (let j = 0; j < segments; j++) {
+                    let angle1 = (j / segments) * Math.PI * 2;
+                    let angle2 = ((j + 1) / segments) * Math.PI * 2;
+
+                    // 紫色與黑色交替（形成棋盤格）
+                    if ((i + j) % 2 === 0) {
+                        ctx.fillStyle = `rgba(25, 0, 45, ${0.35 * fadeAlpha})`; // 深紫
+                    } else {
+                        ctx.fillStyle = `rgba(5, 0, 10, ${0.7 * fadeAlpha})`;  // 近黑
+                    }
+
+                    ctx.beginPath();
+                    // 畫扇形區塊來組成極座標棋盤格
+                    ctx.arc(0, 0, rOuter, angle1, angle2);
+                    ctx.arc(0, 0, Math.max(0, rInner), angle2, angle1, true);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // 網格邊線，帶有神祕的紫色光澤
+                    ctx.strokeStyle = `rgba(110, 0, 180, ${0.2 * fadeAlpha})`;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+            }
+            ctx.restore();
+        }
 
         class VoidEntity {
             constructor() {
@@ -338,9 +390,14 @@
         }
 
         function animate() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+            // 清空畫布留下殘影
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
             ctx.fillRect(0, 0, width, height);
 
+            // 1. 渲染紫黑棋盤無限收縮隧道
+            drawCheckerboardTunnel();
+
+            // 2. 渲染原本被吸入的方塊、隕石與眼睛粒子
             particles.forEach(p => {
                 p.update();
                 p.draw();
