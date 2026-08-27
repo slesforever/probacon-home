@@ -22,7 +22,7 @@
             z-index: 1;
         }
 
-        /* 升級版黑洞遮罩：中心死黑，外側帶有強烈的紫色高光暈染 */
+        /* 黑洞遮罩：中心死黑，外側帶有強烈的紫色高光暈染 */
         .event-horizon {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -44,64 +44,63 @@
 
         /* 卡片本體 (支援黑洞吸入與飛入動畫) */
         .profile-box {
-            background: rgba(8, 0, 15, 0.8);
-            border: 2px solid #660099;
+            background: rgba(8, 0, 15, 0.85);
+            border: 2px solid #550080;
             padding: 50px;
             text-align: center;
-            box-shadow: 0 0 50px rgba(136, 0, 255, 0.4), inset 0 0 25px rgba(136, 0, 255, 0.2);
+            box-shadow: 0 0 50px rgba(136, 0, 255, 0.3), inset 0 0 25px rgba(136, 0, 255, 0.15);
             backdrop-filter: blur(6px);
             pointer-events: auto;
             clip-path: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% calc(100% - 20px), calc(100% - 20px) 100%, 20px 100%, 0 calc(100% - 20px), 0 20px);
             
-            /* 動態切頁過渡基底 */
             transition: transform 0.6s cubic-bezier(0.5, 0, 1, 1), opacity 0.6s ease, filter 0.6s ease;
             transform: scale(1) rotate(0deg);
             opacity: 1;
             filter: blur(0px);
         }
 
-        /* 被黑洞吸入時的狀態 (縮小、旋轉、模糊消失於中心) */
         .profile-box.sucking {
             transform: scale(0) rotate(720deg);
             opacity: 0;
             filter: blur(15px);
         }
 
-        /* 從側邊飛入時的起始狀態 */
         .profile-box.flying-in {
             transform: scale(1.5) translateX(-100vw) rotate(-45deg);
             opacity: 0;
             filter: blur(10px);
         }
 
+        /* 修正後的標題：冰藍到深紫漸層，去除所有抖音霓虹疊影，改用紮實的質感 */
         .title {
             font-size: 3.5rem;
             font-weight: 900;
-            color: #111;
+            background: linear-gradient(180deg, #ffffff 0%, #00e1ff 35%, #7a00cc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             letter-spacing: 8px;
             margin-bottom: 10px;
             text-transform: uppercase;
-            text-shadow: 3px 2px 0px #00ffff, -3px -2px 0px #ff00ff, 0 0 15px rgba(255, 0, 255, 0.5);
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.9));
         }
 
         .subtitle {
-            font-size: 1rem;
-            color: #aa00ff;
-            letter-spacing: 12px;
-            margin-bottom: 40px;
-            text-shadow: 0 0 10px #aa00ff;
+            font-size: 0.95rem;
+            color: #b066ff;
+            letter-spacing: 10px;
+            margin-bottom: 35px;
+            text-shadow: 0 0 8px rgba(176, 102, 255, 0.5);
         }
 
         .desc {
             color: #d4aaff;
-            font-size: 1rem;
+            font-size: 0.95rem;
             line-height: 2;
             max-width: 400px;
             margin: 0 auto 30px auto;
-            border-top: 1px solid rgba(170, 0, 255, 0.3);
-            border-bottom: 1px solid rgba(170, 0, 255, 0.3);
+            border-top: 1px solid rgba(170, 0, 255, 0.25);
+            border-bottom: 1px solid rgba(170, 0, 255, 0.25);
             padding: 20px 0;
-            text-shadow: 0 2px 4px #000;
         }
 
         .btn-group {
@@ -114,10 +113,10 @@
             display: inline-block;
             background: #000;
             color: #d4aaff;
-            border: 1px solid #aa00ff;
+            border: 1px solid #7a00cc;
             padding: 12px 25px;
             font-family: inherit;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             letter-spacing: 4px;
             text-decoration: none;
             text-transform: uppercase;
@@ -126,9 +125,9 @@
         }
 
         .btn:hover {
-            background: #aa00ff;
-            color: #000;
-            box-shadow: 0 0 15px #aa00ff;
+            background: #7a00cc;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(122, 0, 204, 0.6);
         }
     </style>
 </head>
@@ -138,18 +137,15 @@
     <div class="event-horizon"></div>
 
     <div class="content-layer">
-        <div class="profile-box" id="profile-card">
-            <!-- 內容會由 JS 動態渲染以支援切頁效果 -->
-        </div>
+        <div class="profile-box" id="profile-card"></div>
     </div>
 
     <script>
-        // 頁面資料設定 (可自行修改各頁內容)
         const pages = [
             {
                 title: "NULLSCAPE",
                 subtitle: "ENTITY_VOID",
-                desc: "[ 這裡放入第一頁的文字。 ]<br>[ 點擊下方按鈕，體驗被吸入黑洞的切頁效果。 ]",
+                desc: "[ 第一頁內容。 ]<br>[ 字體已修正為冰藍漸層質感，不再有抖音特效。 ]",
                 buttons: [
                     { text: "NEXT PAGE", action: "next" },
                     { text: "PORTAL", action: "external", url: "#" }
@@ -158,7 +154,7 @@
             {
                 title: "LORE // 01",
                 subtitle: "THE ABYSSAL WHISPER",
-                desc: "[ 這裡放入第二頁的文字。 ]<br>[ 虛空深處的記憶碎片。 ]",
+                desc: "[ 第二頁內容。 ]<br>[ 點擊切換時會被黑洞整個吸進去。 ]",
                 buttons: [
                     { text: "PREV PAGE", action: "prev" },
                     { text: "NEXT PAGE", action: "next" }
@@ -167,7 +163,7 @@
             {
                 title: "ARCHIVE",
                 subtitle: "FINAL REALM",
-                desc: "[ 這裡放入第三頁的文字。 ]<br>[ 終點即是起點。 ]",
+                desc: "[ 第三頁內容。 ]<br>[ 終點。 ]",
                 buttons: [
                     { text: "RETURN", action: "home" }
                 ]
@@ -196,23 +192,14 @@
         }
 
         function switchPage(direction) {
-            // 1. 當前頁面被吸入黑洞
             card.classList.add('sucking');
-            
             setTimeout(() => {
-                // 2. 切換頁面索引
                 currentPage = (currentPage + direction + pages.length) % pages.length;
                 renderPage(currentPage);
-                
-                // 3. 準備從側邊飛入
                 card.classList.remove('sucking');
                 card.classList.add('flying-in');
-                
-                // 強制重繪後移除飛入狀態，讓它滑回中心
-                setTimeout(() => {
-                    card.classList.remove('flying-in');
-                }, 50);
-            }, 600); // 對應 CSS 動畫時間
+                setTimeout(() => card.classList.remove('flying-in'), 50);
+            }, 600);
         }
 
         function goToPage(targetIdx) {
@@ -226,9 +213,7 @@
             }, 600);
         }
 
-        // 初始化第一頁
         renderPage(0);
-
 
         // --- Canvas 渲染核心 ---
         const canvas = document.getElementById('void-canvas');
@@ -260,7 +245,6 @@
                 this.speed = Math.random() * 2 + 1.2;
                 this.angleSpeed = (Math.random() * 0.02 + 0.005) * (Math.random() > 0.5 ? 1 : -1);
                 
-                // 調整分佈比例：方塊 60%, 隕石 20%, 升級版詭異眼睛 20%
                 const rand = Math.random();
                 if (rand < 0.6) this.type = 'cube';
                 else if (rand < 0.8) this.type = 'meteor';
@@ -270,7 +254,7 @@
                 this.rotation = Math.random() * Math.PI * 2;
                 this.rotSpeed = (Math.random() - 0.5) * 0.12;
                 
-                const colors = ['#220044', '#6600aa', '#cc00cc', '#111111'];
+                const colors = ['#1a0033', '#4a0080', '#9900cc', '#0a0014'];
                 this.color = colors[Math.floor(Math.random() * colors.length)];
             }
 
@@ -314,42 +298,39 @@
                     ctx.lineTo(this.size/3, this.size/2);
                     ctx.lineTo(-this.size/2, this.size/3);
                     ctx.closePath();
-                    ctx.fillStyle = '#15002b';
+                    ctx.fillStyle = '#100020';
                     ctx.fill();
-                    ctx.strokeStyle = '#aa00ff';
+                    ctx.strokeStyle = '#7a00cc';
                     ctx.lineWidth = 2;
                     ctx.stroke();
                 }
                 else if (this.type === 'eye') {
-                    // 升級版詭異眼睛：不規則、破碎、帶精神污染感的手繪風格
                     ctx.beginPath();
                     ctx.moveTo(-this.size, -this.size * 0.2);
-                    ctx.lineTo(0, -this.size * 0.7); // 尖銳上眼皮
+                    ctx.lineTo(0, -this.size * 0.7);
                     ctx.lineTo(this.size, -this.size * 0.2);
-                    ctx.lineTo(0, this.size * 0.7);  // 尖銳下眼皮
+                    ctx.lineTo(0, this.size * 0.7);
                     ctx.closePath();
-                    ctx.fillStyle = '#f0e6ff';
+                    ctx.fillStyle = '#e6ccff';
                     ctx.fill();
-                    ctx.strokeStyle = '#ff00aa';
+                    ctx.strokeStyle = '#cc0088';
                     ctx.lineWidth = 2;
                     ctx.stroke();
                     
-                    // 裂縫血絲裝飾
                     ctx.beginPath();
                     ctx.moveTo(-this.size * 0.5, 0); ctx.lineTo(-this.size * 0.2, 0);
                     ctx.moveTo(this.size * 0.2, 0); ctx.lineTo(this.size * 0.5, 0);
-                    ctx.strokeStyle = '#550022';
+                    ctx.strokeStyle = '#330011';
                     ctx.stroke();
 
-                    // 瞳孔 (深淵黑與失控的青色高光)
                     ctx.beginPath();
                     ctx.arc(0, 0, this.size * 0.35, 0, Math.PI * 2);
-                    ctx.fillStyle = '#05000a';
+                    ctx.fillStyle = '#030005';
                     ctx.fill();
                     
                     ctx.beginPath();
                     ctx.arc(this.size * 0.05, -this.size * 0.05, this.size * 0.12, 0, Math.PI * 2);
-                    ctx.fillStyle = '#00ffff';
+                    ctx.fillStyle = '#00e1ff';
                     ctx.fill();
                 }
 
