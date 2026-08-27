@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NULLSCAPE // VORTEX</title>
-    <!-- 改用優雅但帶有壓抑感的古典字體 -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,900&family=Noto+Serif+TC:wght@600;900&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -16,7 +15,6 @@
             overflow: hidden;
         }
 
-        /* 背景畫布 */
         #void-canvas {
             position: absolute;
             top: 0; left: 0;
@@ -24,16 +22,15 @@
             z-index: 1;
         }
 
-        /* 中心的黑洞漸層遮罩，強化深淵感 */
+        /* 升級版黑洞遮罩：中心死黑，外側帶有強烈的紫色高光暈染 */
         .event-horizon {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 50%, #000 5%, rgba(10, 0, 20, 0.4) 40%, rgba(30, 0, 60, 0.2) 100%);
+            background: radial-gradient(circle at 50% 50%, #000 15%, rgba(20, 0, 40, 0.3) 50%, rgba(80, 0, 140, 0.4) 90%, #05000a 100%);
             z-index: 2;
             pointer-events: none;
         }
 
-        /* 內容區塊 */
         .content-layer {
             position: relative;
             z-index: 10;
@@ -42,22 +39,41 @@
             align-items: center;
             justify-content: center;
             height: 100%;
-            pointer-events: none; /* 讓滑鼠可以穿透點擊背後(如果需要) */
+            pointer-events: none;
         }
 
+        /* 卡片本體 (支援黑洞吸入與飛入動畫) */
         .profile-box {
-            background: rgba(5, 0, 10, 0.6);
-            border: 2px solid #550088;
+            background: rgba(8, 0, 15, 0.8);
+            border: 2px solid #660099;
             padding: 50px;
             text-align: center;
-            box-shadow: 0 0 40px rgba(136, 0, 255, 0.3), inset 0 0 20px rgba(136, 0, 255, 0.2);
-            backdrop-filter: blur(4px);
+            box-shadow: 0 0 50px rgba(136, 0, 255, 0.4), inset 0 0 25px rgba(136, 0, 255, 0.2);
+            backdrop-filter: blur(6px);
             pointer-events: auto;
-            /* 讓外框帶點幾何邊角感 */
             clip-path: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% calc(100% - 20px), calc(100% - 20px) 100%, 20px 100%, 0 calc(100% - 20px), 0 20px);
+            
+            /* 動態切頁過渡基底 */
+            transition: transform 0.6s cubic-bezier(0.5, 0, 1, 1), opacity 0.6s ease, filter 0.6s ease;
+            transform: scale(1) rotate(0deg);
+            opacity: 1;
+            filter: blur(0px);
         }
 
-        /* 色散錯位標題，這次字體好看多了 */
+        /* 被黑洞吸入時的狀態 (縮小、旋轉、模糊消失於中心) */
+        .profile-box.sucking {
+            transform: scale(0) rotate(720deg);
+            opacity: 0;
+            filter: blur(15px);
+        }
+
+        /* 從側邊飛入時的起始狀態 */
+        .profile-box.flying-in {
+            transform: scale(1.5) translateX(-100vw) rotate(-45deg);
+            opacity: 0;
+            filter: blur(10px);
+        }
+
         .title {
             font-size: 3.5rem;
             font-weight: 900;
@@ -65,7 +81,6 @@
             letter-spacing: 8px;
             margin-bottom: 10px;
             text-transform: uppercase;
-            /* 左青、右紫紅的強烈對比 */
             text-shadow: 3px 2px 0px #00ffff, -3px -2px 0px #ff00ff, 0 0 15px rgba(255, 0, 255, 0.5);
         }
 
@@ -89,20 +104,25 @@
             text-shadow: 0 2px 4px #000;
         }
 
-        /* 簡單暴力的按鈕 */
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
         .btn {
             display: inline-block;
             background: #000;
             color: #d4aaff;
             border: 1px solid #aa00ff;
-            padding: 12px 30px;
+            padding: 12px 25px;
             font-family: inherit;
             font-size: 0.9rem;
             letter-spacing: 4px;
             text-decoration: none;
             text-transform: uppercase;
             transition: 0.3s;
-            margin: 5px;
+            cursor: pointer;
         }
 
         .btn:hover {
@@ -118,32 +138,106 @@
     <div class="event-horizon"></div>
 
     <div class="content-layer">
-        <div class="profile-box">
-            <div class="title">NULLSCAPE</div>
-            <div class="subtitle">ENTITY_VOID</div>
-            
-            <div class="desc">
-                [ 這裡放入你的文字。 ]<br>
-                [ 全部資料皆為預設，請自行修改。 ]
-            </div>
-
-            <div>
-                <a href="#" class="btn">ARCHIVE</a>
-                <a href="#" class="btn">PORTAL</a>
-            </div>
+        <div class="profile-box" id="profile-card">
+            <!-- 內容會由 JS 動態渲染以支援切頁效果 -->
         </div>
     </div>
 
     <script>
+        // 頁面資料設定 (可自行修改各頁內容)
+        const pages = [
+            {
+                title: "NULLSCAPE",
+                subtitle: "ENTITY_VOID",
+                desc: "[ 這裡放入第一頁的文字。 ]<br>[ 點擊下方按鈕，體驗被吸入黑洞的切頁效果。 ]",
+                buttons: [
+                    { text: "NEXT PAGE", action: "next" },
+                    { text: "PORTAL", action: "external", url: "#" }
+                ]
+            },
+            {
+                title: "LORE // 01",
+                subtitle: "THE ABYSSAL WHISPER",
+                desc: "[ 這裡放入第二頁的文字。 ]<br>[ 虛空深處的記憶碎片。 ]",
+                buttons: [
+                    { text: "PREV PAGE", action: "prev" },
+                    { text: "NEXT PAGE", action: "next" }
+                ]
+            },
+            {
+                title: "ARCHIVE",
+                subtitle: "FINAL REALM",
+                desc: "[ 這裡放入第三頁的文字。 ]<br>[ 終點即是起點。 ]",
+                buttons: [
+                    { text: "RETURN", action: "home" }
+                ]
+            }
+        ];
+
+        let currentPage = 0;
+        const card = document.getElementById('profile-card');
+
+        function renderPage(pageIdx) {
+            const p = pages[pageIdx];
+            let btnHtml = '';
+            p.buttons.forEach(b => {
+                if(b.action === 'next') btnHtml += `<button class="btn" onclick="switchPage(1)">${b.text}</button>`;
+                else if(b.action === 'prev') btnHtml += `<button class="btn" onclick="switchPage(-1)">${b.text}</button>`;
+                else if(b.action === 'home') btnHtml += `<button class="btn" onclick="goToPage(0)">${b.text}</button>`;
+                else btnHtml += `<a href="${b.url}" class="btn">${b.text}</a>`;
+            });
+
+            card.innerHTML = `
+                <div class="title">${p.title}</div>
+                <div class="subtitle">${p.subtitle}</div>
+                <div class="desc">${p.desc}</div>
+                <div class="btn-group">${btnHtml}</div>
+            `;
+        }
+
+        function switchPage(direction) {
+            // 1. 當前頁面被吸入黑洞
+            card.classList.add('sucking');
+            
+            setTimeout(() => {
+                // 2. 切換頁面索引
+                currentPage = (currentPage + direction + pages.length) % pages.length;
+                renderPage(currentPage);
+                
+                // 3. 準備從側邊飛入
+                card.classList.remove('sucking');
+                card.classList.add('flying-in');
+                
+                // 強制重繪後移除飛入狀態，讓它滑回中心
+                setTimeout(() => {
+                    card.classList.remove('flying-in');
+                }, 50);
+            }, 600); // 對應 CSS 動畫時間
+        }
+
+        function goToPage(targetIdx) {
+            card.classList.add('sucking');
+            setTimeout(() => {
+                currentPage = targetIdx;
+                renderPage(currentPage);
+                card.classList.remove('sucking');
+                card.classList.add('flying-in');
+                setTimeout(() => card.classList.remove('flying-in'), 50);
+            }, 600);
+        }
+
+        // 初始化第一頁
+        renderPage(0);
+
+
+        // --- Canvas 渲染核心 ---
         const canvas = document.getElementById('void-canvas');
         const ctx = canvas.getContext('2d');
         
         let width, height, cx, cy;
         let particles = [];
-
-        // 參數設定
-        const PARTICLE_COUNT = 150;
-        const MAX_RADIUS = 1200; // 生成的初始最遠距離
+        const PARTICLE_COUNT = 160;
+        const MAX_RADIUS = 1300;
 
         function resize() {
             width = canvas.width = window.innerWidth;
@@ -161,106 +255,101 @@
             }
 
             reset(randomizeRadius = false) {
-                // 距離中心的半徑
                 this.radius = randomizeRadius ? Math.random() * MAX_RADIUS : MAX_RADIUS;
                 this.angle = Math.random() * Math.PI * 2;
-                // 吸入速度與旋轉速度
-                this.speed = Math.random() * 2 + 1;
+                this.speed = Math.random() * 2 + 1.2;
                 this.angleSpeed = (Math.random() * 0.02 + 0.005) * (Math.random() > 0.5 ? 1 : -1);
                 
-                // 決定物件種類 (70% 紫黑方塊, 20% 隕石碎塊, 10% 眼睛)
+                // 調整分佈比例：方塊 60%, 隕石 20%, 升級版詭異眼睛 20%
                 const rand = Math.random();
-                if (rand < 0.7) this.type = 'cube';
-                else if (rand < 0.9) this.type = 'meteor';
+                if (rand < 0.6) this.type = 'cube';
+                else if (rand < 0.8) this.type = 'meteor';
                 else this.type = 'eye';
 
-                this.size = Math.random() * 20 + 10;
+                this.size = Math.random() * 22 + 12;
                 this.rotation = Math.random() * Math.PI * 2;
-                this.rotSpeed = (Math.random() - 0.5) * 0.1;
+                this.rotSpeed = (Math.random() - 0.5) * 0.12;
                 
-                // 顏色 (紫/黑/洋紅)
-                const colors = ['#330066', '#8800ff', '#ff00ff', '#111111'];
+                const colors = ['#220044', '#6600aa', '#cc00cc', '#111111'];
                 this.color = colors[Math.floor(Math.random() * colors.length)];
             }
 
             update() {
-                // 越靠近中心，吸力越強，轉得越快 (引力模擬)
-                let gravityPull = Math.max(1, (MAX_RADIUS / Math.max(this.radius, 10)) * 0.5);
-                
+                let gravityPull = Math.max(1, (MAX_RADIUS / Math.max(this.radius, 10)) * 0.45);
                 this.radius -= this.speed * gravityPull;
                 this.angle += this.angleSpeed * gravityPull;
                 this.rotation += this.rotSpeed * gravityPull;
 
-                // 如果被吸進中心 (半徑極小)，就從外圍重生
                 if (this.radius < 5) {
                     this.reset();
                 }
             }
 
             draw() {
-                // 計算當前 X, Y 座標
                 const x = cx + Math.cos(this.angle) * this.radius;
                 const y = cy + Math.sin(this.angle) * this.radius;
 
-                // 越靠近中心，拉長(麵條化)並縮小
                 const scale = Math.min(1, this.radius / 300);
-                // 伸長比例：靠近中心時沿著旋轉方向被拉扯
                 const stretch = Math.max(1, 300 / Math.max(this.radius, 10));
 
                 ctx.save();
                 ctx.translate(x, y);
-                // 朝向中心的角度，用來做拉扯方向
                 ctx.rotate(this.angle + Math.PI/2); 
                 ctx.scale(scale, scale * stretch); 
-                
-                ctx.rotate(this.rotation); // 物件自轉
+                ctx.rotate(this.rotation);
 
-                ctx.globalAlpha = Math.min(1, this.radius / 150); // 靠近中心時漸隱
+                ctx.globalAlpha = Math.min(1, this.radius / 150);
 
                 if (this.type === 'cube') {
-                    // 畫紫黑西洋棋盤風格的碎塊
                     ctx.fillStyle = this.color;
                     ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
                     ctx.strokeStyle = '#000';
+                    ctx.lineWidth = 2;
                     ctx.strokeRect(-this.size/2, -this.size/2, this.size, this.size);
                 } 
                 else if (this.type === 'meteor') {
-                    // 畫不規則多邊形(隕石)
                     ctx.beginPath();
                     ctx.moveTo(-this.size/2, -this.size/2);
                     ctx.lineTo(this.size/2, -this.size/3);
                     ctx.lineTo(this.size/3, this.size/2);
                     ctx.lineTo(-this.size/2, this.size/3);
                     ctx.closePath();
-                    ctx.fillStyle = '#1a0033';
+                    ctx.fillStyle = '#15002b';
                     ctx.fill();
                     ctx.strokeStyle = '#aa00ff';
                     ctx.lineWidth = 2;
                     ctx.stroke();
                 }
                 else if (this.type === 'eye') {
-                    // 畫混沌的眼睛
+                    // 升級版詭異眼睛：不規則、破碎、帶精神污染感的手繪風格
                     ctx.beginPath();
-                    // 上眼瞼
-                    ctx.moveTo(-this.size, 0);
-                    ctx.quadraticCurveTo(0, -this.size, this.size, 0);
-                    // 下眼瞼
-                    ctx.quadraticCurveTo(0, this.size, -this.size, 0);
-                    ctx.fillStyle = '#fff';
+                    ctx.moveTo(-this.size, -this.size * 0.2);
+                    ctx.lineTo(0, -this.size * 0.7); // 尖銳上眼皮
+                    ctx.lineTo(this.size, -this.size * 0.2);
+                    ctx.lineTo(0, this.size * 0.7);  // 尖銳下眼皮
+                    ctx.closePath();
+                    ctx.fillStyle = '#f0e6ff';
                     ctx.fill();
-                    ctx.strokeStyle = '#ff00ff';
+                    ctx.strokeStyle = '#ff00aa';
                     ctx.lineWidth = 2;
                     ctx.stroke();
                     
-                    // 瞳孔
+                    // 裂縫血絲裝飾
                     ctx.beginPath();
-                    ctx.arc(0, 0, this.size * 0.4, 0, Math.PI * 2);
-                    ctx.fillStyle = '#000';
+                    ctx.moveTo(-this.size * 0.5, 0); ctx.lineTo(-this.size * 0.2, 0);
+                    ctx.moveTo(this.size * 0.2, 0); ctx.lineTo(this.size * 0.5, 0);
+                    ctx.strokeStyle = '#550022';
+                    ctx.stroke();
+
+                    // 瞳孔 (深淵黑與失控的青色高光)
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size * 0.35, 0, Math.PI * 2);
+                    ctx.fillStyle = '#05000a';
                     ctx.fill();
-                    // 發光紅眼珠
+                    
                     ctx.beginPath();
-                    ctx.arc(0, 0, this.size * 0.15, 0, Math.PI * 2);
-                    ctx.fillStyle = '#00ffff'; // 用青色點綴
+                    ctx.arc(this.size * 0.05, -this.size * 0.05, this.size * 0.12, 0, Math.PI * 2);
+                    ctx.fillStyle = '#00ffff';
                     ctx.fill();
                 }
 
@@ -268,15 +357,12 @@
             }
         }
 
-        // 初始化粒子
         for (let i = 0; i < PARTICLE_COUNT; i++) {
             particles.push(new VoidEntity());
         }
 
-        // 動畫循環
         function animate() {
-            // 創造殘影效果，不完全清除畫布，而是覆蓋一層帶透明度的黑色
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
             ctx.fillRect(0, 0, width, height);
 
             particles.forEach(p => {
