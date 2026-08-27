@@ -3,148 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NULLSCAPE // ABYSS</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <title>VOID // REQUIEM</title>
+    <!-- 使用古典、優雅的襯線字體 -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Noto+Serif+TC:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background-color: #030106;
-            color: #e9d5ff;
-            font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
-            min-height: 100vh;
-            display: flex; align-items: center; justify-content: center;
+        
+        body, html {
+            height: 100%;
+            background-color: #030105; /* 極致的暗紫黑 */
+            color: #d8c8e3;
+            font-family: 'Cinzel', 'Noto Serif TC', serif; /* 古典字體 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
             overflow: hidden;
+            position: relative;
         }
 
-        /* 深淵暗角 */
-        body::after {
-            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, transparent 40%, #030106 100%);
-            z-index: 5; pointer-events: none;
+        /* 柔和、不規則的深紫霧氣 */
+        .abyssal-mist {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 40%, rgba(50, 15, 75, 0.15) 0%, rgba(15, 4, 25, 0.8) 60%, #030105 100%);
+            z-index: 1;
+            pointer-events: none;
         }
 
-        #starfield { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
-
-        .terminal-card {
-            position: relative; z-index: 10;
-            width: 90%; max-width: 460px;
-            background: rgba(12, 4, 20, 0.75);
-            border: 1px solid #7e22ce44; padding: 35px;
-            box-shadow: 0 0 40px rgba(126, 34, 206, 0.2), inset 0 0 15px rgba(168, 85, 247, 0.05);
-            clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+        /* 灰燼畫布 */
+        #ash-canvas {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 2;
+            opacity: 0.7;
         }
 
-        .terminal-header {
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid rgba(168, 85, 247, 0.2);
-            padding-bottom: 12px; margin-bottom: 24px;
-            font-size: 0.7rem; color: #c084fc; letter-spacing: 2px;
+        /* 古老石碑感的內容區塊 (無明顯邊框) */
+        .relic-card {
+            position: relative;
+            z-index: 10;
+            width: 85%;
+            max-width: 420px;
+            padding: 60px 40px;
+            background: rgba(10, 3, 15, 0.4);
+            border-top: 1px solid rgba(100, 60, 140, 0.15);
+            border-bottom: 1px solid rgba(100, 60, 140, 0.15);
+            text-align: center;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
+            animation: fade-in 2s ease-in-out;
         }
 
-        .glitch-title {
-            font-size: 1.8rem; font-weight: 700; color: #ffffff;
-            letter-spacing: 4px; text-shadow: 0 0 15px rgba(168, 85, 247, 0.8);
-            margin-bottom: 8px; text-transform: uppercase;
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .subtitle { font-size: 0.8rem; color: #a855f7; margin-bottom: 24px; letter-spacing: 1px; }
+        /* 頂部與底部的古典菱形裝飾 */
+        .relic-card::before, .relic-card::after {
+            content: '◆';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(100, 60, 140, 0.3);
+            font-size: 10px;
+        }
+        .relic-card::before { top: 20px; }
+        .relic-card::after { bottom: 20px; }
 
-        .info-block {
-            background: rgba(168, 85, 247, 0.05);
-            border-left: 2px solid #a855f7; padding: 12px 16px;
-            font-size: 0.82rem; line-height: 1.6; color: #d8b4fe; margin-bottom: 28px;
+        /* 名字 / 銘文標題 */
+        .name-engraved {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #e5d9f2;
+            letter-spacing: 8px;
+            margin-bottom: 8px;
+            text-shadow: 0 0 15px rgba(100, 60, 140, 0.5);
+            text-transform: uppercase;
         }
 
-        .action-list { display: flex; flex-direction: column; gap: 12px; }
-
-        .action-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 14px 18px; background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(168, 85, 247, 0.15);
-            color: #c4b5fd; text-decoration: none; font-size: 0.8rem;
-            letter-spacing: 1px; transition: all 0.2s ease;
+        /* 稱號 / 墓誌銘 */
+        .title-epitaph {
+            font-size: 0.85rem;
+            color: #9c84b5;
+            letter-spacing: 4px;
+            margin-bottom: 35px;
+            font-weight: 300;
         }
 
-        .action-item:hover {
-            background: rgba(168, 85, 247, 0.15); color: #ffffff;
-            border-color: #a855f7; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
-            transform: translateX(5px);
+        /* 故事 / 簡介文本 */
+        .lore-text {
+            font-size: 0.9rem;
+            line-height: 2;
+            color: #a895be;
+            margin-bottom: 45px;
+            text-align: justify;
+            text-align-last: center;
+            font-weight: 300;
+            letter-spacing: 1px;
         }
 
-        .action-item::after { content: '>'; font-weight: bold; color: #a855f7; }
-
-        .footer-tag {
-            margin-top: 24px; font-size: 0.65rem; color: rgba(168, 85, 247, 0.5);
-            text-align: right; letter-spacing: 2px;
+        /* 連結列 */
+        .path-links {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            align-items: center;
         }
+
+        .path-link {
+            text-decoration: none;
+            color: #8c73a6;
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+            padding: 8px 20px;
+            transition: all 0.5s ease;
+            position: relative;
+        }
+
+        /* 滑鼠懸停時的微光與底線 */
+        .path-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 50%;
+            width: 0; height: 1px;
+            background: #cba8f0;
+            transition: all 0.5s ease;
+            transform: translateX(-50%);
+        }
+
+        .path-link:hover {
+            color: #e5d9f2;
+            text-shadow: 0 0 10px rgba(120, 80, 160, 0.7);
+        }
+
+        .path-link:hover::after {
+            width: 100%;
+            box-shadow: 0 0 8px rgba(120, 80, 160, 0.8);
+        }
+
     </style>
 </head>
 <body>
-    <canvas id="starfield"></canvas>
+    <div class="abyssal-mist"></div>
+    <canvas id="ash-canvas"></canvas>
 
-    <div class="terminal-card">
-        <div class="terminal-header">
-            <span>[ NULL_ZONE ]</span>
-            <span>DATA // 0xVOID</span>
+    <div class="relic-card">
+        <div class="name-engraved">[ 這裡填寫名字 ]</div>
+        <div class="title-epitaph">The Abyssal Wanderer</div>
+        
+        <div class="lore-text">
+            [ 這裡輸入簡介。不需要多餘的裝飾，用最純粹的文字寫下你的故事、信仰，或是曾經歷過的黑暗。 ]
         </div>
 
-        <div class="glitch-title">[YOUR_NAME]</div>
-        <div class="subtitle">[YOUR_SUBTITLE_OR_ROLE]</div>
-
-        <div class="info-block">
-            > [個人簡介句第一行]<br>
-            > [個人簡介句第二行]
+        <div class="path-links">
+            <a href="#" class="path-link">第一道封印 / 連結</a>
+            <a href="#" class="path-link">第二道封印 / 連結</a>
+            <a href="#" class="path-link">深淵歸途 / 連結</a>
         </div>
-
-        <div class="action-list">
-            <a href="#" class="action-item"><span>[ 按鈕一文字 ]</span></a>
-            <a href="#" class="action-item"><span>[ 按鈕二文字 ]</span></a>
-            <a href="#" class="action-item"><span>[ 按鈕三文字 ]</span></a>
-        </div>
-
-        <div class="footer-tag">CONNECTION // STABLE</div>
     </div>
 
     <script>
-        const canvas = document.getElementById('starfield');
+        // 緩慢向上飄散的灰燼/塵埃系統 (非科技感星空)
+        const canvas = document.getElementById('ash-canvas');
         const ctx = canvas.getContext('2d');
-        let stars = [];
+        let ashes = [];
 
         function init() {
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            stars = [];
-            for (let i = 0; i < 200; i++) {
-                stars.push({
-                    x: Math.random() * canvas.width, y: Math.random() * canvas.height,
-                    z: Math.random() * canvas.width, o: Math.random()
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            ashes = [];
+            const particleCount = Math.floor(window.innerWidth / 15); // 控制灰燼數量
+            
+            for (let i = 0; i < particleCount; i++) {
+                ashes.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2 + 0.5,
+                    speedY: Math.random() * -0.5 - 0.2, // 緩慢向上
+                    speedX: Math.random() * 0.4 - 0.2,   // 微微左右飄動
+                    opacity: Math.random() * 0.5 + 0.1,
+                    fadeRate: (Math.random() * 0.005) + 0.001,
+                    fadingOut: Math.random() > 0.5
                 });
             }
         }
 
-        function draw() {
-            ctx.fillStyle = '#030106'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+        function drawAshes() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            for (let i = 0; i < ashes.length; i++) {
+                let ash = ashes[i];
+                
+                // 移動邏輯
+                ash.y += ash.speedY;
+                ash.x += ash.speedX;
 
-            for (let i = 0; i < stars.length; i++) {
-                let star = stars[i];
-                star.z -= 0.6; // 星塵向後退的速度
-                if (star.z <= 0) star.z = canvas.width;
-
-                let k = 128 / star.z;
-                let px = (star.x - canvas.width / 2) * k + canvas.width / 2;
-                let py = (star.y - canvas.height / 2) * k + canvas.height / 2;
-
-                if (px >= 0 && px <= canvas.width && py >= 0 && py <= canvas.height) {
-                    let size = (1 - star.z / canvas.width) * 2.5;
-                    // 虛空紫紅漸變星塵
-                    ctx.fillStyle = `rgba(168, 85, 247, ${1 - star.z / canvas.width})`;
-                    ctx.fillRect(px, py, size, size);
+                // 閃爍/漸隱邏輯
+                if (ash.fadingOut) {
+                    ash.opacity -= ash.fadeRate;
+                    if (ash.opacity <= 0.05) ash.fadingOut = false;
+                } else {
+                    ash.opacity += ash.fadeRate;
+                    if (ash.opacity >= 0.6) ash.fadingOut = true;
                 }
+
+                // 邊界重置 (回到畫面底部)
+                if (ash.y < -10) {
+                    ash.y = canvas.height + 10;
+                    ash.x = Math.random() * canvas.width;
+                }
+                if (ash.x > canvas.width + 10) ash.x = -10;
+                if (ash.x < -10) ash.x = canvas.width + 10;
+
+                // 繪製灰燼 (柔和的紫灰色)
+                ctx.beginPath();
+                ctx.arc(ash.x, ash.y, ash.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(160, 130, 190, ${ash.opacity})`;
+                ctx.fill();
             }
-            requestAnimationFrame(draw);
+            requestAnimationFrame(drawAshes);
         }
 
         window.addEventListener('resize', init);
-        init(); draw();
+        init();
+        drawAshes();
     </script>
 </body>
 </html>
