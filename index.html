@@ -1,21 +1,20 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <link rel="icon" href="https://shared.fastly.steamstatic.com/community_assets/images/apps/1256670/6aae1f276e95e65de99d6ffea75f010167d5d0c6.jpg">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sles | Library Archive</title>
+    <title>Sles | Nullscape Archive</title>
     
-    <!-- 引入古典圖書館風格字體 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Serif+TC:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Serif+TC:wght@300;400;500&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --theme-color: #ffea95;
-            --theme-dim: rgba(255, 234, 149, 0.35);
-            --gold-glow: rgba(212, 175, 55, 0.6);
+            --primary-cyan: #00f0ff;
+            --void-purple: #8b00ff;
+            --magenta-glow: #b00088;
+            --bg-dark: #05010a;
             --mouse-x: 50%;
             --mouse-y: 50%;
             --tilt-x: 0deg;
@@ -26,169 +25,101 @@
             margin: 0;
             padding: 0;
             height: 100%;
-            background-color: #020203;
-            color: var(--theme-color);
+            background-color: var(--bg-dark);
+            color: var(--primary-cyan);
             font-family: "Cinzel", "Noto Serif TC", "serif";
             overflow: hidden;
-            touch-action: none;
-            -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
 
-        /* --- 背景圖層與極致暗角 --- */
-        .bg-layer {
+        /* --- Nullscape 虛空背景與粒子 --- */
+        .bg-void {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
             z-index: 1;
-            background-image: radial-gradient(circle at center, rgba(10,10,14,0.3) 0%, rgba(2,2,3,0.85) 100%), url('library.jpg');
-            background-size: cover;
-            background-position: center;
-            transform: scale(1.04);
-            transition: transform 0.3s ease-out;
+            background: radial-gradient(circle at center, rgba(30, 5, 50, 0.6) 0%, rgba(5, 1, 10, 0.95) 100%);
         }
 
-        #canvas-back { position: fixed; top: 0; left: 0; z-index: 2; pointer-events: none; }
-        #canvas-front { position: fixed; top: 0; left: 0; z-index: 7; pointer-events: none; }
-
-        #ripple-container {
+        #canvas-particles {
             position: fixed;
             top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 99;
+            z-index: 2;
             pointer-events: none;
         }
 
-        /* --- 頂部與底部古典標示 --- */
-        .library-header-bar {
+        /* --- 頂部與底部裝飾 --- */
+        .archive-header {
             position: fixed;
-            top: 28px;
-            left: 45px;
-            right: 45px;
+            top: 25px; left: 40px; right: 40px;
             z-index: 10;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 0.7rem;
-            letter-spacing: 5px;
-            color: var(--theme-dim);
-            border-bottom: 1px solid rgba(212, 175, 55, 0.18);
-            padding-bottom: 10px;
+            letter-spacing: 4px;
+            color: rgba(0, 240, 255, 0.4);
+            border-bottom: 1px solid rgba(139, 0, 255, 0.3);
+            padding-bottom: 8px;
             pointer-events: none;
         }
 
-        .library-footer-bar {
+        .archive-footer {
             position: fixed;
-            bottom: 28px;
-            left: 45px;
-            right: 45px;
+            bottom: 25px; left: 40px; right: 40px;
             z-index: 10;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 0.65rem;
-            letter-spacing: 4px;
-            color: rgba(255, 234, 149, 0.25);
+            letter-spacing: 3px;
+            color: rgba(176, 0, 136, 0.5);
             pointer-events: none;
         }
 
-        /* 音訊狀態指示器 (頂級細節) */
-        .audio-hud {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.6rem;
-            letter-spacing: 2px;
-            color: rgba(255, 234, 149, 0.6);
-            pointer-events: auto;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-        .audio-hud:hover { color: #fff; }
-        .audio-waves {
-            display: flex;
-            align-items: flex-end;
-            gap: 2px;
-            height: 10px;
-        }
-        .audio-waves span {
-            width: 2px;
-            background: var(--theme-color);
-            animation: wave-anim 1.2s infinite ease-in-out;
-        }
-        .audio-waves span:nth-child(2) { animation-delay: 0.2s; }
-        .audio-waves span:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes wave-anim {
-            0%, 100% { height: 3px; opacity: 0.3; }
-            50% { height: 10px; opacity: 1; }
-        }
-
-        /* --- 典雅翻頁按鈕 --- */
+        /* --- 左右青藍色菱形切頁按鈕 --- */
         .page-nav {
             position: fixed;
             top: 50%;
-            width: clamp(42px, 5.5vw, 50px);
-            height: clamp(42px, 5.5vw, 50px);
-            background: #fffdf0;
-            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            background: rgba(0, 240, 255, 0.08);
+            border: 1.5px solid var(--primary-cyan);
+            border-radius: 4px;
+            transform: translateY(-50%) rotate(45deg);
             cursor: pointer;
             z-index: 100;
-            transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
             display: flex;
             align-items: center;
             justify-content: center;
-            pointer-events: auto;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.25), inset 0 0 10px rgba(0, 240, 255, 0.15);
             outline: none;
-            border: none;
-            box-shadow: 0 0 25px rgba(255,255,255,0.8), 0 0 40px #d4af37, 0 0 60px rgba(212, 175, 55, 0.45);
-            animation: seed-button-pulse 3.8s infinite ease-in-out;
         }
 
-        .nav-left { left: clamp(20px, 4vw, 45px); transform: translateY(-50%); }
-        .nav-right { right: clamp(20px, 4vw, 45px); transform: translateY(-50%); }
+        .nav-left { left: 40px; }
+        .nav-right { right: 40px; }
 
         .page-nav::after {
             content: "";
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            background: rgba(10, 10, 14, 0.9);
-            transform: rotate(45deg);
-            border: 1px solid #d4af37;
-            transition: all 0.4s ease;
-            box-shadow: inset 0 0 8px rgba(212, 175, 55, 0.6);
+            width: 10px;
+            height: 10px;
+            border-right: 2px solid var(--primary-cyan);
+            border-bottom: 2px solid var(--primary-cyan);
+            transform: rotate(-45deg);
+            transition: transform 0.3s ease;
         }
 
-        @keyframes seed-button-pulse {
-            0%, 100% { 
-                transform: translateY(-50%) scale(0.92); 
-                box-shadow: 0 0 15px rgba(255,255,255,0.8), 0 0 30px #d4af37; 
-            }
-            50% { 
-                transform: translateY(-50%) scale(1.06); 
-                box-shadow: 0 0 35px rgba(255,255,255,1), 0 0 60px #d4af37, 0 0 90px rgba(255, 234, 149, 0.6); 
-            }
+        .nav-left::after { transform: rotate(135deg); }
+        .nav-right::after { transform: rotate(-45deg); }
+
+        .page-nav:hover {
+            background: rgba(0, 240, 255, 0.25);
+            box-shadow: 0 0 25px var(--primary-cyan), 0 0 40px var(--void-purple);
+            transform: translateY(-50%) rotate(45deg) scale(1.15);
         }
 
-        .page-nav:hover, .page-nav:focus-visible {
-            animation: none !important;
-            transform: translateY(-50%) scale(1.22);
-            background: #ffffff;
-            box-shadow: 0 0 40px #fff, 0 0 80px #ffea95, 0 0 120px rgba(212, 175, 55, 0.9);
-        }
-
-        .page-nav:hover::after {
-            background: #ffea95;
-            border-color: #fff;
-            box-shadow: 0 0 15px #ffea95;
-            transform: rotate(225deg) scale(1.15);
-        }
-
-        .page-nav:active {
-            transform: translateY(-50%) scale(0.9);
-        }
-
-        /* --- 頂級書冊 UI 卡片 (加入雙框與奢華光影) --- */
+        /* --- 720px 寬、半透明 Nullscape 主卡片 --- */
         .main-container {
             display: flex;
             justify-content: center;
@@ -200,422 +131,230 @@
             pointer-events: none;
         }
 
-        .ruina-book {
+        .nullscape-card {
             pointer-events: auto;
-            background: linear-gradient(135deg, rgba(14, 14, 20, 0.85) 0%, rgba(6, 6, 9, 0.92) 100%);
-            backdrop-filter: blur(25px) saturate(180%);
-            -webkit-backdrop-filter: blur(25px) saturate(180%);
-            width: 85%;
-            max-width: 580px;
-            padding: clamp(50px, 8vh, 75px) clamp(32px, 5.5vw, 60px);
+            width: 720px;
+            max-width: 88vw;
+            background: rgba(10, 4, 18, 0.78);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 55px 65px;
             position: relative;
-            border: 1px solid rgba(212, 175, 55, 0.4);
-            box-shadow: 0 40px 100px rgba(0,0,0,0.95), 
-                        inset 0 0 30px rgba(212, 175, 55, 0.08),
-                        inset 0 0 2px rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(0, 240, 255, 0.35);
+            box-shadow: 0 30px 90px rgba(0,0,0,0.9),
+                        0 0 30px rgba(139, 0, 255, 0.2),
+                        inset 0 0 25px rgba(0, 240, 255, 0.08);
             transform: rotateX(var(--tilt-y)) rotateY(var(--tilt-x));
-            transition: transform 0.1s ease-out, opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), filter 0.4s ease;
-            will-change: transform, opacity, filter;
-            overflow: hidden;
+            transition: transform 0.1s ease-out, opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), filter 0.35s ease;
             transform-style: preserve-3d;
+            box-sizing: border-box;
         }
 
-        /* 內側精緻細線裝飾框 */
-        .ruina-book::before {
+        /* 動態滑鼠光影聚焦 */
+        .nullscape-card::before {
             content: "";
             position: absolute;
-            inset: 8px;
-            border: 1px solid rgba(212, 175, 55, 0.15);
-            pointer-events: none;
-            z-index: 3;
-        }
-
-        /* 動態滑鼠光影聚焦層 */
-        .ruina-book::after {
-            content: ""; 
-            position: absolute; 
             inset: 0;
-            background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(255, 234, 149, 0.11), transparent 70%);
-            z-index: 1; 
+            background: radial-gradient(500px circle at var(--mouse-x) var(--mouse-y), rgba(0, 240, 255, 0.12), transparent 70%);
             pointer-events: none;
+            z-index: 1;
         }
 
-        /* 頂級 3D 翻頁過場動畫 */
-        .ruina-book.page-switching-next {
+        /* 換頁動態過場 */
+        .nullscape-card.switching-next {
             opacity: 0;
-            filter: blur(12px);
-            transform: rotateX(var(--tilt-y)) rotateY(calc(var(--tilt-x) - 25deg)) translateX(-40px) scale(0.96);
+            filter: blur(10px);
+            transform: rotateX(var(--tilt-y)) rotateY(calc(var(--tilt-x) - 20deg)) translateX(-30px) scale(0.96);
         }
-        .ruina-book.page-switching-prev {
+        .nullscape-card.switching-prev {
             opacity: 0;
-            filter: blur(12px);
-            transform: rotateX(var(--tilt-y)) rotateY(calc(var(--tilt-x) + 25deg)) translateX(40px) scale(0.96);
+            filter: blur(10px);
+            transform: rotateX(var(--tilt-y)) rotateY(calc(var(--tilt-x) + 20deg)) translateX(30px) scale(0.96);
         }
 
-        @media (max-width: 480px) {
-            .ruina-book { width: 80%; padding: 45px 24px; }
-            h1 { letter-spacing: 8px !important; font-size: 2.1rem !important; }
-            .sub-title { letter-spacing: 3px !important; margin-bottom: 35px !important; }
-            .data-row { margin-bottom: 22px !important; }
-            .library-header-bar, .library-footer-bar { font-size: 0.5rem; left: 15px; right: 15px; }
-        }
-
-        /* --- 排版與刻印質感 --- */
-        .card-header-tag {
+        /* --- 內部排版 --- */
+        .card-tag {
             font-size: 0.65rem;
-            color: var(--theme-color);
-            opacity: 0.55;
-            letter-spacing: 6px;
-            text-align: center;
-            margin-bottom: 10px;
+            color: var(--magenta-glow);
+            letter-spacing: 5px;
+            margin-bottom: 8px;
             position: relative;
             z-index: 2;
         }
 
         h1 {
-            font-size: clamp(2.4rem, 7.5vw, 3.6rem);
-            letter-spacing: 16px;
-            margin: 0; 
-            color: #fff; 
-            text-align: center; 
-            opacity: 0;
-            font-weight: 400;
+            font-size: 2.8rem;
+            letter-spacing: 12px;
+            margin: 0 0 10px 0;
+            color: #fff;
+            text-shadow: 0 0 15px rgba(0, 240, 255, 0.6);
             position: relative;
             z-index: 2;
-            transition: opacity 0.3s ease;
         }
-        h1.engraved { animation: gentle-breath 4s infinite ease-in-out; opacity: 1; }
 
-        .sub-title { 
-            text-align: center; 
-            font-size: clamp(0.55rem, 1.8vw, 0.7rem); 
-            letter-spacing: 6px; 
-            color: var(--theme-color); 
-            margin: 10px 0 42px 0; 
-            opacity: 0; 
-            position: relative; 
+        .sub-title {
+            font-size: 0.68rem;
+            letter-spacing: 5px;
+            color: var(--primary-cyan);
+            opacity: 0.7;
+            margin-bottom: 35px;
+            position: relative;
             z-index: 2;
-            transition: opacity 0.3s ease;
         }
-        .sub-title.engraved { animation: gentle-breath 4s infinite ease-in-out; animation-delay: 0.3s; opacity: 1; }
 
-        .data-row { margin-bottom: 28px; position: relative; padding-left: 20px; z-index: 2; }
-        .data-row::before { 
-            content: ""; position: absolute; left: 0; top: 0; width: 2px; height: 100%; 
-            background: linear-gradient(to bottom, var(--theme-color), rgba(212,175,55,0.2)); 
-            transform: scaleY(0); 
-            transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-            box-shadow: 0 0 12px var(--theme-color);
+        .data-row {
+            margin-bottom: 24px;
+            position: relative;
+            padding-left: 18px;
+            z-index: 2;
         }
-        .data-row.engraved::before { transform: scaleY(1); }
 
-        .label { 
-            font-size: 0.68rem; color: var(--theme-color); margin-bottom: 5px; display: block; opacity: 0.65; letter-spacing: 3px; 
+        .data-row::before {
+            content: "";
+            position: absolute; left: 0; top: 0; width: 2px; height: 100%;
+            background: linear-gradient(to bottom, var(--primary-cyan), var(--void-purple));
+            box-shadow: 0 0 8px var(--primary-cyan);
         }
-        .value { font-size: 1.08rem; color: #fff; opacity: 0; display: block; letter-spacing: 1.5px; transition: opacity 0.3s ease; }
-        .value.engraved { animation: gentle-breath 4s infinite ease-in-out; opacity: 1; }
 
-        @keyframes gentle-breath {
-            0%, 100% { opacity: 0.65; text-shadow: 0 0 10px rgba(255, 234, 149, 0.3); }
-            50% { opacity: 1; text-shadow: 0 0 22px var(--theme-color), 0 0 8px #fff; }
+        .label {
+            font-size: 0.65rem;
+            color: var(--primary-cyan);
+            opacity: 0.6;
+            letter-spacing: 2px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .value {
+            font-size: 1.05rem;
+            color: #fff;
+            letter-spacing: 1px;
+            display: block;
+            text-shadow: 0 0 8px rgba(139, 0, 255, 0.5);
         }
 
         .page-indicator {
             position: absolute;
-            bottom: 18px;
-            right: 25px;
-            font-size: 0.68rem;
+            bottom: 20px; right: 25px;
+            font-size: 0.65rem;
             letter-spacing: 3px;
-            color: var(--theme-color);
-            opacity: 0.45;
-            z-index: 4;
+            color: var(--primary-cyan);
+            opacity: 0.5;
+            z-index: 2;
         }
 
-        /* 典雅角邊鑽石印記 */
-        .corner-diamond {
-            position: absolute; width: 8px; height: 8px;
-            background: var(--theme-color); transform: rotate(45deg);
-            box-shadow: 0 0 10px var(--theme-color), 0 0 2px #fff;
-            transition: all 0.4s ease;
-            z-index: 5;
+        @media (max-width: 768px) {
+            .nullscape-card { width: 90vw; padding: 35px 25px; }
+            .page-nav { width: 38px; height: 38px; }
+            .nav-left { left: 15px; }
+            .nav-right { right: 15px; }
+            h1 { font-size: 2rem; letter-spacing: 6px; }
         }
-        .cd-tl { top: -4px; left: -4px; } .cd-tr { top: -4px; right: -4px; }
-        .cd-bl { bottom: -4px; left: -4px; } .cd-br { bottom: -4px; right: -4px; }
-
-        .ruina-book:hover .corner-diamond {
-            box-shadow: 0 0 18px var(--theme-color), 0 0 6px #fff;
-            transform: rotate(225deg) scale(1.1);
-        }
-
-        /* 點擊光輝漣漪 */
-        .ripple {
-            position: absolute; border-radius: 50%; pointer-events: none;
-            transform: translate(-50%, -50%) scale(0);
-            border: 1px solid #ffea95;
-            box-shadow: 0 0 30px #d4af37, inset 0 0 10px #ffea95;
-            animation: ripple-anim 0.65s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
-            z-index: 99;
-        }
-        @keyframes ripple-anim { to { transform: translate(-50%, -50%) scale(2.8); opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div class="library-header-bar">
-        <span>PATRON LIBRARIAN ARCHIVE</span>
-        <span>SECTOR-01 // SLES</span>
+    <div class="archive-header">
+        <span>NULLSPACE // VOID ARCHIVE</span>
+        <span>SECTOR // SLES</span>
     </div>
 
-    <div class="library-footer-bar">
-        <span>MAY YOU FIND YOUR BOOK IN THIS PLACE</span>
-        <div class="audio-hud" id="audio-toggle" title="切換音樂播放">
-            <span id="audio-status-text">BGM: ACTIVE</span>
-            <div class="audio-waves">
-                <span></span><span></span><span></span>
-            </div>
-        </div>
+    <div class="archive-footer">
+        <span>ENDLESS PATTERN</span>
+        <span>SYSTEM ONLINE</span>
     </div>
 
-    <div class="bg-layer" id="bg-layer"></div>
-    <div id="ripple-container"></div>
-    
-    <canvas id="canvas-back"></canvas>
-    <canvas id="canvas-front"></canvas>
+    <div class="bg-void"></div>
+    <canvas id="canvas-particles"></canvas>
 
-    <!-- 典雅翻頁按鈕 -->
-    <button class="page-nav nav-left" id="btn-prev" aria-label="Previous Page"></button>
-    <button class="page-nav nav-right" id="btn-next" aria-label="Next Page"></button>
+    <!-- 左右青藍色菱形切頁按鈕 -->
+    <button class="page-nav nav-left" id="btn-prev" aria-label="Previous"></button>
+    <button class="page-nav nav-right" id="btn-next" aria-label="Next"></button>
 
     <div class="main-container">
-        <div class="ruina-book" id="ui-card">
-            <div class="corner-diamond cd-tl"></div><div class="corner-diamond cd-tr"></div>
-            <div class="corner-diamond cd-bl"></div><div class="corner-diamond cd-br"></div>
-
-            <div class="card-header-tag">RECORD OF LIBRARIAN</div>
-            <h1 id="title-name">𝑆𝑙𝑒𝑠</h1>
-            <div class="sub-title" id="sub-title">BOOK, LIBRARIAN, STAR AND CITY</div>
+        <div class="nullscape-card" id="ui-card">
+            <div class="card-tag">SYSTEM RECORD</div>
+            <h1 id="card-title">Sles</h1>
+            <div class="sub-title" id="card-subtitle">VOID // DEVELOPMENT // CREATION</div>
             
             <div id="data-container">
                 <div class="data-row">
-                    <span class="label">Identity // Ego</span>
-                    <span class="value">Human // Developer</span>
+                    <span class="label">Identity // Designation</span>
+                    <span class="value">Developer // Creator</span>
                 </div>
                 <div class="data-row">
-                    <span class="label">Likes // Love</span>
-                    <span class="value">Develop // Novel</span>
+                    <span class="label">Primary Focus</span>
+                    <span class="value">Roblox Luau & Web Systems</span>
                 </div>
                 <div class="data-row">
-                    <span class="label">Age // Birthday</span>
-                    <span class="value">15 // 9/21</span>
+                    <span class="label">Status</span>
+                    <span class="value">Active in the Nullspace</span>
                 </div>
             </div>
 
-            <div class="page-indicator" id="page-indicator">PAGE 01 / 03</div>
+            <div class="page-indicator" id="page-indicator">01 / 03</div>
         </div>
     </div>
 
     <script>
-        /* --- 背景 BGM 音樂播放器與互動開關 --- */
-        const bgm = new Audio('https://project-moon-archive.vercel.app/bgm.mp3');
-        bgm.loop = true;
-        bgm.volume = 0.35;
-
-        const audioToggle = document.getElementById('audio-toggle');
-        const audioStatusText = document.getElementById('audio-status-text');
-        let isMusicPlaying = false;
-
-        const startAudio = () => {
-            bgm.play().then(() => {
-                isMusicPlaying = true;
-                audioStatusText.textContent = "BGM: ACTIVE";
-            }).catch(() => {});
-            document.removeEventListener('click', startAudio);
-            document.removeEventListener('keydown', startAudio);
-        };
-        document.addEventListener('click', startAudio);
-        document.addEventListener('keydown', startAudio);
-
-        audioToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (isMusicPlaying) {
-                bgm.pause();
-                isMusicPlaying = false;
-                audioStatusText.textContent = "BGM: MUTED";
-            } else {
-                bgm.play();
-                isMusicPlaying = true;
-                audioStatusText.textContent = "BGM: ACTIVE";
-            }
-        });
-
-        const uiCard = document.getElementById('ui-card');
-        const rippleContainer = document.getElementById('ripple-container');
-        const titleElem = document.getElementById('title-name');
-        const subTitleElem = document.getElementById('sub-title');
+        const card = document.getElementById('ui-card');
+        const titleElem = document.getElementById('card-title');
+        const subTitleElem = document.getElementById('card-subtitle');
         const dataContainer = document.getElementById('data-container');
         const pageIndicator = document.getElementById('page-indicator');
 
-        /* --- 帶有圖書館大廳空間迴音 (Spatial Echo/Reverb) 的 Web Audio 音效 --- */
-        const playSfx = (type = 'click') => {
-            try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                
-                if (type === 'click') {
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(460, ctx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(230, ctx.currentTime + 0.12);
-                    gain.gain.setValueAtTime(0.04, ctx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
-                    osc.start();
-                    osc.stop(ctx.currentTime + 0.12);
-
-                    const echoOsc = ctx.createOscillator();
-                    const echoGain = ctx.createGain();
-                    echoOsc.type = 'sine';
-                    echoOsc.frequency.setValueAtTime(230, ctx.currentTime + 0.05);
-                    echoOsc.frequency.exponentialRampToValueAtTime(115, ctx.currentTime + 0.35);
-                    echoGain.gain.setValueAtTime(0.015, ctx.currentTime + 0.05);
-                    echoGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35);
-                    echoOsc.connect(echoGain);
-                    echoGain.connect(ctx.destination);
-                    echoOsc.start(ctx.currentTime + 0.05);
-                    echoOsc.stop(ctx.currentTime + 0.35);
-
-                } else if (type === 'page') {
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(190, ctx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(380, ctx.currentTime + 0.22);
-                    gain.gain.setValueAtTime(0.035, ctx.currentTime);
-                    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.22);
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
-                    osc.start();
-                    osc.stop(ctx.currentTime + 0.22);
-                }
-            } catch(e) {}
-        };
-
         const pages = [
             {
-                tag: "RECORD OF LIBRARIAN",
-                title: "𝑆𝑙𝑒𝑠",
-                subtitle: "BOOK, LIBRARIAN, STAR AND CITY",
+                tag: "SYSTEM RECORD",
+                title: "Sles",
+                subtitle: "VOID // DEVELOPMENT // CREATION",
                 rows: [
-                    { label: "Identity // Ego", value: "Human // Developer" },
-                    { label: "Likes // Love", value: "Develop // Novel" },
-                    { label: "Age // Birthday", value: "15 // 9/21" }
+                    { label: "Identity // Designation", value: "Developer // Creator" },
+                    { label: "Primary Focus", value: "Roblox Luau & Web Systems" },
+                    { label: "Status", value: "Active in the Nullspace" }
                 ]
             },
             {
                 tag: "ARCHIVE DATABASE",
-                title: "𝐹𝑎𝑣𝑜𝑟𝑖𝑡𝑒𝑠",
-                subtitle: "PREFERENCES // ARCHIVE",
+                title: "Projects",
+                subtitle: "SCRIPTING // NARRATIVE",
                 rows: [
-                    { label: "Games // Universe", value: "Project Moon (Library of Ruina / Limbus / lobotomy corp)" },
-                    { label: "MusicArtist // Music", value: "Mili // Gone Angels" }
+                    { label: "Environment", value: "Roblox Engine & Vercel Web" },
+                    { label: "Architecture", value: "Client-Server Replication & UI Design" }
                 ]
             },
             {
-                tag: "CREATIVE WORKS",
-                title: "𝑊𝑜𝑟𝑘𝑠",
-                subtitle: "CREATIVE & SCRIPTING ARCHIVE",
+                tag: "CORE PARAMETERS",
+                title: "Aesthetic",
+                subtitle: "DARK // SURREAL // NEON",
                 rows: [
-                    { label: "Game Dev // Engine", value: "Roblox Luau & Web Front-end" },
-                    { label: "Status // Activity", value: "Active Development" }
+                    { label: "Palette", value: "Cyan, Magenta, Void Purple" },
+                    { label: "Interface", value: "Geometric Glassmorphism" }
                 ]
             }
         ];
 
         let currentPage = 0;
         let isTransitioning = false;
-        let mousePos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 
-        const handleMove = (e) => {
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            
-            mousePos.x = clientX;
-            mousePos.y = clientY;
-
-            const rect = uiCard.getBoundingClientRect();
-            uiCard.style.setProperty('--mouse-x', `${clientX - rect.left}px`);
-            uiCard.style.setProperty('--mouse-y', `${clientY - rect.top}px`);
+        // 滑鼠傾斜與光暈追蹤
+        document.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+            card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
 
             const centerX = window.innerWidth / 2;
             const centerY = window.innerHeight / 2;
-            const tiltX = ((clientX - centerX) / centerX) * 6;
-            const tiltY = ((clientY - centerY) / centerY) * -6;
+            const tiltX = ((e.clientX - centerX) / centerX) * 5;
+            const tiltY = ((e.clientY - centerY) / centerY) * -5;
 
-            uiCard.style.setProperty('--tilt-x', `${tiltX}deg`);
-            uiCard.style.setProperty('--tilt-y', `${tiltY}deg`);
-        };
+            card.style.setProperty('--tilt-x', `${tiltX}deg`);
+            card.style.setProperty('--tilt-y', `${tiltY}deg`);
+        });
 
-        document.addEventListener('mousemove', handleMove);
-        document.addEventListener('touchmove', handleMove);
-
-        const createRipple = (e) => {
-            const ripple = document.createElement('div');
-            ripple.className = 'ripple';
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            ripple.style.width = ripple.style.height = `60px`;
-            ripple.style.left = `${clientX}px`;
-            ripple.style.top = `${clientY}px`;
-            rippleContainer.appendChild(ripple);
-            playSfx('click');
-            setTimeout(() => ripple.remove(), 650);
-        };
-
-        document.addEventListener('mousedown', createRipple);
-
-        // 手機 Touch 滑動支援
-        let touchStartX = 0;
-        let touchEndX = 0;
-
-        uiCard.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-        }, { passive: true });
-
-        uiCard.addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches[0].screenX;
-            const swipeDistance = touchEndX - touchStartX;
-            if (Math.abs(swipeDistance) > 50) {
-                if (swipeDistance < 0) switchPage('next');
-                else switchPage('prev');
-            }
-        }, { passive: true });
-
-        function startEngraving() {
-            titleElem.classList.remove('engraved');
-            subTitleElem.classList.remove('engraved');
-            const rows = dataContainer.querySelectorAll('.data-row');
-            rows.forEach(row => {
-                row.classList.remove('engraved');
-                const val = row.querySelector('.value');
-                if (val) val.classList.remove('engraved');
-            });
-
-            setTimeout(() => { titleElem.classList.add('engraved'); }, 150);
-            setTimeout(() => { subTitleElem.classList.add('engraved'); }, 400);
-            
-            rows.forEach((row, i) => {
-                setTimeout(() => {
-                    row.classList.add('engraved');
-                    const val = row.querySelector('.value');
-                    if (val) val.classList.add('engraved');
-                }, 700 + (i * 250));
-            });
-        }
-
-        function renderPageContent(pageIndex) {
-            const data = pages[pageIndex];
-            document.querySelector('.card-header-tag').textContent = data.tag;
+        function renderPage(index) {
+            const data = pages[index];
+            document.querySelector('.card-tag').textContent = data.tag;
             titleElem.textContent = data.title;
             subTitleElem.textContent = data.subtitle;
 
@@ -626,16 +365,15 @@
                 </div>
             `).join('');
 
-            pageIndicator.textContent = `PAGE 0${pageIndex + 1} / 0${pages.length}`;
+            pageIndicator.textContent = `0${index + 1} / 0${pages.length}`;
         }
 
         function switchPage(direction) {
             if (isTransitioning) return;
             isTransitioning = true;
-            playSfx('page');
 
-            const targetClass = direction === 'next' ? 'page-switching-next' : 'page-switching-prev';
-            uiCard.classList.add(targetClass);
+            const targetClass = direction === 'next' ? 'switching-next' : 'switching-prev';
+            card.classList.add(targetClass);
 
             setTimeout(() => {
                 if (direction === 'next') {
@@ -644,88 +382,55 @@
                     currentPage = (currentPage - 1 + pages.length) % pages.length;
                 }
 
-                renderPageContent(currentPage);
-                uiCard.classList.remove(targetClass);
-                startEngraving();
+                renderPage(currentPage);
+                card.classList.remove(targetClass);
 
-                setTimeout(() => { isTransitioning = false; }, 400);
-            }, 300);
+                setTimeout(() => { isTransitioning = false; }, 350);
+            }, 250);
         }
 
-        document.getElementById('btn-next').addEventListener('click', (e) => {
-            e.stopPropagation();
-            switchPage('next');
-        });
+        document.getElementById('btn-next').addEventListener('click', () => switchPage('next'));
+        document.getElementById('btn-prev').addEventListener('click', () => switchPage('prev'));
 
-        document.getElementById('btn-prev').addEventListener('click', (e) => {
-            e.stopPropagation();
-            switchPage('prev');
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') switchPage('next');
-            if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') switchPage('prev');
-        });
-
-        // 背景柔和光之粒子
-        const cBack = document.getElementById('canvas-back');
-        const cFront = document.getElementById('canvas-front');
-        const ctxBack = cBack.getContext('2d');
-        const ctxFront = cFront.getContext('2d');
+        // 背景微粒效果
+        const canvas = document.getElementById('canvas-particles');
+        const ctx = canvas.getContext('2d');
         let particles = [];
 
-        function resize() { 
-            cBack.width = cFront.width = window.innerWidth; 
-            cBack.height = cFront.height = window.innerHeight; 
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         }
-        window.addEventListener('resize', resize);
-        resize();
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
-        class Particle {
-            constructor() { this.reset(true); }
-            reset(initial = false) {
-                this.x = Math.random() * cBack.width;
-                this.y = initial ? Math.random() * cBack.height : cBack.height + 30;
-                this.radius = Math.random() * 1.6 + 0.4;
-                this.speedY = Math.random() * 0.7 + 0.25;    
-                this.speedX = (Math.random() - 0.5) * 0.15;
-                this.opacity = Math.random() * 0.5 + 0.15;
-                this.layer = Math.random() > 0.55 ? 'front' : 'back';
+        class VoidParticle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + 20;
+                this.size = Math.random() * 1.5 + 0.5;
+                this.speedY = Math.random() * 0.5 + 0.2;
+                this.opacity = Math.random() * 0.4 + 0.1;
             }
-            update() { 
-                this.y -= this.speedY; 
-                this.x += this.speedX;
-
-                const dx = mousePos.x - this.x;
-                if (Math.abs(dx) < 150) {
-                    this.x += dx * 0.0003;
-                }
-
-                if (this.y < -30) this.reset(false); 
+            update() {
+                this.y -= this.speedY;
+                if (this.y < -10) this.reset();
             }
             draw() {
-                const ctx = this.layer === 'front' ? ctxFront : ctxBack;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255, 234, 149, ${this.opacity})`;
-                ctx.fill();
+                ctx.fillStyle = `rgba(0, 240, 255, ${this.opacity})`;
+                ctx.fillRect(this.x, this.y, this.size, this.size);
             }
         }
-        
-        for (let i = 0; i < 45; i++) particles.push(new Particle());
 
-        function animate() {
-            ctxBack.clearRect(0, 0, cBack.width, cBack.height);
-            ctxFront.clearRect(0, 0, cFront.width, cFront.height);
+        for (let i = 0; i < 40; i++) particles.push(new VoidParticle());
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(animate);
+            requestAnimationFrame(animateParticles);
         }
-
-        window.onload = () => {
-            animate();
-            renderPageContent(0);
-            startEngraving();
-        };
+        animateParticles();
     </script>
 </body>
 </html>
