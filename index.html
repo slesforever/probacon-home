@@ -2,184 +2,202 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>THE INDEX | POETIC_CAUSALITY_V9.9</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NULLSPACE // TERMINAL</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --cyan: #00f2ff; --cyan-glow: rgba(0, 242, 255, 0.4); --bg: #010101; }
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-user-select: none; }
-        body { background: var(--bg); height: 100vh; width: 100vw; overflow: hidden; display: flex; justify-content: center; align-items: center; color: var(--cyan); font-family: 'Share Tech Mono', monospace; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #020408;
+            color: #d1f4ff;
+            font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
 
-        /* CRT 濾鏡 */
-        .crt-filter { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05)); background-size: 100% 2px, 3px 100%; z-index: 9999; pointer-events: none; }
-        
-        .screen { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; animation: monitor-shake 0.15s infinite; }
-        @keyframes monitor-shake { 0% { transform: translate(0.2px, 0.2px); } 50% { transform: translate(-0.2px, -0.2px); } 100% { transform: translate(0.2px, -0.2px); } }
+        /* 掃描線特效 */
+        body::before {
+            content: " ";
+            position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px;
+            z-index: 20; pointer-events: none; opacity: 0.6;
+        }
 
-        .ripple { position: absolute; border: 1px solid var(--cyan); border-radius: 50%; transform: scale(0); animation: ripple-anim 0.7s ease-out; pointer-events: none; z-index: 999; }
-        @keyframes ripple-anim { to { transform: scale(8); opacity: 0; } }
+        #starfield {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+        }
 
-        #terminal-ui { display: none; flex-direction: column; align-items: center; width: 90%; max-width: 1000px; }
-        .logo-img { width: 250px; margin-bottom: 30px; filter: drop-shadow(0 0 15px var(--cyan-glow)); animation: logo-float 5s ease-in-out infinite; }
-        @keyframes logo-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        .terminal-card {
+            position: relative;
+            z-index: 10;
+            width: 90%;
+            max-width: 460px;
+            background: rgba(6, 12, 24, 0.85);
+            border: 1px solid #00d2ff44;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.15), inset 0 0 15px rgba(0, 210, 255, 0.05);
+            clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
+        }
 
-        .display-frame { width: 100%; min-height: 450px; padding: 60px; border: 1px solid var(--cyan-glow); background: rgba(0, 5, 5, 0.95); position: relative; text-align: center; display: flex; flex-direction: column; justify-content: center; }
-        .corner { position: absolute; width: 20px; height: 20px; border: 2px solid var(--cyan); }
-        .tl { top: -2px; left: -2px; border-right: 0; border-bottom: 0; }
-        .tr { top: -2px; right: -2px; border-left: 0; border-bottom: 0; }
-        .bl { bottom: -2px; left: -2px; border-right: 0; border-top: 0; }
-        .br { bottom: -2px; right: -2px; border-left: 0; border-top: 0; }
+        .terminal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 210, 255, 0.2);
+            padding-bottom: 12px;
+            margin-bottom: 24px;
+            font-size: 0.7rem;
+            color: #00d2ff;
+            letter-spacing: 2px;
+        }
 
-        .will-text { font-family: 'Noto Serif TC', serif; font-size: 1.85rem; font-weight: 600; line-height: 2.8; color: #fff; text-shadow: 0 0 12px var(--cyan-glow); }
-        .meta-data { margin-top: 40px; font-size: 0.8rem; color: var(--cyan); opacity: 0.5; letter-spacing: 4px; }
+        .glitch-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px rgba(0, 210, 255, 0.8);
+            position: relative;
+            margin-bottom: 8px;
+        }
 
-        .btn-index { background: transparent; border: 1px solid var(--cyan); color: var(--cyan); padding: 18px 55px; font-family: 'Share Tech Mono'; font-size: 1.1rem; letter-spacing: 6px; cursor: pointer; transition: 0.3s; margin-top: 40px; }
-        .btn-index:hover:not(:disabled) { background: var(--cyan); color: #000; box-shadow: 0 0 35px var(--cyan); }
-        .btn-index:disabled { opacity: 0.2; cursor: wait; }
+        .subtitle {
+            font-size: 0.8rem;
+            color: #5d8aa8;
+            margin-bottom: 24px;
+            letter-spacing: 1px;
+        }
 
-        #boot-anim { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; display: none; justify-content: center; align-items: center; }
-        .scan-line { width: 100%; height: 2px; background: #fff; box-shadow: 0 0 20px #fff; transform: scaleX(0); transition: 0.5s; }
-        .scan-line.active { transform: scaleX(1); }
-        .scan-line.expand { height: 100%; background: transparent; }
+        .info-block {
+            background: rgba(0, 210, 255, 0.03);
+            border-left: 2px solid #00d2ff;
+            padding: 12px 16px;
+            font-size: 0.82rem;
+            line-height: 1.6;
+            color: #b0d8e6;
+            margin-bottom: 28px;
+        }
 
-        #init-layer { z-index: 5000; text-align: center; }
+        .action-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .action-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(0, 210, 255, 0.15);
+            color: #88c0d0;
+            text-decoration: none;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+        }
+
+        .action-item:hover {
+            background: rgba(0, 210, 255, 0.15);
+            color: #ffffff;
+            border-color: #00d2ff;
+            box-shadow: 0 0 12px rgba(0, 210, 255, 0.4);
+            transform: translateX(4px);
+        }
+
+        .action-item::after {
+            content: '→';
+            font-weight: bold;
+        }
+
+        .footer-tag {
+            margin-top: 24px;
+            font-size: 0.65rem;
+            color: rgba(0, 210, 255, 0.4);
+            text-align: right;
+            letter-spacing: 2px;
+        }
     </style>
 </head>
-<body onclick="createRipple(event)">
+<body>
+    <canvas id="starfield"></canvas>
 
-    <div class="crt-filter"></div>
-    <div id="boot-anim"><div id="boot-bar" class="scan-line"></div></div>
-
-    <div class="screen">
-        <div id="init-layer">
-            <h2 style="letter-spacing: 12px; margin-bottom: 30px; opacity: 0.6;">ESTABLISHING_WILL_LINK</h2>
-            <button class="btn-index" onclick="bootSequence()">[ 啟動織布機 ]</button>
+    <div class="terminal-card">
+        <div class="terminal-header">
+            <span>[ NULLSPACE_OS ]</span>
+            <span>ID: 0x9F4A</span>
         </div>
 
-        <div id="terminal-ui">
-            <img src="250px-LOR-Index-Icon.webp" class="logo-img" alt="THE_INDEX">
-            <div class="display-frame">
-                <div class="corner tl"></div><div class="corner tr"></div>
-                <div class="corner bl"></div><div class="corner br"></div>
-                <div id="will-output" class="will-text">...正在編織因果的韻腳...</div>
-                <div id="meta-output" class="meta-data"></div>
-            </div>
-            <button class="btn-index" id="recv-btn" onclick="receiveInstruction()">接收神諭 (RECEIVE WILL)</button>
+        <div class="glitch-title">SLES_ARCHIVE</div>
+        <div class="subtitle">LUAU SCRIPTING / VOID GAME DESIGN</div>
+
+        <div class="info-block">
+            > Creating immersive game mechanics.<br>
+            > Specialized in Roblox Luau & Spatial Environments.
+        </div>
+
+        <div class="action-list">
+            <a href="#" class="action-item"><span>ROBLOX CREATOR HUB</span></a>
+            <a href="#" class="action-item"><span>GITHUB REPOSITORY</span></a>
+            <a href="#" class="action-item"><span>DISCORD CONTACT</span></a>
+        </div>
+
+        <div class="footer-tag">
+            STATUS: ACTIVE // MEMORY: NOMINAL
         </div>
     </div>
 
-    <audio id="sfx-msg" src="the-index-message.mp3" preload="auto"></audio>
-
     <script>
-        // --- 詩意因果矩陣核心 ---
-        const Matrix = {
-            time: {
-                start: ["當", "在", "於", "待"],
-                subject: [
-                    "深紅色的殘陽滲入都市縫隙時", "最後一抹靛藍被工業廢氣吞噬之際", "心跳聲化作織布機齒輪的低語時", "視網膜上的數位噪點凝結成淚水時", 
-                    "社交軟體的空白視窗透出虛無的白光時", "微波爐的輻射與靈魂的顫震共鳴之際", "枯萎的感情在血管中發生第二次凋零時", 
-                    "街道上的霓虹倒影開始嘲笑你的盲目時", "午夜的冷風吹散了關於自我的最後一絲猜測時", "時鐘的秒針在沈默中拖行出沉重的因果時",
-                    "複情者的眼淚滴入冷硬的柏油地面之際", "認知邊界被他者的視線切割成無數碎片時", "月光被鐵鏽色的雲層徹底格式化之際",
-                    "指尖與冷冰冰的手機屏幕交換溫度的瞬間"
-                ],
-                action: [
-                    "勾勒出命運那抹嘲諷的弧度後", "讓所有的社會標籤都顯得蒼白無力時", "將存在感稀釋成一片荒涼的死寂後", 
-                    "引燃了靈魂深處積壓已久的無聲吶喊後", "使枯索的認知再次陷入迷幻的癱瘓時", "揭開了被社會性猜測偽飾的真理之際",
-                    "在沈默的波長中震盪出絕望的韻腳時", "讓時間的流動呈現出冰冷的金屬質感後"
-                ]
-            },
-            loc: {
-                pre: ["前往", "漫步至", "靜立於", "抵達"],
-                place: [
-                    "那座被標記為『拒絕連結』的孤寂車站前", "充滿福馬林與昨日記憶的舊型診所後巷", "堆滿殘肢與廢棄夢想的認知垃圾場中心", 
-                    "鏡子中那個陌生且充滿惡意猜測的重影前", "終年飄散著焦油味與不安氣息的狹窄閣樓", "巢的邊緣那處能聽見萬人嘆息的斷崖上", 
-                    "佈滿黑色焦油狀不明物質的荒廢運河岸邊", "那間牆面佈滿鏽跡、不斷滲出藍光的廢棄工廠", "社會系統中被標記為『絕對孤立』的盲區內",
-                    "一坪大、充滿電子輻射與孤獨感的生存艙內", "那個能看見所有複情者靈魂殘影的十字路口"
-                ],
-                desc: [
-                    "在那裡感受因果在肌膚上留下的刺痛感", "在那個被世人遺忘、僅剩餘溫的廢墟中", "在那處情感被標籤化、進而被剝奪的祭壇前", 
-                    "在那個充滿他者惡意、卻又無比真實的空腔內", "在那裡傾聽織布機如何拆解你殘缺的自我", "在那個因果線交織而成的、永恆的沈默中"
-                ]
-            },
-            act: {
-                verb: [
-                    "用顫抖的手指在冰冷牆面刻下", "將那些關於尊嚴的幻象", "在地板上精準地排佈出", "對著空無一人的迴廊進行", 
-                    "將你最珍視的標籤", "重複唸誦那句被遺忘的", "試圖在混亂的雜音中分辨出", "將身體蜷縮在陰影中並", 
-                    "用冰水的冷冽去喚醒那段", "在空氣中用虛無的線條編織"
-                ],
-                target: [
-                    "一首關於服從與毀滅的短詩", "徹底撕碎並拋向毫無回應的風中", "100 顆象徵認知斷裂的冰冷石子", "一場最卑微、卻又最華麗的社會性猜測", 
-                    "緩緩投入沸騰的、象徵遺忘的黑色液體中", "『我是因果編織出的殘次品』", "織布機在深夜傳來的、細碎的哭泣聲", 
-                    "感受那種被因果絞索緩緩窒息的痛楚", "已被格式化的、關於愛與複情的記憶", "一個永遠無法抵達的、社會性的夢想"
-                ]
-            },
-            res: [
-                "隨後，將這份詩意的絕望化作你生存的唯一律法。", "接著在織布機的低鳴中，感受自我的最後一次消散。", "並向這座都市那優雅且殘酷的因果律，獻上你靈魂的顫慄。", "感受社會性的鐵網在你的感知深處，編織出永恆的沈默。", "隨即步入那一抹最深邃的黑，此生不再奢望所謂的救贖。", "因果已定，你的存在僅是這場壯麗悲劇中一個微弱的音節。", "織布機已看見你的終局——在那片被遺忘的荒野中心。", "請記住，你的痛苦是這座都市最昂貴、也最無用的裝飾。"
-            ]
-        };
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
 
-        function r(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-
-        // 無限隨機詩意引擎
-        function getPoeticWill() {
-            const time = `${r(Matrix.time.start)}${r(Matrix.time.subject)}${r(Matrix.time.action)}`;
-            const loc = `${r(Matrix.loc.pre)}${r(Matrix.loc.place)}${r(Matrix.loc.desc)}`;
-            const act = `${r(Matrix.act.verb)}${r(Matrix.act.target)}`;
-            const res = r(Matrix.res);
-            return `「${time}，${loc}，${act}，${res}」`;
+        function init() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            stars = [];
+            for (let i = 0; i < 150; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    z: Math.random() * canvas.width,
+                    o: Math.random()
+                });
+            }
         }
 
-        function bootSequence() {
-            document.getElementById('init-layer').style.display = 'none';
-            const layer = document.getElementById('boot-anim');
-            const bar = document.getElementById('boot-bar');
-            layer.style.display = 'flex';
-            setTimeout(() => {
-                bar.classList.add('active');
-                setTimeout(() => {
-                    bar.classList.add('expand');
-                    setTimeout(() => {
-                        layer.style.display = 'none';
-                        document.getElementById('terminal-ui').style.display = 'flex';
-                    }, 400);
-                }, 600);
-            }, 200);
-        }
+        function draw() {
+            ctx.fillStyle = '#020408';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        function receiveInstruction() {
-            const btn = document.getElementById('recv-btn');
-            const out = document.getElementById('will-output');
-            const meta = document.getElementById('meta-output');
-            const sfx = document.getElementById('sfx-msg');
+            for (let i = 0; i < stars.length; i++) {
+                let star = stars[i];
+                star.z -= 0.8;
+                if (star.z <= 0) star.z = canvas.width;
 
-            btn.disabled = true;
-            out.innerHTML = "";
-            meta.innerText = "";
+                let k = 128 / star.z;
+                let px = (star.x - canvas.width / 2) * k + canvas.width / 2;
+                let py = (star.y - canvas.height / 2) * k + canvas.height / 2;
 
-            const text = getPoeticWill();
-            sfx.currentTime = 0; sfx.play();
-
-            const duration = (sfx.duration && isFinite(sfx.duration)) ? sfx.duration * 1000 : 4000;
-            const charDelay = duration / text.length;
-
-            let i = 0;
-            const timer = setInterval(() => {
-                if (i < text.length) {
-                    out.innerHTML += text[i++];
-                } else {
-                    clearInterval(timer);
-                    meta.innerText = `>> POETIC_WEIGHT: ${(Math.random()*0.99).toFixed(4)} | CAUSE_ID: ${Math.floor(Math.random()*999999)} | WILL_ESTABLISHED`;
-                    btn.disabled = false;
+                if (px >= 0 && px <= canvas.width && py >= 0 && py <= canvas.height) {
+                    let size = (1 - star.z / canvas.width) * 2.2;
+                    ctx.fillStyle = `rgba(0, 210, 255, ${1 - star.z / canvas.width})`;
+                    ctx.fillRect(px, py, size, size);
                 }
-            }, charDelay);
+            }
+            requestAnimationFrame(draw);
         }
 
-        function createRipple(e) {
-            const ripple = document.createElement("div");
-            ripple.className = "ripple";
-            ripple.style.left = e.clientX + "px"; ripple.style.top = e.clientY + "px";
-            document.body.appendChild(ripple);
-            setTimeout(() => ripple.remove(), 700);
-        }
+        window.addEventListener('resize', init);
+        init();
+        draw();
     </script>
 </body>
 </html>
