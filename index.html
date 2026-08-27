@@ -3,231 +3,222 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VOID // REQUIEM</title>
-    <!-- 使用古典、優雅的襯線字體 -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Noto+Serif+TC:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>NULLSCAPE // ENTITY</title>
+    <!-- 使用經典的襯線字體來重現圖片中的標題感 -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,900&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body, html {
             height: 100%;
-            background-color: #030105; /* 極致的暗紫黑 */
-            color: #d8c8e3;
-            font-family: 'Cinzel', 'Noto Serif TC', serif; /* 古典字體 */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            position: relative;
+            background-color: #05000a;
+            font-family: 'Playfair Display', 'Noto Serif TC', serif;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; perspective: 800px;
         }
 
-        /* 柔和、不規則的深紫霧氣 */
-        .abyssal-mist {
+        /* 深淵漸層遮罩：讓棋盤格隱沒在紫黑色虛空中 */
+        .void-vignette {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 30%, transparent 0%, rgba(15, 0, 30, 0.8) 50%, #05000a 90%);
+            z-index: 2; pointer-events: none;
+        }
+
+        /* 3D 扭曲西洋棋盤格 (對應 image_e4c0d7.jpg) */
+        .checkerboard-floor {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 40%, rgba(50, 15, 75, 0.15) 0%, rgba(15, 4, 25, 0.8) 60%, #030105 100%);
+            bottom: -60%; left: -50%;
+            width: 200%; height: 200%;
+            background-image: 
+                repeating-linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000),
+                repeating-linear-gradient(45deg, #000 25%, #2a0066 25%, #2a0066 75%, #000 75%, #000);
+            background-position: 0 0, 30px 30px;
+            background-size: 60px 60px;
+            transform: rotateX(75deg) translateY(0);
+            transform-origin: top;
+            animation: move-grid 4s linear infinite;
             z-index: 1;
+            opacity: 0.6;
+        }
+
+        @keyframes move-grid {
+            0% { transform: rotateX(75deg) translateY(0); }
+            100% { transform: rotateX(75deg) translateY(60px); }
+        }
+
+        /* 幾何發光結界框 (對應 image_e4c196.png) */
+        .entity-card {
+            position: relative; z-index: 10;
+            width: 90%; max-width: 480px; padding: 50px 40px;
+            background: rgba(10, 0, 20, 0.85);
+            /* 切割成類似結界的幾何多邊形 */
+            clip-path: polygon(15px 0, calc(100% - 15px) 0, 100% 15px, 100% calc(100% - 15px), calc(100% - 15px) 100%, 15px 100%, 0 calc(100% - 15px), 0 15px);
+            /* 紫色螢光邊框效應 */
+            border: 4px solid #000;
+            box-shadow: 0 0 30px #b000ff, inset 0 0 20px #b000ff;
+            text-align: center;
+            animation: float-card 6s ease-in-out infinite;
+        }
+
+        /* 用偽元素做真正的發光邊框 */
+        .entity-card::before {
+            content: ''; position: absolute;
+            top: 2px; left: 2px; right: 2px; bottom: 2px;
+            border: 3px solid #b000ff;
+            clip-path: inherit;
             pointer-events: none;
         }
 
-        /* 灰燼畫布 */
-        #ash-canvas {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 2;
-            opacity: 0.7;
+        @keyframes float-card {
+            0%, 100% { transform: translateY(0) rotate(0deg); box-shadow: 0 0 30px #b000ff, inset 0 0 20px #b000ff; }
+            50% { transform: translateY(-10px) rotate(1deg); box-shadow: 0 0 50px #d400ff, inset 0 0 30px #d400ff; }
         }
 
-        /* 古老石碑感的內容區塊 (無明顯邊框) */
-        .relic-card {
-            position: relative;
-            z-index: 10;
-            width: 85%;
-            max-width: 420px;
-            padding: 60px 40px;
-            background: rgba(10, 3, 15, 0.4);
-            border-top: 1px solid rgba(100, 60, 140, 0.15);
-            border-bottom: 1px solid rgba(100, 60, 140, 0.15);
-            text-align: center;
-            backdrop-filter: blur(8px);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
-            animation: fade-in 2s ease-in-out;
-        }
-
-        @keyframes fade-in {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* 頂部與底部的古典菱形裝飾 */
-        .relic-card::before, .relic-card::after {
-            content: '◆';
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            color: rgba(100, 60, 140, 0.3);
-            font-size: 10px;
-        }
-        .relic-card::before { top: 20px; }
-        .relic-card::after { bottom: 20px; }
-
-        /* 名字 / 銘文標題 */
-        .name-engraved {
-            font-size: 1.8rem;
-            font-weight: 600;
-            color: #e5d9f2;
-            letter-spacing: 8px;
-            margin-bottom: 8px;
-            text-shadow: 0 0 15px rgba(100, 60, 140, 0.5);
+        /* 色散分離標題 (對應 image_e4c0d7.jpg 的 NULLSCAPE 字體) */
+        .chromatic-title {
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: #000; /* 字體本體偏暗 */
+            letter-spacing: 6px;
+            margin-bottom: 5px;
             text-transform: uppercase;
+            /* 左青色，右紫紅色 */
+            text-shadow: 3px 2px 0px #00ffff, -3px -1px 0px #ff00ff, 0 0 20px #ff00ff;
+            animation: glitch-skew 3s infinite linear alternate-reverse;
         }
 
-        /* 稱號 / 墓誌銘 */
-        .title-epitaph {
-            font-size: 0.85rem;
-            color: #9c84b5;
-            letter-spacing: 4px;
-            margin-bottom: 35px;
-            font-weight: 300;
+        @keyframes glitch-skew {
+            0% { transform: skew(0deg); }
+            95% { transform: skew(0deg); }
+            96% { transform: skew(3deg); }
+            98% { transform: skew(-3deg); }
+            100% { transform: skew(0deg); }
         }
 
-        /* 故事 / 簡介文本 */
-        .lore-text {
+        .subtitle {
             font-size: 0.9rem;
-            line-height: 2;
-            color: #a895be;
-            margin-bottom: 45px;
+            color: #b000ff;
+            letter-spacing: 8px;
+            margin-bottom: 30px;
+            font-family: monospace;
+            text-shadow: 0 0 8px #b000ff;
+        }
+
+        /* 介紹文本 */
+        .lore-box {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: #e0b3ff;
+            margin-bottom: 40px;
+            padding: 20px 0;
+            border-top: 1px solid rgba(176, 0, 255, 0.4);
+            border-bottom: 1px solid rgba(176, 0, 255, 0.4);
             text-align: justify;
             text-align-last: center;
-            font-weight: 300;
-            letter-spacing: 1px;
         }
 
-        /* 連結列 */
-        .path-links {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            align-items: center;
+        /* 連結區塊 */
+        .links-container {
+            display: flex; flex-direction: column; gap: 15px;
         }
 
-        .path-link {
+        .void-btn {
+            display: inline-block;
             text-decoration: none;
-            color: #8c73a6;
-            font-size: 0.8rem;
-            letter-spacing: 3px;
-            padding: 8px 20px;
-            transition: all 0.5s ease;
+            color: #fff;
+            background: #0a0014;
+            border: 2px solid #5a0080;
+            padding: 12px;
+            font-size: 1rem;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            letter-spacing: 4px;
             position: relative;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            z-index: 1;
         }
 
-        /* 滑鼠懸停時的微光與底線 */
-        .path-link::after {
-            content: '';
+        .void-btn::before {
+            content: ''; position: absolute;
+            top: 0; left: -100%; width: 100%; height: 100%;
+            background: #b000ff;
+            transition: all 0.3s ease;
+            z-index: -1;
+        }
+
+        .void-btn:hover {
+            color: #000;
+            border-color: #b000ff;
+            box-shadow: 0 0 15px #b000ff;
+            text-shadow: 2px 2px 0px #00ffff;
+        }
+
+        .void-btn:hover::before {
+            left: 0;
+        }
+
+        /* 漂浮的混沌粒子 (代替無聊的星空) */
+        .particle {
             position: absolute;
-            bottom: 0; left: 50%;
-            width: 0; height: 1px;
-            background: #cba8f0;
-            transition: all 0.5s ease;
-            transform: translateX(-50%);
+            background: #b000ff;
+            border-radius: 50%;
+            pointer-events: none;
+            box-shadow: 0 0 10px #ff00ff;
+            z-index: 3;
+            animation: float-up infinite linear;
         }
 
-        .path-link:hover {
-            color: #e5d9f2;
-            text-shadow: 0 0 10px rgba(120, 80, 160, 0.7);
-        }
-
-        .path-link:hover::after {
-            width: 100%;
-            box-shadow: 0 0 8px rgba(120, 80, 160, 0.8);
+        @keyframes float-up {
+            0% { transform: translateY(100vh) scale(0); opacity: 1; }
+            100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
         }
 
     </style>
 </head>
 <body>
-    <div class="abyssal-mist"></div>
-    <canvas id="ash-canvas"></canvas>
+    <div class="void-vignette"></div>
+    <div class="checkerboard-floor"></div>
 
-    <div class="relic-card">
-        <div class="name-engraved">[ 這裡填寫名字 ]</div>
-        <div class="title-epitaph">The Abyssal Wanderer</div>
+    <div class="entity-card">
+        <div class="chromatic-title">[ NAME ]</div>
+        <div class="subtitle">ENTITY // ID_000</div>
         
-        <div class="lore-text">
-            [ 這裡輸入簡介。不需要多餘的裝飾，用最純粹的文字寫下你的故事、信仰，或是曾經歷過的黑暗。 ]
+        <div class="lore-box">
+            [ 這裡輸入簡介。不需要任何科幻設定，用文字填補這片虛空。 ]<br>
+            [ 可以是第二行文字。 ]
         </div>
 
-        <div class="path-links">
-            <a href="#" class="path-link">第一道封印 / 連結</a>
-            <a href="#" class="path-link">第二道封印 / 連結</a>
-            <a href="#" class="path-link">深淵歸途 / 連結</a>
+        <div class="links-container">
+            <a href="#" class="void-btn">LINK_ONE</a>
+            <a href="#" class="void-btn">LINK_TWO</a>
         </div>
     </div>
 
     <script>
-        // 緩慢向上飄散的灰燼/塵埃系統 (非科技感星空)
-        const canvas = document.getElementById('ash-canvas');
-        const ctx = canvas.getContext('2d');
-        let ashes = [];
-
-        function init() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            ashes = [];
-            const particleCount = Math.floor(window.innerWidth / 15); // 控制灰燼數量
-            
-            for (let i = 0; i < particleCount; i++) {
-                ashes.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    size: Math.random() * 2 + 0.5,
-                    speedY: Math.random() * -0.5 - 0.2, // 緩慢向上
-                    speedX: Math.random() * 0.4 - 0.2,   // 微微左右飄動
-                    opacity: Math.random() * 0.5 + 0.1,
-                    fadeRate: (Math.random() * 0.005) + 0.001,
-                    fadingOut: Math.random() > 0.5
-                });
-            }
-        }
-
-        function drawAshes() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            for (let i = 0; i < ashes.length; i++) {
-                let ash = ashes[i];
+        // 生成混沌紫光粒子
+        function createParticles() {
+            for (let i = 0; i < 25; i++) {
+                let particle = document.createElement('div');
+                particle.className = 'particle';
                 
-                // 移動邏輯
-                ash.y += ash.speedY;
-                ash.x += ash.speedX;
+                // 隨機大小、位置、動畫時間
+                let size = Math.random() * 4 + 1;
+                let duration = Math.random() * 5 + 4;
+                let left = Math.random() * 100;
+                let delay = Math.random() * 5;
 
-                // 閃爍/漸隱邏輯
-                if (ash.fadingOut) {
-                    ash.opacity -= ash.fadeRate;
-                    if (ash.opacity <= 0.05) ash.fadingOut = false;
-                } else {
-                    ash.opacity += ash.fadeRate;
-                    if (ash.opacity >= 0.6) ash.fadingOut = true;
-                }
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = left + 'vw';
+                particle.style.animationDuration = duration + 's';
+                particle.style.animationDelay = delay + 's';
 
-                // 邊界重置 (回到畫面底部)
-                if (ash.y < -10) {
-                    ash.y = canvas.height + 10;
-                    ash.x = Math.random() * canvas.width;
-                }
-                if (ash.x > canvas.width + 10) ash.x = -10;
-                if (ash.x < -10) ash.x = canvas.width + 10;
-
-                // 繪製灰燼 (柔和的紫灰色)
-                ctx.beginPath();
-                ctx.arc(ash.x, ash.y, ash.size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(160, 130, 190, ${ash.opacity})`;
-                ctx.fill();
+                document.body.appendChild(particle);
             }
-            requestAnimationFrame(drawAshes);
         }
-
-        window.addEventListener('resize', init);
-        init();
-        drawAshes();
+        createParticles();
     </script>
 </body>
 </html>
