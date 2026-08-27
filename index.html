@@ -2,15 +2,12 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>NULLSCAPE // PROFILE</title>
+    <title>NULLSCAPE // VORTEX</title>
 
     <link
-        href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700;6..96,900&family=Noto+Serif+TC:wght@500;700;900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,900&family=Noto+Serif+TC:wght@600;900&display=swap"
         rel="stylesheet"
     >
 
@@ -23,7 +20,6 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
         }
 
         html,
@@ -33,14 +29,10 @@
         }
 
         body {
+            background: #010102;
+            color: #fff;
+            font-family: "Playfair Display", "Noto Serif TC", serif;
             overflow: hidden;
-            background: #030307;
-            color: #ffffff;
-            font-family:
-                "Bodoni Moda",
-                "Noto Serif TC",
-                Georgia,
-                serif;
             user-select: none;
         }
 
@@ -49,7 +41,7 @@
         }
 
         /* =========================================================
-           BACKGROUND
+           CANVAS
         ========================================================= */
 
         #void-canvas {
@@ -58,164 +50,151 @@
             width: 100%;
             height: 100%;
             display: block;
-            z-index: 0;
+            z-index: 1;
         }
 
-        /*
-            Atmospheric layers.
-            These intentionally remain subtle.
-        */
+        /* =========================================================
+           ATMOSPHERE
+        ========================================================= */
 
-        .void-atmosphere {
+        .event-horizon {
             position: fixed;
             inset: 0;
+            z-index: 2;
             pointer-events: none;
-            z-index: 1;
 
             background:
                 radial-gradient(
-                    ellipse at 50% 50%,
-                    rgba(0, 0, 0, 0) 0%,
-                    rgba(0, 0, 0, 0.12) 28%,
-                    rgba(0, 0, 0, 0.58) 73%,
-                    rgba(0, 0, 0, 0.94) 100%
+                    circle at 50% 50%,
+                    rgba(0, 0, 0, 0.98) 0%,
+                    rgba(0, 0, 0, 0.94) 10%,
+                    rgba(16, 0, 29, 0.58) 30%,
+                    rgba(34, 0, 58, 0.20) 54%,
+                    rgba(70, 0, 120, 0.09) 74%,
+                    rgba(0, 0, 0, 0.72) 100%
                 );
         }
 
-        .void-vignette {
+        /*
+            很淡的全畫面紫色空氣感。
+            不再像整片紫色濾鏡。
+        */
+
+        .void-glow {
             position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 2;
-
-            background:
-                linear-gradient(
-                    90deg,
-                    rgba(0, 0, 0, 0.5),
-                    transparent 24%,
-                    transparent 76%,
-                    rgba(0, 0, 0, 0.5)
-                );
-
-            mix-blend-mode: multiply;
-        }
-
-        .scanline {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
+            inset: -20%;
             z-index: 3;
-
-            opacity: 0.035;
+            pointer-events: none;
 
             background:
-                repeating-linear-gradient(
-                    0deg,
-                    rgba(255, 255, 255, 0.06) 0px,
-                    rgba(255, 255, 255, 0.06) 1px,
-                    transparent 1px,
-                    transparent 4px
+                radial-gradient(
+                    ellipse at 50% 48%,
+                    rgba(115, 0, 190, 0.07) 0%,
+                    rgba(70, 0, 120, 0.025) 34%,
+                    transparent 68%
+                );
+
+            filter: blur(18px);
+
+            animation: ambientPulse 8s ease-in-out infinite;
+        }
+
+        @keyframes ambientPulse {
+            0%,
+            100% {
+                opacity: 0.72;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.035);
+            }
+        }
+
+        /*
+            暗角，讓中央內容自然成為焦點。
+        */
+
+        .vignette {
+            position: fixed;
+            inset: 0;
+            z-index: 4;
+            pointer-events: none;
+
+            background:
+                radial-gradient(
+                    ellipse at center,
+                    transparent 42%,
+                    rgba(0, 0, 0, 0.22) 67%,
+                    rgba(0, 0, 0, 0.78) 100%
                 );
         }
 
         /* =========================================================
-           TOP / BOTTOM HUD
+           TOP / BOTTOM DECORATION
         ========================================================= */
 
-        .top-line {
+        .top-mark {
             position: fixed;
-            top: 22px;
+            top: 24px;
+            left: 30px;
+            z-index: 20;
+
+            color: rgba(210, 191, 230, 0.34);
+
+            font-family: Arial, sans-serif;
+            font-size: 9px;
+            letter-spacing: 0.32em;
+
+            text-transform: uppercase;
+            pointer-events: none;
+        }
+
+        .top-mark-right {
+            position: fixed;
+            top: 24px;
+            right: 30px;
+            z-index: 20;
+
+            color: rgba(210, 191, 230, 0.22);
+
+            font-family: Arial, sans-serif;
+            font-size: 9px;
+            letter-spacing: 0.28em;
+
+            text-transform: uppercase;
+            pointer-events: none;
+        }
+
+        .top-line,
+        .bottom-line {
+            position: fixed;
             left: 28px;
             right: 28px;
             height: 1px;
 
+            z-index: 20;
+            pointer-events: none;
+
             background:
                 linear-gradient(
                     90deg,
-                    transparent,
-                    rgba(190, 153, 255, 0.38),
-                    transparent
+                    transparent 0%,
+                    rgba(122, 0, 190, 0.18) 28%,
+                    rgba(180, 100, 255, 0.12) 50%,
+                    rgba(122, 0, 190, 0.18) 72%,
+                    transparent 100%
                 );
+        }
 
-            z-index: 20;
-            pointer-events: none;
+        .top-line {
+            top: 17px;
         }
 
         .bottom-line {
-            position: fixed;
-            bottom: 22px;
-            left: 28px;
-            right: 28px;
-            height: 1px;
-
-            background:
-                linear-gradient(
-                    90deg,
-                    transparent,
-                    rgba(190, 153, 255, 0.18),
-                    transparent
-                );
-
-            z-index: 20;
-            pointer-events: none;
-        }
-
-        .top-label {
-            position: fixed;
-            top: 36px;
-            left: 34px;
-
-            z-index: 21;
-
-            color: rgba(236, 228, 250, 0.55);
-
-            font-family: Arial, sans-serif;
-            font-size: 10px;
-            letter-spacing: 0.36em;
-            text-transform: uppercase;
-        }
-
-        .system-label {
-            position: fixed;
-            top: 36px;
-            right: 34px;
-
-            z-index: 21;
-
-            color: rgba(160, 132, 196, 0.45);
-
-            font-family: Arial, sans-serif;
-            font-size: 9px;
-            letter-spacing: 0.3em;
-            text-transform: uppercase;
-        }
-
-        .bottom-label-left {
-            position: fixed;
-            bottom: 34px;
-            left: 34px;
-
-            z-index: 21;
-
-            color: rgba(236, 228, 250, 0.4);
-
-            font-family: Arial, sans-serif;
-            font-size: 9px;
-            letter-spacing: 0.24em;
-        }
-
-        .bottom-label-right {
-            position: fixed;
-            bottom: 34px;
-            right: 34px;
-
-            z-index: 21;
-
-            color: rgba(236, 228, 250, 0.4);
-
-            font-family: Arial, sans-serif;
-            font-size: 9px;
-            letter-spacing: 0.24em;
+            bottom: 17px;
+            opacity: 0.45;
         }
 
         /* =========================================================
@@ -223,70 +202,94 @@
         ========================================================= */
 
         .content-layer {
-            position: fixed;
-            inset: 0;
-
+            position: relative;
             z-index: 10;
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 100%;
+            height: 100%;
 
-            padding: 90px 90px 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            padding: 50px;
 
             pointer-events: none;
         }
 
-        /*
-            Profile frame:
-            Much flatter and more transparent than the original.
-        */
+        /* =========================================================
+           PROFILE CARD
+        ========================================================= */
 
         .profile-box {
             position: relative;
 
-            width: min(980px, 88vw);
-            min-height: 500px;
+            width: 720px;
+            max-width: 90vw;
 
-            display: grid;
-            grid-template-columns: 350px 1fr;
-
-            overflow: hidden;
-
-            pointer-events: auto;
+            padding: 54px 58px 46px;
 
             background:
                 linear-gradient(
-                    135deg,
-                    rgba(17, 12, 28, 0.68),
-                    rgba(4, 4, 9, 0.48)
+                    145deg,
+                    rgba(11, 3, 18, 0.90),
+                    rgba(4, 1, 8, 0.82)
                 );
 
             border:
-                1px solid rgba(211, 190, 244, 0.16);
+                1px solid rgba(128, 0, 190, 0.42);
+
+            /*
+                不再大面積發光。
+                光只存在於卡片周圍。
+            */
 
             box-shadow:
-                0 30px 100px rgba(0, 0, 0, 0.75),
-                inset 0 1px 0 rgba(255, 255, 255, 0.045);
+                0 0 50px rgba(72, 0, 110, 0.18),
+                0 18px 70px rgba(0, 0, 0, 0.78),
+                inset 0 0 35px rgba(89, 0, 130, 0.06);
 
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
+            backdrop-filter: blur(9px);
+            -webkit-backdrop-filter: blur(9px);
+
+            /*
+                保留你原本的切角。
+            */
+
+            clip-path:
+                polygon(
+                    18px 0,
+                    calc(100% - 18px) 0,
+                    100% 18px,
+                    100% calc(100% - 18px),
+                    calc(100% - 18px) 100%,
+                    18px 100%,
+                    0 calc(100% - 18px),
+                    0 18px
+                );
+
+            pointer-events: auto;
+
+            transform: translate3d(0, 0, 0) scale(1);
+            opacity: 1;
+            filter: blur(0);
 
             transition:
-                transform 0.52s cubic-bezier(0.22, 0.61, 0.36, 1),
-                opacity 0.4s ease,
-                filter 0.4s ease;
+                transform 0.62s cubic-bezier(0.22, 0.61, 0.36, 1),
+                opacity 0.45s ease,
+                filter 0.45s ease;
         }
 
         /*
-            Thin angular accent.
+            上方細線。
         */
 
         .profile-box::before {
             content: "";
+
             position: absolute;
             top: 0;
-            left: 0;
+            left: 20px;
 
             width: 170px;
             height: 1px;
@@ -294,649 +297,242 @@
             background:
                 linear-gradient(
                     90deg,
-                    rgba(219, 191, 255, 0.85),
+                    rgba(170, 66, 255, 0.75),
                     transparent
                 );
-
-            z-index: 5;
         }
+
+        /*
+            下方非常淡的線。
+        */
 
         .profile-box::after {
             content: "";
 
             position: absolute;
-            right: 0;
+            right: 20px;
             bottom: 0;
 
-            width: 210px;
+            width: 130px;
             height: 1px;
 
             background:
                 linear-gradient(
                     90deg,
                     transparent,
-                    rgba(131, 101, 173, 0.55)
+                    rgba(110, 0, 170, 0.55)
                 );
-
-            z-index: 5;
         }
 
         /* =========================================================
            PAGE TRANSITIONS
         ========================================================= */
 
-        .profile-box.is-exiting-left {
-            opacity: 0;
-            filter: blur(8px);
-
+        .profile-box.sucking-left {
             transform:
-                translateX(-70px)
-                scale(0.985);
-        }
+                translate3d(-70px, 0, 0)
+                scale(0.94)
+                rotate(-2deg);
 
-        .profile-box.is-exiting-right {
             opacity: 0;
-            filter: blur(8px);
+            filter: blur(9px);
+        }
 
+        .profile-box.sucking-right {
             transform:
-                translateX(70px)
-                scale(0.985);
+                translate3d(70px, 0, 0)
+                scale(0.94)
+                rotate(2deg);
+
+            opacity: 0;
+            filter: blur(9px);
         }
 
-        .profile-box.is-entering-left {
-            animation: enterFromLeft 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+        .profile-box.flying-left {
+            animation:
+                pageInFromRight
+                0.62s
+                cubic-bezier(0.22, 0.61, 0.36, 1)
+                forwards;
         }
 
-        .profile-box.is-entering-right {
-            animation: enterFromRight 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+        .profile-box.flying-right {
+            animation:
+                pageInFromLeft
+                0.62s
+                cubic-bezier(0.22, 0.61, 0.36, 1)
+                forwards;
         }
 
-        @keyframes enterFromLeft {
+        @keyframes pageInFromRight {
             from {
-                opacity: 0;
-                filter: blur(8px);
-
                 transform:
-                    translateX(70px)
-                    scale(0.985);
+                    translate3d(70px, 0, 0)
+                    scale(0.94);
+
+                opacity: 0;
+                filter: blur(9px);
             }
 
             to {
+                transform:
+                    translate3d(0, 0, 0)
+                    scale(1);
+
                 opacity: 1;
                 filter: blur(0);
-
-                transform:
-                    translateX(0)
-                    scale(1);
             }
         }
 
-        @keyframes enterFromRight {
+        @keyframes pageInFromLeft {
             from {
-                opacity: 0;
-                filter: blur(8px);
-
                 transform:
-                    translateX(-70px)
-                    scale(0.985);
+                    translate3d(-70px, 0, 0)
+                    scale(0.94);
+
+                opacity: 0;
+                filter: blur(9px);
             }
 
             to {
+                transform:
+                    translate3d(0, 0, 0)
+                    scale(1);
+
                 opacity: 1;
                 filter: blur(0);
-
-                transform:
-                    translateX(0)
-                    scale(1);
             }
         }
 
         /* =========================================================
-           CHARACTER / AVATAR AREA
+           TITLE
         ========================================================= */
 
-        .profile-visual {
-            position: relative;
+        .title {
+            margin-bottom: 10px;
 
-            min-height: 500px;
+            color: #f3edf8;
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            overflow: hidden;
-
-            border-right:
-                1px solid rgba(204, 183, 236, 0.1);
-
-            background:
-                radial-gradient(
-                    circle at 50% 50%,
-                    rgba(117, 76, 169, 0.15),
-                    transparent 55%
-                );
-        }
-
-        .visual-index {
-            position: absolute;
-            top: 24px;
-            left: 24px;
-
-            color: rgba(222, 208, 239, 0.35);
-
-            font-family: Arial, sans-serif;
-            font-size: 9px;
-            letter-spacing: 0.28em;
-        }
-
-        .visual-caption {
-            position: absolute;
-            bottom: 22px;
-            left: 24px;
-
-            color: rgba(222, 208, 239, 0.35);
-
-            font-family: Arial, sans-serif;
-            font-size: 8px;
-            letter-spacing: 0.22em;
-            text-transform: uppercase;
-        }
-
-        /*
-            Geometric avatar construction.
-            You can replace this later with an actual Roblox render.
-        */
-
-        .avatar-container {
-            position: relative;
-
-            width: 250px;
-            height: 340px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .avatar-aura {
-            position: absolute;
-
-            width: 220px;
-            height: 220px;
-
-            border-radius: 50%;
-
-            border:
-                1px solid rgba(214, 191, 255, 0.16);
-
-            box-shadow:
-                0 0 80px rgba(118, 74, 180, 0.12),
-                inset 0 0 80px rgba(118, 74, 180, 0.06);
-
-            animation:
-                auraPulse 5s ease-in-out infinite;
-        }
-
-        @keyframes auraPulse {
-            0%,
-            100% {
-                transform: scale(0.96);
-                opacity: 0.5;
-            }
-
-            50% {
-                transform: scale(1.04);
-                opacity: 0.8;
-            }
-        }
-
-        .avatar-ring {
-            position: absolute;
-
-            width: 275px;
-            height: 275px;
-
-            border-radius: 50%;
-
-            border:
-                1px dashed rgba(192, 169, 232, 0.12);
-
-            transform: rotate(16deg);
-
-            animation:
-                ringSpin 26s linear infinite;
-        }
-
-        @keyframes ringSpin {
-            from {
-                transform: rotate(16deg);
-            }
-
-            to {
-                transform: rotate(376deg);
-            }
-        }
-
-        .avatar {
-            position: relative;
-
-            width: 150px;
-            height: 210px;
-
-            transform: translateY(8px);
-        }
-
-        /*
-            Head
-        */
-
-        .avatar-head {
-            position: absolute;
-
-            top: 4px;
-            left: 35px;
-
-            width: 80px;
-            height: 92px;
-
-            background:
-                linear-gradient(
-                    155deg,
-                    #f3f0f7 0%,
-                    #d8d1df 45%,
-                    #8e8399 100%
-                );
-
-            clip-path:
-                polygon(
-                    18% 0,
-                    82% 0,
-                    100% 22%,
-                    92% 78%,
-                    64% 100%,
-                    36% 100%,
-                    8% 78%,
-                    0 22%
-                );
-
-            box-shadow:
-                0 0 22px rgba(225, 203, 255, 0.18);
-        }
-
-        /*
-            Dark face mask
-        */
-
-        .avatar-mask {
-            position: absolute;
-
-            top: 34px;
-            left: 42px;
-
-            width: 66px;
-            height: 42px;
-
-            background: #09070e;
-
-            clip-path:
-                polygon(
-                    0 25%,
-                    25% 0,
-                    75% 0,
-                    100% 25%,
-                    82% 100%,
-                    18% 100%
-                );
-        }
-
-        .avatar-eye {
-            position: absolute;
-
-            top: 50px;
-
-            width: 5px;
-            height: 5px;
-
-            background: #e9ddff;
-
-            box-shadow:
-                0 0 12px rgba(208, 174, 255, 0.9);
-        }
-
-        .avatar-eye.left {
-            left: 57px;
-        }
-
-        .avatar-eye.right {
-            left: 88px;
-        }
-
-        /*
-            Torso
-        */
-
-        .avatar-body {
-            position: absolute;
-
-            top: 94px;
-            left: 17px;
-
-            width: 116px;
-            height: 100px;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    #28212f,
-                    #0c0a10
-                );
-
-            clip-path:
-                polygon(
-                    17% 0,
-                    83% 0,
-                    100% 22%,
-                    88% 100%,
-                    12% 100%,
-                    0 22%
-                );
-
-            border:
-                1px solid rgba(216, 193, 245, 0.12);
-        }
-
-        /*
-            Chest slit
-        */
-
-        .avatar-core {
-            position: absolute;
-
-            top: 111px;
-            left: 71px;
-
-            width: 8px;
-            height: 66px;
-
-            background:
-                linear-gradient(
-                    180deg,
-                    transparent,
-                    rgba(198, 155, 255, 0.75),
-                    transparent
-                );
-
-            box-shadow:
-                0 0 18px rgba(161, 91, 234, 0.5);
-        }
-
-        /*
-            Arms
-        */
-
-        .avatar-arm {
-            position: absolute;
-
-            top: 108px;
-
-            width: 30px;
-            height: 87px;
-
-            background:
-                linear-gradient(
-                    180deg,
-                    #1d1822,
-                    #08070c
-                );
-        }
-
-        .avatar-arm.left {
-            left: -3px;
-
-            transform:
-                rotate(12deg);
-
-            clip-path:
-                polygon(
-                    24% 0,
-                    100% 4%,
-                    82% 100%,
-                    0 90%
-                );
-        }
-
-        .avatar-arm.right {
-            right: -3px;
-
-            transform:
-                rotate(-12deg);
-
-            clip-path:
-                polygon(
-                    0 4%,
-                    76% 0,
-                    100% 90%,
-                    18% 100%
-                );
-        }
-
-        /*
-            Legs
-        */
-
-        .avatar-leg {
-            position: absolute;
-
-            top: 183px;
-
-            width: 42px;
-            height: 27px;
-
-            background:
-                linear-gradient(
-                    180deg,
-                    #201a27,
-                    #09070d
-                );
-        }
-
-        .avatar-leg.left {
-            left: 29px;
-        }
-
-        .avatar-leg.right {
-            right: 29px;
-        }
-
-        /* =========================================================
-           PROFILE INFORMATION
-        ========================================================= */
-
-        .profile-info {
-            position: relative;
-
-            padding: 58px 58px 50px;
-
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-
-            min-width: 0;
-        }
-
-        .profile-category {
-            margin-bottom: 18px;
-
-            color: rgba(204, 175, 238, 0.55);
-
-            font-family: Arial, sans-serif;
-            font-size: 9px;
-            font-weight: 700;
-
-            letter-spacing: 0.35em;
-            text-transform: uppercase;
-        }
-
-        .profile-name {
-            margin-bottom: 4px;
-
-            color: #f6f3f9;
-
-            font-size: clamp(2.6rem, 5vw, 4.8rem);
-
-            line-height: 0.95;
+            font-size: clamp(2.7rem, 6vw, 3.8rem);
 
             font-weight: 900;
 
-            letter-spacing: 0.025em;
+            letter-spacing: 0.12em;
+            line-height: 1;
+
+            text-transform: uppercase;
 
             text-shadow:
-                0 10px 40px rgba(0, 0, 0, 0.65);
+                0 4px 22px rgba(0, 0, 0, 0.82),
+                0 0 26px rgba(132, 31, 190, 0.12);
         }
 
-        .profile-subtitle {
-            margin-bottom: 34px;
+        .title::first-letter {
+            color: #ffffff;
+        }
 
-            color: rgba(184, 152, 221, 0.67);
+        .subtitle {
+            margin-bottom: 36px;
+
+            color: rgba(171, 105, 210, 0.78);
 
             font-family: Arial, sans-serif;
 
-            font-size: 10px;
+            font-size: 0.72rem;
+            font-weight: 600;
+
+            letter-spacing: 0.42em;
+
+            text-transform: uppercase;
+
+            text-shadow:
+                0 0 10px rgba(137, 53, 190, 0.24);
+        }
+
+        /* =========================================================
+           DESCRIPTION
+        ========================================================= */
+
+        .desc {
+            position: relative;
+
+            max-width: 510px;
+
+            margin: 0 auto 32px;
+
+            padding: 22px 0;
+
+            color: rgba(221, 210, 230, 0.73);
+
+            font-size: 0.93rem;
+
+            line-height: 2;
+
+            text-align: center;
+        }
+
+        /*
+            不再上下雙實線。
+            只在中間留一個非常細的紫線。
+        */
+
+        .desc::before {
+            content: "";
+
+            position: absolute;
+
+            left: 50%;
+            top: 0;
+
+            width: 55px;
+            height: 1px;
+
+            transform: translateX(-50%);
+
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(154, 61, 210, 0.55),
+                    transparent
+                );
+        }
+
+        .desc::after {
+            content: "";
+
+            position: absolute;
+
+            left: 50%;
+            bottom: 0;
+
+            width: 25px;
+            height: 1px;
+
+            transform: translateX(-50%);
+
+            background:
+                rgba(121, 42, 167, 0.28);
+        }
+
+        /* =========================================================
+           PAGE INDICATOR
+        ========================================================= */
+
+        .page-indicator {
+            margin-top: 4px;
+
+            color: rgba(172, 123, 209, 0.65);
+
+            font-family: Arial, sans-serif;
+
+            font-size: 0.68rem;
+
+            font-weight: 700;
 
             letter-spacing: 0.34em;
 
             text-transform: uppercase;
-        }
-
-        .profile-description {
-            max-width: 500px;
-
-            margin-bottom: 34px;
-
-            color: rgba(230, 224, 236, 0.67);
-
-            font-family:
-                "Noto Serif TC",
-                Georgia,
-                serif;
-
-            font-size: 14px;
-
-            line-height: 2;
-        }
-
-        /* =========================================================
-           STATS
-        ========================================================= */
-
-        .stats-grid {
-            display: grid;
-
-            grid-template-columns:
-                repeat(3, minmax(0, 1fr));
-
-            gap: 1px;
-
-            margin-top: 4px;
-            margin-bottom: 34px;
-
-            border:
-                1px solid rgba(205, 184, 231, 0.09);
-
-            background:
-                rgba(205, 184, 231, 0.09);
-        }
-
-        .stat {
-            min-width: 0;
-
-            padding: 15px 14px;
-
-            background:
-                rgba(8, 7, 12, 0.68);
-        }
-
-        .stat-label {
-            margin-bottom: 7px;
-
-            color: rgba(215, 198, 231, 0.35);
-
-            font-family: Arial, sans-serif;
-
-            font-size: 8px;
-
-            letter-spacing: 0.2em;
-
-            text-transform: uppercase;
-        }
-
-        .stat-value {
-            color: rgba(245, 240, 250, 0.9);
-
-            font-family: Arial, sans-serif;
-
-            font-size: 13px;
-
-            font-weight: 700;
-
-            letter-spacing: 0.08em;
-
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* =========================================================
-           FOOTER INSIDE PROFILE
-        ========================================================= */
-
-        .profile-footer {
-            display: flex;
-
-            align-items: center;
-            justify-content: space-between;
-
-            gap: 20px;
-        }
-
-        .profile-status {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-
-            color: rgba(219, 207, 230, 0.38);
-
-            font-family: Arial, sans-serif;
-
-            font-size: 8px;
-
-            letter-spacing: 0.2em;
-
-            text-transform: uppercase;
-        }
-
-        .status-dot {
-            width: 5px;
-            height: 5px;
-
-            border-radius: 50%;
-
-            background: #caa9ff;
-
-            box-shadow:
-                0 0 12px rgba(202, 169, 255, 0.7);
-        }
-
-        .page-indicator {
-            color: rgba(221, 207, 237, 0.55);
-
-            font-family: Arial, sans-serif;
-
-            font-size: 9px;
-
-            font-weight: 700;
-
-            letter-spacing: 0.25em;
         }
 
         /* =========================================================
@@ -948,268 +544,228 @@
 
             top: 50%;
 
-            width: 60px;
-            height: 120px;
+            width: 52px;
+            height: 52px;
 
-            transform: translateY(-50%);
+            z-index: 100;
 
-            border: none;
+            border: 1px solid rgba(169, 74, 216, 0.48);
 
-            background: transparent;
+            background:
+                rgba(18, 3, 28, 0.30);
 
             cursor: pointer;
 
-            z-index: 30;
+            transform:
+                translateY(-50%)
+                rotate(45deg);
 
             display: flex;
-
             align-items: center;
-
             justify-content: center;
 
-            opacity: 0.45;
-
             transition:
-                opacity 0.25s ease,
-                transform 0.25s ease;
-        }
+                transform 0.32s cubic-bezier(0.22, 0.61, 0.36, 1),
+                background 0.3s ease,
+                border-color 0.3s ease,
+                box-shadow 0.3s ease;
 
-        .page-nav:hover {
-            opacity: 1;
-        }
+            outline: none;
 
-        .page-nav:focus-visible {
-            outline:
-                1px solid rgba(212, 183, 249, 0.55);
+            box-shadow:
+                0 0 18px rgba(102, 26, 148, 0.12);
 
-            outline-offset: -8px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
         }
 
         .nav-left {
-            left: 8px;
+            left: 35px;
         }
 
         .nav-right {
-            right: 8px;
+            right: 35px;
         }
 
-        .page-nav::before {
-            content: "";
-
-            width: 25px;
-            height: 25px;
-
-            border:
-                1px solid rgba(230, 220, 245, 0.72);
-
-            transition:
-                border-color 0.25s ease,
-                box-shadow 0.25s ease;
-        }
+        /*
+            Arrow itself.
+        */
 
         .page-nav::after {
             content: "";
 
-            position: absolute;
-
-            width: 8px;
-            height: 8px;
+            width: 9px;
+            height: 9px;
 
             border-right:
-                1px solid rgba(236, 226, 249, 0.95);
+                1.5px solid rgba(232, 216, 245, 0.78);
 
             border-bottom:
-                1px solid rgba(236, 226, 249, 0.95);
+                1.5px solid rgba(232, 216, 245, 0.78);
+
+            transform:
+                rotate(-45deg);
 
             transition:
-                border-color 0.25s ease;
-        }
-
-        .nav-left::before {
-            transform: rotate(45deg);
-        }
-
-        .nav-right::before {
-            transform: rotate(45deg);
+                border-color 0.3s ease,
+                filter 0.3s ease;
         }
 
         .nav-left::after {
-            transform: rotate(135deg);
-            margin-left: 3px;
+            transform:
+                rotate(135deg);
         }
 
         .nav-right::after {
-            transform: rotate(-45deg);
-            margin-right: 3px;
+            transform:
+                rotate(-45deg);
         }
 
-        .page-nav:hover::before {
+        .page-nav:hover {
+            background:
+                rgba(76, 9, 105, 0.30);
+
             border-color:
-                rgba(202, 165, 255, 0.9);
+                rgba(194, 105, 239, 0.82);
 
             box-shadow:
-                0 0 24px rgba(158, 96, 219, 0.18);
+                0 0 25px rgba(147, 46, 204, 0.25),
+                0 0 55px rgba(72, 0, 108, 0.14);
+
+            transform:
+                translateY(-50%)
+                rotate(45deg)
+                scale(1.08);
         }
 
         .page-nav:hover::after {
             border-color:
-                rgba(220, 191, 255, 1);
+                rgba(255, 239, 255, 0.96);
         }
 
         .page-nav:active {
             transform:
                 translateY(-50%)
-                scale(0.92);
+                rotate(45deg)
+                scale(0.93);
         }
+
+        .page-nav:focus-visible {
+            border-color:
+                rgba(230, 192, 255, 0.9);
+
+            box-shadow:
+                0 0 0 3px rgba(131, 50, 174, 0.15);
+        }
+
+        /* =========================================================
+           CANVAS CORE
+        ========================================================= */
+
+        /*
+            這裡不再做非常密集的棋盤。
+            改成「暗淡幾何洞穴」。
+        */
+
+        let {
+            dummy
+        } = {};
 
         /* =========================================================
            RESPONSIVE
         ========================================================= */
 
-        @media (max-width: 900px) {
+        @media (max-width: 760px) {
             .content-layer {
-                padding:
-                    80px 45px
-                    90px;
+                padding: 35px;
             }
 
             .profile-box {
-                width: min(800px, 92vw);
-                grid-template-columns: 260px 1fr;
-                min-height: 460px;
-            }
-
-            .profile-visual {
-                min-height: 460px;
-            }
-
-            .profile-info {
-                padding:
-                    48px 42px;
-            }
-
-            .avatar-container {
-                transform: scale(0.84);
-            }
-        }
-
-        @media (max-width: 680px) {
-            body {
-                overflow: auto;
-            }
-
-            .content-layer {
-                position: relative;
-
-                min-height: 100%;
-                height: auto;
+                width: min(92vw, 620px);
 
                 padding:
-                    90px 18px
-                    90px;
+                    42px 32px 36px;
             }
 
-            .profile-box {
-                width: 100%;
-
-                min-height: 0;
-
-                grid-template-columns: 1fr;
-
-                margin: 0 auto;
+            .title {
+                font-size: 2.45rem;
+                letter-spacing: 0.09em;
             }
 
-            .profile-visual {
-                min-height: 310px;
-
-                border-right: none;
-
-                border-bottom:
-                    1px solid rgba(204, 183, 236, 0.1);
+            .subtitle {
+                font-size: 0.62rem;
+                letter-spacing: 0.28em;
             }
 
-            .avatar-container {
-                transform: scale(0.7);
-            }
-
-            .profile-info {
-                padding: 34px 28px 32px;
-            }
-
-            .profile-name {
-                font-size: 3rem;
-            }
-
-            .profile-description {
-                font-size: 13px;
+            .desc {
+                font-size: 0.86rem;
             }
 
             .page-nav {
-                width: 48px;
-                height: 90px;
+                width: 44px;
+                height: 44px;
             }
 
             .nav-left {
-                left: 0;
+                left: 13px;
             }
 
             .nav-right {
-                right: 0;
+                right: 13px;
             }
 
-            .top-label,
-            .system-label,
-            .bottom-label-left,
-            .bottom-label-right {
+            .top-mark,
+            .top-mark-right {
                 font-size: 7px;
-                letter-spacing: 0.2em;
-            }
-
-            .top-label {
-                left: 18px;
-            }
-
-            .system-label {
-                right: 18px;
-            }
-
-            .bottom-label-left {
-                left: 18px;
-            }
-
-            .bottom-label-right {
-                right: 18px;
-            }
-
-            .top-line,
-            .bottom-line {
-                left: 14px;
-                right: 14px;
             }
         }
 
-        @media (max-height: 700px) and (min-width: 681px) {
-            .profile-box {
-                transform: scale(0.88);
-            }
-
+        @media (max-width: 480px) {
             .content-layer {
-                padding-top: 65px;
-                padding-bottom: 65px;
+                padding:
+                    25px 48px;
+            }
+
+            .profile-box {
+                padding:
+                    38px 24px 32px;
+            }
+
+            .title {
+                font-size: 2.05rem;
+            }
+
+            .desc {
+                font-size: 0.79rem;
+                line-height: 1.9;
+            }
+
+            .page-nav {
+                width: 36px;
+                height: 36px;
+            }
+
+            .nav-left {
+                left: 9px;
+            }
+
+            .nav-right {
+                right: 9px;
+            }
+
+            .page-nav::after {
+                width: 7px;
+                height: 7px;
             }
         }
-
-        /* =========================================================
-           REDUCED MOTION
-        ========================================================= */
 
         @media (prefers-reduced-motion: reduce) {
             *,
             *::before,
             *::after {
-                animation-duration: 0.001ms !important;
+                animation-duration: 0.01ms !important;
                 animation-iteration-count: 1 !important;
-                transition-duration: 0.001ms !important;
+                transition-duration: 0.01ms !important;
             }
         }
     </style>
@@ -1219,70 +775,58 @@
 
     <!-- =========================================================
          BACKGROUND
-    ========================================================== -->
+    ========================================================= -->
 
     <canvas id="void-canvas"></canvas>
 
-    <div class="void-atmosphere"></div>
-    <div class="void-vignette"></div>
-    <div class="scanline"></div>
+    <div class="event-horizon"></div>
+    <div class="void-glow"></div>
+    <div class="vignette"></div>
 
     <!-- =========================================================
-         OUTER UI
-    ========================================================== -->
+         DECORATION
+    ========================================================= -->
 
     <div class="top-line"></div>
     <div class="bottom-line"></div>
 
-    <div class="top-label">
-        NULLSCAPE / PROFILE
+    <div class="top-mark">
+        NULLSCAPE // VORTEX
     </div>
 
-    <div class="system-label">
-        SECTOR // 07
-    </div>
-
-    <div class="bottom-label-left">
-        VOID ARCHIVE
-    </div>
-
-    <div class="bottom-label-right">
-        SYSTEM ONLINE
+    <div class="top-mark-right">
+        ARCHIVE 07
     </div>
 
     <!-- =========================================================
          NAVIGATION
-    ========================================================== -->
+    ========================================================= -->
 
     <button
         class="page-nav nav-left"
         id="prevButton"
-        aria-label="上一頁"
         type="button"
+        aria-label="上一頁"
     ></button>
 
     <button
         class="page-nav nav-right"
         id="nextButton"
-        aria-label="下一頁"
         type="button"
+        aria-label="下一頁"
     ></button>
 
     <!-- =========================================================
-         PROFILE
-    ========================================================== -->
+         MAIN PROFILE
+    ========================================================= -->
 
     <main class="content-layer">
 
         <section
             class="profile-box"
-            id="profileCard"
+            id="profile-card"
             aria-live="polite"
-        >
-
-            <!-- JS will render this -->
-
-        </section>
+        ></section>
 
     </main>
 
@@ -1290,198 +834,53 @@
         "use strict";
 
         /* =========================================================
-           PROFILE DATA
-           改這裡就可以改人物資料
+           PAGE DATA
         ========================================================= */
 
         const pages = [
             {
-                name: "SLES",
-                subtitle: "THE OBSERVER",
-                category: "ENTITY PROFILE",
-
-                description:
-                    "A presence wandering through the empty spaces between worlds. " +
-                    "The entity observes before it speaks, leaving only traces behind.",
-
-                stats: {
-                    origin: "NULL",
-                    state: "ACTIVE",
-                    class: "VOID"
-                },
-
-                status: "PRESENT",
-                index: "01"
+                title: "NULLSCAPE",
+                subtitle: "ENTITY_VOID",
+                desc:
+                    "[ 第一頁內容。 ]<br>" +
+                    "[ 在不存在的空間裡，一切痕跡都會被吸入中心。 ]"
             },
 
             {
-                name: "VESSEL",
-                subtitle: "UNRESOLVED",
-                category: "ENTITY PROFILE",
-
-                description:
-                    "A form without a fixed destination. Memory, identity and reality " +
-                    "appear to overlap whenever the surrounding space begins to collapse.",
-
-                stats: {
-                    origin: "UNKNOWN",
-                    state: "STABLE",
-                    class: "ANOMALY"
-                },
-
-                status: "OBSERVED",
-                index: "02"
+                title: "LORE // 01",
+                subtitle: "THE ABYSSAL WHISPER",
+                desc:
+                    "[ 第二頁內容。 ]<br>" +
+                    "[ 某些存在並非消失，只是逐漸失去被觀測的資格。 ]"
             },
 
             {
-                name: "NULL",
-                subtitle: "THE SILENT CORE",
-                category: "ENTITY PROFILE",
-
-                description:
-                    "Nothing is recorded beyond this point. The archive recognizes the " +
-                    "entity, yet refuses to describe what exists beyond its surface.",
-
-                stats: {
-                    origin: "VOID",
-                    state: "UNKNOWN",
-                    class: "NULL"
-                },
-
-                status: "UNRESOLVED",
-                index: "03"
+                title: "ARCHIVE",
+                subtitle: "FINAL REALM",
+                desc:
+                    "[ 第三頁內容。 ]<br>" +
+                    "[ 所有紀錄終將沉入虛空。 ]"
             }
         ];
 
         let currentPage = 0;
-        let isSwitching = false;
-        let switchTimer = null;
 
-        const card = document.getElementById("profileCard");
-        const prevButton = document.getElementById("prevButton");
-        const nextButton = document.getElementById("nextButton");
+        let isSwitching = false;
+
+        let switchTimeout = null;
+
+        const card =
+            document.getElementById("profile-card");
+
+        const prevButton =
+            document.getElementById("prevButton");
+
+        const nextButton =
+            document.getElementById("nextButton");
 
         /* =========================================================
-           RENDER PROFILE
+           ESCAPE HTML
         ========================================================= */
-
-        function renderPage(index) {
-            const page = pages[index];
-
-            card.innerHTML = `
-                <div class="profile-visual">
-
-                    <div class="visual-index">
-                        ${page.index} / ${String(pages.length).padStart(2, "0")}
-                    </div>
-
-                    <div class="avatar-container" aria-hidden="true">
-                        <div class="avatar-ring"></div>
-                        <div class="avatar-aura"></div>
-
-                        <div class="avatar">
-
-                            <div class="avatar-head"></div>
-
-                            <div class="avatar-mask"></div>
-
-                            <div class="avatar-eye left"></div>
-                            <div class="avatar-eye right"></div>
-
-                            <div class="avatar-body"></div>
-
-                            <div class="avatar-core"></div>
-
-                            <div class="avatar-arm left"></div>
-                            <div class="avatar-arm right"></div>
-
-                            <div class="avatar-leg left"></div>
-                            <div class="avatar-leg right"></div>
-
-                        </div>
-                    </div>
-
-                    <div class="visual-caption">
-                        ${page.category}
-                    </div>
-
-                </div>
-
-                <div class="profile-info">
-
-                    <div class="profile-category">
-                        ${page.category}
-                    </div>
-
-                    <h1 class="profile-name">
-                        ${escapeHTML(page.name)}
-                    </h1>
-
-                    <div class="profile-subtitle">
-                        ${escapeHTML(page.subtitle)}
-                    </div>
-
-                    <p class="profile-description">
-                        ${escapeHTML(page.description)}
-                    </p>
-
-                    <div class="stats-grid">
-
-                        <div class="stat">
-                            <div class="stat-label">
-                                Origin
-                            </div>
-
-                            <div class="stat-value">
-                                ${escapeHTML(page.stats.origin)}
-                            </div>
-                        </div>
-
-                        <div class="stat">
-                            <div class="stat-label">
-                                State
-                            </div>
-
-                            <div class="stat-value">
-                                ${escapeHTML(page.stats.state)}
-                            </div>
-                        </div>
-
-                        <div class="stat">
-                            <div class="stat-label">
-                                Class
-                            </div>
-
-                            <div class="stat-value">
-                                ${escapeHTML(page.stats.class)}
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div class="profile-footer">
-
-                        <div class="profile-status">
-                            <span class="status-dot"></span>
-                            ${escapeHTML(page.status)}
-                        </div>
-
-                        <div class="page-indicator">
-                            ${page.index}
-                            /
-                            ${String(pages.length).padStart(2, "0")}
-                        </div>
-
-                    </div>
-
-                </div>
-            `;
-        }
-
-        /*
-            Prevent accidental HTML injection if you later use
-            user-generated profile data.
-        */
 
         function escapeHTML(value) {
             return String(value)
@@ -1490,6 +889,35 @@
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
+        }
+
+        /* =========================================================
+           PAGE RENDER
+        ========================================================= */
+
+        function renderPage(pageIndex) {
+            const page =
+                pages[pageIndex];
+
+            card.innerHTML = `
+                <div class="title">
+                    ${escapeHTML(page.title)}
+                </div>
+
+                <div class="subtitle">
+                    ${escapeHTML(page.subtitle)}
+                </div>
+
+                <div class="desc">
+                    ${page.desc}
+                </div>
+
+                <div class="page-indicator">
+                    ${String(pageIndex + 1).padStart(2, "0")}
+                    /
+                    ${String(pages.length).padStart(2, "0")}
+                </div>
+            `;
         }
 
         /* =========================================================
@@ -1507,79 +935,106 @@
 
             isSwitching = true;
 
+            clearTimeout(switchTimeout);
+
             const exitClass =
                 direction > 0
-                    ? "is-exiting-left"
-                    : "is-exiting-right";
+                    ? "sucking-left"
+                    : "sucking-right";
 
             const enterClass =
                 direction > 0
-                    ? "is-entering-left"
-                    : "is-entering-right";
+                    ? "flying-left"
+                    : "flying-right";
+
+            /*
+                清理任何前一次動畫。
+            */
 
             card.classList.remove(
-                "is-entering-left",
-                "is-entering-right",
-                "is-exiting-left",
-                "is-exiting-right"
+                "sucking-left",
+                "sucking-right",
+                "flying-left",
+                "flying-right"
             );
 
             /*
-                Force reflow so repeated transitions always trigger.
+                強制重新計算 layout，
+                確保每次切頁動畫都會重新播放。
             */
 
             void card.offsetWidth;
 
             card.classList.add(exitClass);
 
-            clearTimeout(switchTimer);
-
-            switchTimer = setTimeout(() => {
-                currentPage =
-                    (
-                        currentPage +
-                        direction +
-                        pages.length
-                    ) %
-                    pages.length;
-
-                renderPage(currentPage);
-
-                card.classList.remove(exitClass);
-
-                void card.offsetWidth;
-
-                card.classList.add(enterClass);
-
+            switchTimeout =
                 setTimeout(() => {
-                    card.classList.remove(enterClass);
-                    isSwitching = false;
-                }, 580);
 
-            }, 410);
+                    currentPage =
+                        (
+                            currentPage +
+                            direction +
+                            pages.length
+                        ) %
+                        pages.length;
+
+                    renderPage(currentPage);
+
+                    card.classList.remove(exitClass);
+
+                    void card.offsetWidth;
+
+                    card.classList.add(enterClass);
+
+                    setTimeout(() => {
+                        card.classList.remove(
+                            enterClass
+                        );
+
+                        isSwitching = false;
+
+                    }, 650);
+
+                }, 420);
         }
 
-        prevButton.addEventListener("click", () => {
-            switchPage(-1);
-        });
-
-        nextButton.addEventListener("click", () => {
-            switchPage(1);
-        });
-
         /* =========================================================
-           KEYBOARD CONTROL
+           BUTTON EVENTS
         ========================================================= */
 
-        window.addEventListener("keydown", (event) => {
-            if (event.key === "ArrowLeft") {
-                switchPage(-1);
-            }
+        prevButton.addEventListener(
+            "click",
+            () => switchPage(-1)
+        );
 
-            if (event.key === "ArrowRight") {
-                switchPage(1);
+        nextButton.addEventListener(
+            "click",
+            () => switchPage(1)
+        );
+
+        /* =========================================================
+           KEYBOARD
+        ========================================================= */
+
+        window.addEventListener(
+            "keydown",
+            (event) => {
+
+                if (
+                    event.key === "ArrowLeft" ||
+                    event.key.toLowerCase() === "a"
+                ) {
+                    switchPage(-1);
+                }
+
+                if (
+                    event.key === "ArrowRight" ||
+                    event.key.toLowerCase() === "d"
+                ) {
+                    switchPage(1);
+                }
             }
-        });
+        );
 
         /* =========================================================
            TOUCH SWIPE
@@ -1591,12 +1046,17 @@
         window.addEventListener(
             "touchstart",
             (event) => {
+
                 if (!event.touches.length) {
                     return;
                 }
 
-                touchStartX = event.touches[0].clientX;
-                touchStartY = event.touches[0].clientY;
+                touchStartX =
+                    event.touches[0].clientX;
+
+                touchStartY =
+                    event.touches[0].clientY;
+
             },
             { passive: true }
         );
@@ -1604,87 +1064,107 @@
         window.addEventListener(
             "touchend",
             (event) => {
+
                 if (!event.changedTouches.length) {
                     return;
                 }
 
-                const touch = event.changedTouches[0];
+                const touch =
+                    event.changedTouches[0];
 
-                const dx = touch.clientX - touchStartX;
-                const dy = touch.clientY - touchStartY;
+                const deltaX =
+                    touch.clientX -
+                    touchStartX;
+
+                const deltaY =
+                    touch.clientY -
+                    touchStartY;
 
                 /*
-                    Ignore vertical scrolling gestures.
+                    只把明顯的左右滑動當成換頁。
                 */
 
-                if (Math.abs(dx) < 50) {
+                if (
+                    Math.abs(deltaX) < 55 ||
+                    Math.abs(deltaX) <= Math.abs(deltaY)
+                ) {
                     return;
                 }
 
-                if (Math.abs(dx) < Math.abs(dy)) {
-                    return;
-                }
-
-                if (dx < 0) {
+                if (deltaX < 0) {
                     switchPage(1);
                 } else {
                     switchPage(-1);
                 }
+
             },
             { passive: true }
         );
 
-        /* =========================================================
-           INITIAL RENDER
-        ========================================================= */
-
         renderPage(currentPage);
 
         /* =========================================================
-           CANVAS VOID WORLD
+           CANVAS
         ========================================================= */
 
-        const canvas = document.getElementById("void-canvas");
-        const ctx = canvas.getContext("2d", {
-            alpha: false
-        });
+        const canvas =
+            document.getElementById("void-canvas");
+
+        const ctx =
+            canvas.getContext("2d", {
+                alpha: false
+            });
 
         let width = 0;
         let height = 0;
-        let centerX = 0;
-        let centerY = 0;
+
+        let cx = 0;
+        let cy = 0;
+
         let dpr = 1;
+
+        let animationTime = 0;
+
+        const PARTICLE_COUNT = 95;
+        const SHARD_COUNT = 24;
 
         const particles = [];
         const shards = [];
-
-        /*
-            Keep the amount reasonable so this remains smooth.
-        */
-
-        const PARTICLE_COUNT = 105;
-        const SHARD_COUNT = 18;
-
-        let time = 0;
 
         /* =========================================================
            RESIZE
         ========================================================= */
 
         function resizeCanvas() {
-            dpr = Math.min(window.devicePixelRatio || 1, 2);
+            dpr =
+                Math.min(
+                    window.devicePixelRatio || 1,
+                    2
+                );
 
-            width = window.innerWidth;
-            height = window.innerHeight;
+            width =
+                window.innerWidth;
 
-            centerX = width * 0.5;
-            centerY = height * 0.5;
+            height =
+                window.innerHeight;
 
-            canvas.width = Math.floor(width * dpr);
-            canvas.height = Math.floor(height * dpr);
+            cx =
+                width * 0.5;
 
-            canvas.style.width = `${width}px`;
-            canvas.style.height = `${height}px`;
+            cy =
+                height * 0.5;
+
+            canvas.width =
+                Math.floor(width * dpr);
+
+            canvas.height =
+                Math.floor(height * dpr);
+
+            canvas.style.width =
+                `${width}px`;
+
+            canvas.style.height =
+                `${height}px`;
 
             ctx.setTransform(
                 dpr,
@@ -1696,98 +1176,150 @@
             );
         }
 
-        window.addEventListener("resize", resizeCanvas);
+        window.addEventListener(
+            "resize",
+            resizeCanvas
+        );
 
         resizeCanvas();
 
         /* =========================================================
-           RANDOM HELPERS
+           RANDOM
         ========================================================= */
 
         function random(min, max) {
-            return Math.random() * (max - min) + min;
+            return Math.random() *
+                (max - min) +
+                min;
         }
 
         function randomSign() {
-            return Math.random() > 0.5 ? 1 : -1;
+            return Math.random() < 0.5
+                ? -1
+                : 1;
         }
 
         /* =========================================================
-           BACKGROUND PARTICLE
+           PARTICLES
         ========================================================= */
 
         class VoidParticle {
+
             constructor() {
                 this.reset(true);
             }
 
             reset(initial = false) {
+
                 this.angle =
-                    random(0, Math.PI * 2);
+                    random(
+                        0,
+                        Math.PI * 2
+                    );
 
                 this.radius =
                     initial
-                        ? random(120, Math.max(width, height) * 0.8)
-                        : random(550, Math.max(width, height) * 0.85);
-
-                this.depth =
-                    random(0.15, 1);
+                        ? random(
+                            180,
+                            Math.max(
+                                width,
+                                height
+                            ) * 0.82
+                        )
+                        : random(
+                            Math.max(
+                                width,
+                                height
+                            ) * 0.55,
+                            Math.max(
+                                width,
+                                height
+                            ) * 0.90
+                        );
 
                 this.speed =
-                    random(0.08, 0.36) *
-                    this.depth;
+                    random(0.22, 0.65);
+
+                this.angularSpeed =
+                    random(
+                        0.00015,
+                        0.0008
+                    ) *
+                    randomSign();
 
                 this.size =
-                    random(0.4, 1.8) *
-                    this.depth;
+                    random(0.5, 1.8);
 
-                this.twinkle =
-                    random(0, Math.PI * 2);
+                this.alpha =
+                    random(
+                        0.15,
+                        0.48
+                    );
 
-                this.twinkleSpeed =
-                    random(0.005, 0.025);
-
-                this.drift =
-                    random(0.0003, 0.0016) *
-                    randomSign();
+                this.phase =
+                    random(
+                        0,
+                        Math.PI * 2
+                    );
             }
 
             update() {
-                this.radius -= this.speed;
-
-                this.angle += this.drift;
-
-                this.twinkle += this.twinkleSpeed;
 
                 /*
-                    Recycle once close to the void center.
+                    越接近中心，
+                    吸入速度越來越明顯。
                 */
 
-                if (this.radius < 35) {
+                const distanceFactor =
+                    Math.max(
+                        0.8,
+                        280 /
+                        Math.max(
+                            this.radius,
+                            40
+                        )
+                    );
+
+                this.radius -=
+                    this.speed *
+                    distanceFactor;
+
+                this.angle +=
+                    this.angularSpeed *
+                    distanceFactor;
+
+                this.phase +=
+                    0.018;
+
+                if (this.radius < 38) {
                     this.reset(false);
                 }
             }
 
             draw() {
+
                 const x =
-                    centerX +
+                    cx +
                     Math.cos(this.angle) *
                     this.radius;
 
                 const y =
-                    centerY +
+                    cy +
                     Math.sin(this.angle) *
                     this.radius;
 
-                /*
-                    Very subtle breathing brightness.
-                */
+                const pulse =
+                    0.72 +
+                    Math.sin(this.phase) *
+                    0.28;
 
                 const alpha =
-                    (0.10 + (
-                        Math.sin(this.twinkle) + 1
-                    ) * 0.12) *
-                    this.depth;
+                    this.alpha *
+                    pulse *
+                    Math.min(
+                        1,
+                        this.radius / 180
+                    );
 
                 ctx.beginPath();
 
@@ -1800,96 +1332,149 @@
                 );
 
                 ctx.fillStyle =
-                    `rgba(214, 192, 238, ${alpha})`;
+                    `rgba(
+                        184,
+                        137,
+                        216,
+                        ${alpha}
+                    )`;
 
                 ctx.fill();
             }
         }
 
         /* =========================================================
-           FLOATING SHARD
+           GEOMETRIC SHARDS
         ========================================================= */
 
         class VoidShard {
+
             constructor() {
                 this.reset(true);
             }
 
             reset(initial = false) {
+
                 this.angle =
-                    random(0, Math.PI * 2);
+                    random(
+                        0,
+                        Math.PI * 2
+                    );
 
                 this.radius =
                     initial
-                        ? random(260, Math.max(width, height) * 0.72)
-                        : random(620, Math.max(width, height) * 0.82);
+                        ? random(
+                            360,
+                            Math.max(
+                                width,
+                                height
+                            ) * 0.75
+                        )
+                        : random(
+                            Math.max(
+                                width,
+                                height
+                            ) * 0.68,
+                            Math.max(
+                                width,
+                                height
+                            ) * 0.95
+                        );
 
                 this.size =
-                    random(10, 34);
+                    random(8, 24);
+
+                this.speed =
+                    random(0.16, 0.42);
 
                 this.rotation =
-                    random(0, Math.PI * 2);
+                    random(
+                        0,
+                        Math.PI * 2
+                    );
 
                 this.rotationSpeed =
                     random(
-                        -0.0015,
-                        0.0015
+                        -0.008,
+                        0.008
                     );
 
-                this.speed =
-                    random(0.12, 0.42);
-
-                this.skew =
-                    random(0.6, 1.6);
+                this.scaleY =
+                    random(
+                        0.65,
+                        1.55
+                    );
 
                 this.alpha =
-                    random(0.12, 0.42);
+                    random(
+                        0.12,
+                        0.32
+                    );
             }
 
             update() {
-                this.radius -= this.speed;
 
-                this.angle +=
-                    0.00025 *
-                    randomSign();
+                const pull =
+                    Math.max(
+                        1,
+                        220 /
+                        Math.max(
+                            this.radius,
+                            50
+                        )
+                    );
+
+                this.radius -=
+                    this.speed *
+                    pull;
 
                 this.rotation +=
                     this.rotationSpeed;
 
-                if (this.radius < 70) {
+                this.angle +=
+                    0.00035 *
+                    pull *
+                    randomSign();
+
+                if (this.radius < 55) {
                     this.reset(false);
                 }
             }
 
             draw() {
+
                 const x =
-                    centerX +
+                    cx +
                     Math.cos(this.angle) *
                     this.radius;
 
                 const y =
-                    centerY +
+                    cy +
                     Math.sin(this.angle) *
                     this.radius;
 
-                const pulse =
-                    0.75 +
-                    Math.sin(
-                        time * 0.001 +
-                        this.radius
-                    ) *
-                    0.15;
+                const visibility =
+                    Math.min(
+                        1,
+                        this.radius / 160
+                    );
 
                 ctx.save();
 
                 ctx.translate(x, y);
 
-                ctx.rotate(this.rotation);
+                ctx.rotate(
+                    this.rotation
+                );
 
                 ctx.scale(
-                    this.skew,
-                    1
+                    1,
+                    this.scaleY
                 );
+
+                /*
+                    深紫幾何碎片。
+                */
 
                 ctx.beginPath();
 
@@ -1899,37 +1484,42 @@
                 );
 
                 ctx.lineTo(
-                    this.size * 0.45,
-                    0
+                    this.size * 0.46,
+                    -this.size * 0.18
                 );
 
                 ctx.lineTo(
-                    0,
+                    this.size * 0.18,
                     this.size
                 );
 
                 ctx.lineTo(
-                    -this.size * 0.45,
-                    0
+                    -this.size * 0.58,
+                    this.size * 0.55
                 );
 
                 ctx.closePath();
 
-                /*
-                    Fill is deliberately very dark.
-                */
-
                 ctx.fillStyle =
-                    `rgba(19, 13, 27, ${this.alpha * pulse})`;
+                    `rgba(
+                        24,
+                        8,
+                        35,
+                        ${this.alpha *
+                        visibility}
+                    )`;
 
                 ctx.fill();
 
-                /*
-                    Thin Nullscape-style outline.
-                */
-
                 ctx.strokeStyle =
-                    `rgba(196, 157, 235, ${this.alpha * 0.75})`;
+                    `rgba(
+                        128,
+                        54,
+                        165,
+                        ${this.alpha *
+                        0.85 *
+                        visibility}
+                    )`;
 
                 ctx.lineWidth = 0.8;
 
@@ -1940,83 +1530,54 @@
         }
 
         /* =========================================================
-           CENTRAL VOID
+           VORTEX RINGS
         ========================================================= */
 
-        function drawVoidCore() {
-            const maxRadius =
-                Math.min(width, height) * 0.32;
+        let vortexRotation = 0;
+        let vortexPulse = 0;
 
-            /*
-                Outer diffuse glow.
-            */
+        function drawVortex() {
 
-            const glow =
-                ctx.createRadialGradient(
-                    centerX,
-                    centerY,
-                    maxRadius * 0.28,
-                    centerX,
-                    centerY,
-                    maxRadius
-                );
+            vortexRotation += 0.00045;
+            vortexPulse += 0.022;
 
-            glow.addColorStop(
-                0,
-                "rgba(55, 24, 78, 0.02)"
-            );
-
-            glow.addColorStop(
-                0.45,
-                "rgba(100, 55, 135, 0.06)"
-            );
-
-            glow.addColorStop(
-                0.72,
-                "rgba(95, 51, 132, 0.04)"
-            );
-
-            glow.addColorStop(
-                1,
-                "rgba(0, 0, 0, 0)"
-            );
-
-            ctx.beginPath();
-
-            ctx.arc(
-                centerX,
-                centerY,
-                maxRadius,
-                0,
-                Math.PI * 2
-            );
-
-            ctx.fillStyle = glow;
-            ctx.fill();
-
-            /*
-                Thin rings.
-            */
-
-            const pulse =
-                Math.sin(time * 0.001) * 5;
+            const baseRadius =
+                Math.min(
+                    width,
+                    height
+                ) * 0.22;
 
             ctx.save();
 
             ctx.translate(
-                centerX,
-                centerY
+                cx,
+                cy
             );
 
             ctx.rotate(
-                time * 0.00006
+                vortexRotation
             );
 
-            for (let i = 0; i < 3; i++) {
+            /*
+                只保留幾個淡淡的環。
+            */
+
+            for (
+                let i = 0;
+                i < 5;
+                i++
+            ) {
+
+                const pulse =
+                    Math.sin(
+                        vortexPulse +
+                        i * 0.8
+                    );
+
                 const radius =
-                    maxRadius *
-                    (0.54 + i * 0.13) +
-                    pulse;
+                    baseRadius +
+                    i * 62 +
+                    pulse * 5;
 
                 ctx.beginPath();
 
@@ -2025,58 +1586,82 @@
                     0,
                     radius,
                     radius * (
-                        0.86 +
-                        i * 0.025
+                        0.58 +
+                        i * 0.05
                     ),
                     0,
                     0,
                     Math.PI * 2
                 );
 
+                const alpha =
+                    0.038 -
+                    i * 0.004;
+
                 ctx.strokeStyle =
                     `rgba(
-                        183,
-                        136,
-                        225,
-                        ${0.055 - i * 0.012}
+                        133,
+                        39,
+                        174,
+                        ${Math.max(
+                            alpha,
+                            0.012
+                        )}
                     )`;
 
-                ctx.lineWidth = 1;
+                ctx.lineWidth =
+                    i === 0
+                        ? 1.15
+                        : 0.7;
 
                 ctx.stroke();
             }
 
             ctx.restore();
+        }
+
+        /* =========================================================
+           CENTRAL BLACK HOLE
+        ========================================================= */
+
+        function drawBlackHole() {
+
+            const radius =
+                Math.min(
+                    width,
+                    height
+                ) * 0.065;
 
             /*
-                Black central void.
+                Outer halo.
             */
 
-            const coreRadius =
-                Math.min(width, height) *
-                0.055;
-
-            const core =
+            const halo =
                 ctx.createRadialGradient(
-                    centerX,
-                    centerY,
-                    coreRadius * 0.1,
-                    centerX,
-                    centerY,
-                    coreRadius * 1.9
+                    cx,
+                    cy,
+                    radius * 0.4,
+                    cx,
+                    cy,
+                    radius * 2.7
                 );
 
-            core.addColorStop(
+            halo.addColorStop(
                 0,
-                "rgba(0, 0, 0, 1)"
+                "rgba(92, 20, 126, 0.02)"
             );
 
-            core.addColorStop(
-                0.62,
-                "rgba(0, 0, 0, 0.96)"
+            halo.addColorStop(
+                0.42,
+                "rgba(120, 48, 163, 0.07)"
             );
 
-            core.addColorStop(
+            halo.addColorStop(
+                0.68,
+                "rgba(83, 23, 112, 0.055)"
+            );
+
+            halo.addColorStop(
                 1,
                 "rgba(0, 0, 0, 0)"
             );
@@ -2084,172 +1669,82 @@
             ctx.beginPath();
 
             ctx.arc(
-                centerX,
-                centerY,
-                coreRadius * 1.9,
+                cx,
+                cy,
+                radius * 2.7,
                 0,
                 Math.PI * 2
             );
 
-            ctx.fillStyle = core;
+            ctx.fillStyle = halo;
             ctx.fill();
-        }
-
-        /* =========================================================
-           DISTANT GEOMETRY
-        ========================================================= */
-
-        function drawDistantGeometry() {
-            ctx.save();
-
-            ctx.translate(
-                centerX,
-                centerY
-            );
-
-            const scale =
-                Math.min(width, height) / 900;
-
-            ctx.scale(
-                scale,
-                scale
-            );
-
-            const rotation =
-                time * 0.000018;
-
-            ctx.rotate(rotation);
-
-            const distance =
-                420 + (
-                    Math.sin(
-                        time * 0.00035
-                    ) * 15
-                );
 
             /*
-                Large extremely dark geometric planes.
+                Event horizon.
             */
 
-            for (let i = 0; i < 7; i++) {
-                const a =
-                    (Math.PI * 2 / 7) * i;
-
-                const x =
-                    Math.cos(a) * distance;
-
-                const y =
-                    Math.sin(a) * distance;
-
-                const s =
-                    38 + i * 7;
-
-                ctx.save();
-
-                ctx.translate(x, y);
-
-                ctx.rotate(
-                    -a +
-                    Math.sin(time * 0.0002 + i) * 0.08
+            const black =
+                ctx.createRadialGradient(
+                    cx,
+                    cy,
+                    0,
+                    cx,
+                    cy,
+                    radius * 1.38
                 );
 
-                ctx.beginPath();
-
-                ctx.moveTo(
-                    -s,
-                    -s * 0.52
-                );
-
-                ctx.lineTo(
-                    s * 0.75,
-                    -s * 0.35
-                );
-
-                ctx.lineTo(
-                    s,
-                    s * 0.48
-                );
-
-                ctx.lineTo(
-                    -s * 0.65,
-                    s * 0.78
-                );
-
-                ctx.closePath();
-
-                ctx.fillStyle =
-                    "rgba(13, 9, 18, 0.66)";
-
-                ctx.fill();
-
-                ctx.strokeStyle =
-                    "rgba(151, 108, 187, 0.12)";
-
-                ctx.lineWidth = 1;
-
-                ctx.stroke();
-
-                ctx.restore();
-            }
-
-            ctx.restore();
-        }
-
-        /* =========================================================
-           MAIN ANIMATION
-        ========================================================= */
-
-        function animate() {
-            time += 16;
-
-            /*
-                Background.
-            */
-
-            ctx.fillStyle = "#030307";
-
-            ctx.fillRect(
+            black.addColorStop(
                 0,
-                0,
-                width,
-                height
+                "rgba(0, 0, 0, 1)"
             );
 
+            black.addColorStop(
+                0.72,
+                "rgba(0, 0, 0, 0.99)"
+            );
+
+            black.addColorStop(
+                1,
+                "rgba(0, 0, 0, 0)"
+            );
+
+            ctx.beginPath();
+
+            ctx.arc(
+                cx,
+                cy,
+                radius * 1.38,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fillStyle = black;
+            ctx.fill();
+
             /*
-                Distant geometry.
+                一圈非常細的紫色邊緣。
             */
 
-            drawDistantGeometry();
+            ctx.beginPath();
 
-            /*
-                Particles.
-            */
+            ctx.arc(
+                cx,
+                cy,
+                radius * 1.06,
+                0,
+                Math.PI * 2
+            );
 
-            for (const particle of particles) {
-                particle.update();
-                particle.draw();
-            }
+            ctx.strokeStyle =
+                "rgba(167, 74, 210, 0.20)";
 
-            /*
-                Floating shards.
-            */
+            ctx.lineWidth = 1;
 
-            for (const shard of shards) {
-                shard.update();
-                shard.draw();
-            }
-
-            /*
-                Central void on top.
-            */
-
-            drawVoidCore();
-
-            requestAnimationFrame(animate);
+            ctx.stroke();
         }
 
         /* =========================================================
-           CREATE PARTICLES
+           CREATE OBJECTS
         ========================================================= */
 
         for (
@@ -2272,7 +1767,85 @@
             );
         }
 
-        animate();
+        /* =========================================================
+           ANIMATION
+        ========================================================= */
+
+        let lastTime = performance.now();
+
+        function animate(now) {
+
+            /*
+                使用實際 delta time，
+                避免高刷新率螢幕跑太快。
+            */
+
+            const delta =
+                Math.min(
+                    now - lastTime,
+                    34
+                );
+
+            lastTime = now;
+
+            animationTime += delta;
+
+            /*
+                清除畫面。
+            */
+
+            ctx.fillStyle =
+                "#010102";
+
+            ctx.fillRect(
+                0,
+                0,
+                width,
+                height
+            );
+
+            /*
+                Vortex.
+            */
+
+            drawVortex();
+
+            /*
+                Particles.
+            */
+
+            for (const particle of particles) {
+
+                particle.update();
+
+                particle.draw();
+            }
+
+            /*
+                Shards.
+            */
+
+            for (const shard of shards) {
+
+                shard.update();
+
+                shard.draw();
+            }
+
+            /*
+                Central void.
+            */
+
+            drawBlackHole();
+
+            requestAnimationFrame(
+                animate
+            );
+        }
+
+        requestAnimationFrame(
+            animate
+        );
     </script>
 </body>
 </html>
