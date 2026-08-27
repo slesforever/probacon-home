@@ -3,222 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NULLSCAPE // ENTITY</title>
-    <!-- 使用經典的襯線字體來重現圖片中的標題感 -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,900&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
+    <title>NULLSCAPE</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body, html {
-            height: 100%;
-            background-color: #05000a;
-            font-family: 'Playfair Display', 'Noto Serif TC', serif;
-            display: flex; align-items: center; justify-content: center;
-            overflow: hidden; perspective: 800px;
-        }
-
-        /* 深淵漸層遮罩：讓棋盤格隱沒在紫黑色虛空中 */
-        .void-vignette {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 30%, transparent 0%, rgba(15, 0, 30, 0.8) 50%, #05000a 90%);
-            z-index: 2; pointer-events: none;
-        }
-
-        /* 3D 扭曲西洋棋盤格 (對應 image_e4c0d7.jpg) */
-        .checkerboard-floor {
-            position: absolute;
-            bottom: -60%; left: -50%;
-            width: 200%; height: 200%;
+        /* 捨棄所有平滑與現代字體，回歸最原始的點陣/等寬字體 */
+        body {
+            background-color: #000000;
+            /* 靜態、死硬的紫黑棋盤格 (對應第一張圖的背景感) */
             background-image: 
-                repeating-linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000),
-                repeating-linear-gradient(45deg, #000 25%, #2a0066 25%, #2a0066 75%, #000 75%, #000);
-            background-position: 0 0, 30px 30px;
-            background-size: 60px 60px;
-            transform: rotateX(75deg) translateY(0);
-            transform-origin: top;
-            animation: move-grid 4s linear infinite;
-            z-index: 1;
-            opacity: 0.6;
+                repeating-linear-gradient(45deg, #1a0033 25%, transparent 25%, transparent 75%, #1a0033 75%, #1a0033),
+                repeating-linear-gradient(45deg, #1a0033 25%, #000000 25%, #000000 75%, #1a0033 75%, #1a0033);
+            background-position: 0 0, 20px 20px;
+            background-size: 40px 40px;
+            font-family: "MS Gothic", "MingLiU", "Courier New", monospace;
+            color: #cc00ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
         }
 
-        @keyframes move-grid {
-            0% { transform: rotateX(75deg) translateY(0); }
-            100% { transform: rotateX(75deg) translateY(60px); }
-        }
-
-        /* 幾何發光結界框 (對應 image_e4c196.png) */
-        .entity-card {
-            position: relative; z-index: 10;
-            width: 90%; max-width: 480px; padding: 50px 40px;
-            background: rgba(10, 0, 20, 0.85);
-            /* 切割成類似結界的幾何多邊形 */
-            clip-path: polygon(15px 0, calc(100% - 15px) 0, 100% 15px, 100% calc(100% - 15px), calc(100% - 15px) 100%, 15px 100%, 0 calc(100% - 15px), 0 15px);
-            /* 紫色螢光邊框效應 */
-            border: 4px solid #000;
-            box-shadow: 0 0 30px #b000ff, inset 0 0 20px #b000ff;
+        /* 對應第三張圖的紫黑幾何結界框：沒有圓角、沒有平滑陰影 */
+        .classic-container {
+            background-color: #000000;
+            border: 4px solid #8000ff;
+            padding: 40px 30px;
+            width: 400px;
             text-align: center;
-            animation: float-card 6s ease-in-out infinite;
         }
 
-        /* 用偽元素做真正的發光邊框 */
-        .entity-card::before {
-            content: ''; position: absolute;
-            top: 2px; left: 2px; right: 2px; bottom: 2px;
-            border: 3px solid #b000ff;
-            clip-path: inherit;
-            pointer-events: none;
-        }
-
-        @keyframes float-card {
-            0%, 100% { transform: translateY(0) rotate(0deg); box-shadow: 0 0 30px #b000ff, inset 0 0 20px #b000ff; }
-            50% { transform: translateY(-10px) rotate(1deg); box-shadow: 0 0 50px #d400ff, inset 0 0 30px #d400ff; }
-        }
-
-        /* 色散分離標題 (對應 image_e4c0d7.jpg 的 NULLSCAPE 字體) */
-        .chromatic-title {
-            font-size: 2.8rem;
-            font-weight: 900;
-            color: #000; /* 字體本體偏暗 */
-            letter-spacing: 6px;
-            margin-bottom: 5px;
+        /* 靜態的錯位標題：左青色、右洋紅，不加任何閃爍特效 */
+        .title {
+            font-size: 48px;
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: -4px 0px 0px #00ffff, 4px 0px 0px #ff00ff;
+            margin: 0 0 10px 0;
+            letter-spacing: 4px;
             text-transform: uppercase;
-            /* 左青色，右紫紅色 */
-            text-shadow: 3px 2px 0px #00ffff, -3px -1px 0px #ff00ff, 0 0 20px #ff00ff;
-            animation: glitch-skew 3s infinite linear alternate-reverse;
-        }
-
-        @keyframes glitch-skew {
-            0% { transform: skew(0deg); }
-            95% { transform: skew(0deg); }
-            96% { transform: skew(3deg); }
-            98% { transform: skew(-3deg); }
-            100% { transform: skew(0deg); }
         }
 
         .subtitle {
-            font-size: 0.9rem;
-            color: #b000ff;
-            letter-spacing: 8px;
+            font-size: 14px;
+            color: #ff00ff;
+            letter-spacing: 2px;
             margin-bottom: 30px;
-            font-family: monospace;
-            text-shadow: 0 0 8px #b000ff;
+            border-bottom: 2px solid #330066;
+            padding-bottom: 10px;
         }
 
-        /* 介紹文本 */
-        .lore-box {
-            font-family: 'Noto Serif TC', serif;
-            font-size: 0.95rem;
+        /* 生硬的純文字排版 */
+        .lore-text {
+            color: #9933ff;
+            font-size: 14px;
             line-height: 1.8;
-            color: #e0b3ff;
             margin-bottom: 40px;
-            padding: 20px 0;
-            border-top: 1px solid rgba(176, 0, 255, 0.4);
-            border-bottom: 1px solid rgba(176, 0, 255, 0.4);
-            text-align: justify;
-            text-align-last: center;
+            text-align: left;
         }
 
-        /* 連結區塊 */
-        .links-container {
-            display: flex; flex-direction: column; gap: 15px;
+        /* 經典舊網頁風格的按鈕/連結 */
+        .link-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        .void-btn {
-            display: inline-block;
+        .link-item {
+            display: block;
+            background-color: #000000;
+            color: #ff00ff;
             text-decoration: none;
-            color: #fff;
-            background: #0a0014;
-            border: 2px solid #5a0080;
-            padding: 12px;
-            font-size: 1rem;
-            font-family: 'Playfair Display', serif;
-            font-weight: 700;
-            letter-spacing: 4px;
-            position: relative;
-            transition: all 0.3s ease;
-            overflow: hidden;
-            z-index: 1;
+            border: 2px solid #5500aa;
+            padding: 10px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
 
-        .void-btn::before {
-            content: ''; position: absolute;
-            top: 0; left: -100%; width: 100%; height: 100%;
-            background: #b000ff;
-            transition: all 0.3s ease;
-            z-index: -1;
+        /* 只有最基礎的反轉色懸停，沒有過渡動畫 */
+        .link-item:hover {
+            background-color: #8000ff;
+            color: #000000;
+            border-color: #8000ff;
         }
-
-        .void-btn:hover {
-            color: #000;
-            border-color: #b000ff;
-            box-shadow: 0 0 15px #b000ff;
-            text-shadow: 2px 2px 0px #00ffff;
-        }
-
-        .void-btn:hover::before {
-            left: 0;
-        }
-
-        /* 漂浮的混沌粒子 (代替無聊的星空) */
-        .particle {
-            position: absolute;
-            background: #b000ff;
-            border-radius: 50%;
-            pointer-events: none;
-            box-shadow: 0 0 10px #ff00ff;
-            z-index: 3;
-            animation: float-up infinite linear;
-        }
-
-        @keyframes float-up {
-            0% { transform: translateY(100vh) scale(0); opacity: 1; }
-            100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
-        }
-
     </style>
 </head>
 <body>
-    <div class="void-vignette"></div>
-    <div class="checkerboard-floor"></div>
 
-    <div class="entity-card">
-        <div class="chromatic-title">[ NAME ]</div>
-        <div class="subtitle">ENTITY // ID_000</div>
+    <div class="classic-container">
+        <div class="title">[ NAME ]</div>
+        <div class="subtitle">ID: NULL // ENTITY</div>
         
-        <div class="lore-box">
-            [ 這裡輸入簡介。不需要任何科幻設定，用文字填補這片虛空。 ]<br>
-            [ 可以是第二行文字。 ]
+        <div class="lore-text">
+            [ 這裡輸入文字。 ]<br><br>
+            [ 沒有特效，沒有動態。只有最純粹的舊網頁深淵感。 ]
         </div>
 
-        <div class="links-container">
-            <a href="#" class="void-btn">LINK_ONE</a>
-            <a href="#" class="void-btn">LINK_TWO</a>
+        <div class="link-list">
+            <a href="#" class="link-item">> [ LINK_01 ]</a>
+            <a href="#" class="link-item">> [ LINK_02 ]</a>
         </div>
     </div>
 
-    <script>
-        // 生成混沌紫光粒子
-        function createParticles() {
-            for (let i = 0; i < 25; i++) {
-                let particle = document.createElement('div');
-                particle.className = 'particle';
-                
-                // 隨機大小、位置、動畫時間
-                let size = Math.random() * 4 + 1;
-                let duration = Math.random() * 5 + 4;
-                let left = Math.random() * 100;
-                let delay = Math.random() * 5;
-
-                particle.style.width = size + 'px';
-                particle.style.height = size + 'px';
-                particle.style.left = left + 'vw';
-                particle.style.animationDuration = duration + 's';
-                particle.style.animationDelay = delay + 's';
-
-                document.body.appendChild(particle);
-            }
-        }
-        createParticles();
-    </script>
 </body>
 </html>
