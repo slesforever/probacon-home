@@ -1,360 +1,731 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+    <link rel="icon" href="https://shared.fastly.steamstatic.com/community_assets/images/apps/1256670/6aae1f276e95e65de99d6ffea75f010167d5d0c6.jpg">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NULLSCAPE // VORTEX</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,900&family=Noto+Serif+TC:wght@600;900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sles | Library Archive</title>
+    
+    <!-- 引入古典圖書館風格字體 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Serif+TC:wght@300;400;500&display=swap" rel="stylesheet">
+
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body, html {
-            width: 100%; height: 100%;
-            background-color: #000;
-            font-family: 'Playfair Display', 'Noto Serif TC', serif;
-            overflow: hidden;
+        :root {
+            --theme-color: #ffea95;
+            --theme-dim: rgba(255, 234, 149, 0.35);
+            --gold-glow: rgba(212, 175, 55, 0.6);
+            --mouse-x: 50%;
+            --mouse-y: 50%;
+            --tilt-x: 0deg;
+            --tilt-y: 0deg;
         }
 
-        #void-canvas {
-            position: absolute;
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: #020203;
+            color: var(--theme-color);
+            font-family: "Cinzel", "Noto Serif TC", "serif";
+            overflow: hidden;
+            touch-action: none;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        /* --- 背景圖層與極致暗角 --- */
+        .bg-layer {
+            position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
             z-index: 1;
+            background-image: radial-gradient(circle at center, rgba(10,10,14,0.3) 0%, rgba(2,2,3,0.85) 100%), url('library.jpg');
+            background-size: cover;
+            background-position: center;
+            transform: scale(1.04);
+            transition: transform 0.3s ease-out;
         }
 
-        /* 黑洞遮罩：中心死黑，外側帶有強烈的紫色高光暈染 */
-        .event-horizon {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 50%, #000 15%, rgba(20, 0, 40, 0.3) 50%, rgba(80, 0, 140, 0.4) 90%, #05000a 100%);
-            z-index: 2;
+        #canvas-back { position: fixed; top: 0; left: 0; z-index: 2; pointer-events: none; }
+        #canvas-front { position: fixed; top: 0; left: 0; z-index: 7; pointer-events: none; }
+
+        #ripple-container {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 99;
             pointer-events: none;
         }
 
-        .content-layer {
-            position: relative;
+        /* --- 頂部與底部古典標示 --- */
+        .library-header-bar {
+            position: fixed;
+            top: 28px;
+            left: 45px;
+            right: 45px;
             z-index: 10;
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            height: 100%;
+            font-size: 0.7rem;
+            letter-spacing: 5px;
+            color: var(--theme-dim);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.18);
+            padding-bottom: 10px;
             pointer-events: none;
         }
 
-        /* 卡片本體 (支援黑洞吸入與飛入動畫) */
-        .profile-box {
-            background: rgba(8, 0, 15, 0.85);
-            border: 2px solid #550080;
-            padding: 50px;
-            text-align: center;
-            box-shadow: 0 0 50px rgba(136, 0, 255, 0.3), inset 0 0 25px rgba(136, 0, 255, 0.15);
-            backdrop-filter: blur(6px);
+        .library-footer-bar {
+            position: fixed;
+            bottom: 28px;
+            left: 45px;
+            right: 45px;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.65rem;
+            letter-spacing: 4px;
+            color: rgba(255, 234, 149, 0.25);
+            pointer-events: none;
+        }
+
+        /* 音訊狀態指示器 (頂級細節) */
+        .audio-hud {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+            color: rgba(255, 234, 149, 0.6);
             pointer-events: auto;
-            clip-path: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% calc(100% - 20px), calc(100% - 20px) 100%, 20px 100%, 0 calc(100% - 20px), 0 20px);
-            
-            transition: transform 0.6s cubic-bezier(0.5, 0, 1, 1), opacity 0.6s ease, filter 0.6s ease;
-            transform: scale(1) rotate(0deg);
-            opacity: 1;
-            filter: blur(0px);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .audio-hud:hover { color: #fff; }
+        .audio-waves {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 10px;
+        }
+        .audio-waves span {
+            width: 2px;
+            background: var(--theme-color);
+            animation: wave-anim 1.2s infinite ease-in-out;
+        }
+        .audio-waves span:nth-child(2) { animation-delay: 0.2s; }
+        .audio-waves span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes wave-anim {
+            0%, 100% { height: 3px; opacity: 0.3; }
+            50% { height: 10px; opacity: 1; }
         }
 
-        .profile-box.sucking {
-            transform: scale(0) rotate(720deg);
-            opacity: 0;
-            filter: blur(15px);
+        /* --- 典雅翻頁按鈕 --- */
+        .page-nav {
+            position: fixed;
+            top: 50%;
+            width: clamp(42px, 5.5vw, 50px);
+            height: clamp(42px, 5.5vw, 50px);
+            background: #fffdf0;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+            outline: none;
+            border: none;
+            box-shadow: 0 0 25px rgba(255,255,255,0.8), 0 0 40px #d4af37, 0 0 60px rgba(212, 175, 55, 0.45);
+            animation: seed-button-pulse 3.8s infinite ease-in-out;
         }
 
-        .profile-box.flying-in {
-            transform: scale(1.5) translateX(-100vw) rotate(-45deg);
-            opacity: 0;
-            filter: blur(10px);
+        .nav-left { left: clamp(20px, 4vw, 45px); transform: translateY(-50%); }
+        .nav-right { right: clamp(20px, 4vw, 45px); transform: translateY(-50%); }
+
+        .page-nav::after {
+            content: "";
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: rgba(10, 10, 14, 0.9);
+            transform: rotate(45deg);
+            border: 1px solid #d4af37;
+            transition: all 0.4s ease;
+            box-shadow: inset 0 0 8px rgba(212, 175, 55, 0.6);
         }
 
-        /* 修正後的標題：冰藍到深紫漸層，去除所有抖音霓虹疊影，改用紮實的質感 */
-        .title {
-            font-size: 3.5rem;
-            font-weight: 900;
-            background: linear-gradient(180deg, #ffffff 0%, #00e1ff 35%, #7a00cc 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: 8px;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.9));
+        @keyframes seed-button-pulse {
+            0%, 100% { 
+                transform: translateY(-50%) scale(0.92); 
+                box-shadow: 0 0 15px rgba(255,255,255,0.8), 0 0 30px #d4af37; 
+            }
+            50% { 
+                transform: translateY(-50%) scale(1.06); 
+                box-shadow: 0 0 35px rgba(255,255,255,1), 0 0 60px #d4af37, 0 0 90px rgba(255, 234, 149, 0.6); 
+            }
         }
 
-        .subtitle {
-            font-size: 0.95rem;
-            color: #b066ff;
-            letter-spacing: 10px;
-            margin-bottom: 35px;
-            text-shadow: 0 0 8px rgba(176, 102, 255, 0.5);
+        .page-nav:hover, .page-nav:focus-visible {
+            animation: none !important;
+            transform: translateY(-50%) scale(1.22);
+            background: #ffffff;
+            box-shadow: 0 0 40px #fff, 0 0 80px #ffea95, 0 0 120px rgba(212, 175, 55, 0.9);
         }
 
-        .desc {
-            color: #d4aaff;
-            font-size: 0.95rem;
-            line-height: 2;
-            max-width: 400px;
-            margin: 0 auto 30px auto;
-            border-top: 1px solid rgba(170, 0, 255, 0.25);
-            border-bottom: 1px solid rgba(170, 0, 255, 0.25);
-            padding: 20px 0;
+        .page-nav:hover::after {
+            background: #ffea95;
+            border-color: #fff;
+            box-shadow: 0 0 15px #ffea95;
+            transform: rotate(225deg) scale(1.15);
         }
 
-        .btn-group {
+        .page-nav:active {
+            transform: translateY(-50%) scale(0.9);
+        }
+
+        /* --- 頂級書冊 UI 卡片 (加入雙框與奢華光影) --- */
+        .main-container {
             display: flex;
             justify-content: center;
-            gap: 15px;
+            align-items: center;
+            height: 100vh;
+            position: relative;
+            z-index: 5;
+            perspective: 1200px;
+            pointer-events: none;
         }
 
-        .btn {
-            display: inline-block;
-            background: #000;
-            color: #d4aaff;
-            border: 1px solid #7a00cc;
-            padding: 12px 25px;
-            font-family: inherit;
-            font-size: 0.85rem;
-            letter-spacing: 4px;
-            text-decoration: none;
-            text-transform: uppercase;
-            transition: 0.3s;
-            cursor: pointer;
+        .ruina-book {
+            pointer-events: auto;
+            background: linear-gradient(135deg, rgba(14, 14, 20, 0.85) 0%, rgba(6, 6, 9, 0.92) 100%);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            width: 85%;
+            max-width: 580px;
+            padding: clamp(50px, 8vh, 75px) clamp(32px, 5.5vw, 60px);
+            position: relative;
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.95), 
+                        inset 0 0 30px rgba(212, 175, 55, 0.08),
+                        inset 0 0 2px rgba(255, 255, 255, 0.15);
+            transform: rotateX(var(--tilt-y)) rotateY(var(--tilt-x));
+            transition: transform 0.1s ease-out, opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), filter 0.4s ease;
+            will-change: transform, opacity, filter;
+            overflow: hidden;
+            transform-style: preserve-3d;
         }
 
-        .btn:hover {
-            background: #7a00cc;
-            color: #fff;
-            box-shadow: 0 0 15px rgba(122, 0, 204, 0.6);
+        /* 內側精緻細線裝飾框 */
+        .ruina-book::before {
+            content: "";
+            position: absolute;
+            inset: 8px;
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            pointer-events: none;
+            z-index: 3;
         }
+
+        /* 動態滑鼠光影聚焦層 */
+        .ruina-book::after {
+            content: ""; 
+            position: absolute; 
+            inset: 0;
+            background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(255, 234, 149, 0.11), transparent 70%);
+            z-index: 1; 
+            pointer-events: none;
+        }
+
+        /* 頂級 3D 翻頁過場動畫 */
+        .ruina-book.page-switching-next {
+            opacity: 0;
+            filter: blur(12px);
+            transform: rotateX(var(--tilt-y)) rotateY(calc(var(--tilt-x) - 25deg)) translateX(-40px) scale(0.96);
+        }
+        .ruina-book.page-switching-prev {
+            opacity: 0;
+            filter: blur(12px);
+            transform: rotateX(var(--tilt-y)) rotateY(calc(var(--tilt-x) + 25deg)) translateX(40px) scale(0.96);
+        }
+
+        @media (max-width: 480px) {
+            .ruina-book { width: 80%; padding: 45px 24px; }
+            h1 { letter-spacing: 8px !important; font-size: 2.1rem !important; }
+            .sub-title { letter-spacing: 3px !important; margin-bottom: 35px !important; }
+            .data-row { margin-bottom: 22px !important; }
+            .library-header-bar, .library-footer-bar { font-size: 0.5rem; left: 15px; right: 15px; }
+        }
+
+        /* --- 排版與刻印質感 --- */
+        .card-header-tag {
+            font-size: 0.65rem;
+            color: var(--theme-color);
+            opacity: 0.55;
+            letter-spacing: 6px;
+            text-align: center;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        h1 {
+            font-size: clamp(2.4rem, 7.5vw, 3.6rem);
+            letter-spacing: 16px;
+            margin: 0; 
+            color: #fff; 
+            text-align: center; 
+            opacity: 0;
+            font-weight: 400;
+            position: relative;
+            z-index: 2;
+            transition: opacity 0.3s ease;
+        }
+        h1.engraved { animation: gentle-breath 4s infinite ease-in-out; opacity: 1; }
+
+        .sub-title { 
+            text-align: center; 
+            font-size: clamp(0.55rem, 1.8vw, 0.7rem); 
+            letter-spacing: 6px; 
+            color: var(--theme-color); 
+            margin: 10px 0 42px 0; 
+            opacity: 0; 
+            position: relative; 
+            z-index: 2;
+            transition: opacity 0.3s ease;
+        }
+        .sub-title.engraved { animation: gentle-breath 4s infinite ease-in-out; animation-delay: 0.3s; opacity: 1; }
+
+        .data-row { margin-bottom: 28px; position: relative; padding-left: 20px; z-index: 2; }
+        .data-row::before { 
+            content: ""; position: absolute; left: 0; top: 0; width: 2px; height: 100%; 
+            background: linear-gradient(to bottom, var(--theme-color), rgba(212,175,55,0.2)); 
+            transform: scaleY(0); 
+            transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 0 12px var(--theme-color);
+        }
+        .data-row.engraved::before { transform: scaleY(1); }
+
+        .label { 
+            font-size: 0.68rem; color: var(--theme-color); margin-bottom: 5px; display: block; opacity: 0.65; letter-spacing: 3px; 
+        }
+        .value { font-size: 1.08rem; color: #fff; opacity: 0; display: block; letter-spacing: 1.5px; transition: opacity 0.3s ease; }
+        .value.engraved { animation: gentle-breath 4s infinite ease-in-out; opacity: 1; }
+
+        @keyframes gentle-breath {
+            0%, 100% { opacity: 0.65; text-shadow: 0 0 10px rgba(255, 234, 149, 0.3); }
+            50% { opacity: 1; text-shadow: 0 0 22px var(--theme-color), 0 0 8px #fff; }
+        }
+
+        .page-indicator {
+            position: absolute;
+            bottom: 18px;
+            right: 25px;
+            font-size: 0.68rem;
+            letter-spacing: 3px;
+            color: var(--theme-color);
+            opacity: 0.45;
+            z-index: 4;
+        }
+
+        /* 典雅角邊鑽石印記 */
+        .corner-diamond {
+            position: absolute; width: 8px; height: 8px;
+            background: var(--theme-color); transform: rotate(45deg);
+            box-shadow: 0 0 10px var(--theme-color), 0 0 2px #fff;
+            transition: all 0.4s ease;
+            z-index: 5;
+        }
+        .cd-tl { top: -4px; left: -4px; } .cd-tr { top: -4px; right: -4px; }
+        .cd-bl { bottom: -4px; left: -4px; } .cd-br { bottom: -4px; right: -4px; }
+
+        .ruina-book:hover .corner-diamond {
+            box-shadow: 0 0 18px var(--theme-color), 0 0 6px #fff;
+            transform: rotate(225deg) scale(1.1);
+        }
+
+        /* 點擊光輝漣漪 */
+        .ripple {
+            position: absolute; border-radius: 50%; pointer-events: none;
+            transform: translate(-50%, -50%) scale(0);
+            border: 1px solid #ffea95;
+            box-shadow: 0 0 30px #d4af37, inset 0 0 10px #ffea95;
+            animation: ripple-anim 0.65s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+            z-index: 99;
+        }
+        @keyframes ripple-anim { to { transform: translate(-50%, -50%) scale(2.8); opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <canvas id="void-canvas"></canvas>
-    <div class="event-horizon"></div>
+    <div class="library-header-bar">
+        <span>PATRON LIBRARIAN ARCHIVE</span>
+        <span>SECTOR-01 // SLES</span>
+    </div>
 
-    <div class="content-layer">
-        <div class="profile-box" id="profile-card"></div>
+    <div class="library-footer-bar">
+        <span>MAY YOU FIND YOUR BOOK IN THIS PLACE</span>
+        <div class="audio-hud" id="audio-toggle" title="切換音樂播放">
+            <span id="audio-status-text">BGM: ACTIVE</span>
+            <div class="audio-waves">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-layer" id="bg-layer"></div>
+    <div id="ripple-container"></div>
+    
+    <canvas id="canvas-back"></canvas>
+    <canvas id="canvas-front"></canvas>
+
+    <!-- 典雅翻頁按鈕 -->
+    <button class="page-nav nav-left" id="btn-prev" aria-label="Previous Page"></button>
+    <button class="page-nav nav-right" id="btn-next" aria-label="Next Page"></button>
+
+    <div class="main-container">
+        <div class="ruina-book" id="ui-card">
+            <div class="corner-diamond cd-tl"></div><div class="corner-diamond cd-tr"></div>
+            <div class="corner-diamond cd-bl"></div><div class="corner-diamond cd-br"></div>
+
+            <div class="card-header-tag">RECORD OF LIBRARIAN</div>
+            <h1 id="title-name">𝑆𝑙𝑒𝑠</h1>
+            <div class="sub-title" id="sub-title">BOOK, LIBRARIAN, STAR AND CITY</div>
+            
+            <div id="data-container">
+                <div class="data-row">
+                    <span class="label">Identity // Ego</span>
+                    <span class="value">Human // Developer</span>
+                </div>
+                <div class="data-row">
+                    <span class="label">Likes // Love</span>
+                    <span class="value">Develop // Novel</span>
+                </div>
+                <div class="data-row">
+                    <span class="label">Age // Birthday</span>
+                    <span class="value">15 // 9/21</span>
+                </div>
+            </div>
+
+            <div class="page-indicator" id="page-indicator">PAGE 01 / 03</div>
+        </div>
     </div>
 
     <script>
+        /* --- 背景 BGM 音樂播放器與互動開關 --- */
+        const bgm = new Audio('https://project-moon-archive.vercel.app/bgm.mp3');
+        bgm.loop = true;
+        bgm.volume = 0.35;
+
+        const audioToggle = document.getElementById('audio-toggle');
+        const audioStatusText = document.getElementById('audio-status-text');
+        let isMusicPlaying = false;
+
+        const startAudio = () => {
+            bgm.play().then(() => {
+                isMusicPlaying = true;
+                audioStatusText.textContent = "BGM: ACTIVE";
+            }).catch(() => {});
+            document.removeEventListener('click', startAudio);
+            document.removeEventListener('keydown', startAudio);
+        };
+        document.addEventListener('click', startAudio);
+        document.addEventListener('keydown', startAudio);
+
+        audioToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (isMusicPlaying) {
+                bgm.pause();
+                isMusicPlaying = false;
+                audioStatusText.textContent = "BGM: MUTED";
+            } else {
+                bgm.play();
+                isMusicPlaying = true;
+                audioStatusText.textContent = "BGM: ACTIVE";
+            }
+        });
+
+        const uiCard = document.getElementById('ui-card');
+        const rippleContainer = document.getElementById('ripple-container');
+        const titleElem = document.getElementById('title-name');
+        const subTitleElem = document.getElementById('sub-title');
+        const dataContainer = document.getElementById('data-container');
+        const pageIndicator = document.getElementById('page-indicator');
+
+        /* --- 帶有圖書館大廳空間迴音 (Spatial Echo/Reverb) 的 Web Audio 音效 --- */
+        const playSfx = (type = 'click') => {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                if (type === 'click') {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(460, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(230, ctx.currentTime + 0.12);
+                    gain.gain.setValueAtTime(0.04, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.12);
+
+                    const echoOsc = ctx.createOscillator();
+                    const echoGain = ctx.createGain();
+                    echoOsc.type = 'sine';
+                    echoOsc.frequency.setValueAtTime(230, ctx.currentTime + 0.05);
+                    echoOsc.frequency.exponentialRampToValueAtTime(115, ctx.currentTime + 0.35);
+                    echoGain.gain.setValueAtTime(0.015, ctx.currentTime + 0.05);
+                    echoGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35);
+                    echoOsc.connect(echoGain);
+                    echoGain.connect(ctx.destination);
+                    echoOsc.start(ctx.currentTime + 0.05);
+                    echoOsc.stop(ctx.currentTime + 0.35);
+
+                } else if (type === 'page') {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(190, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(380, ctx.currentTime + 0.22);
+                    gain.gain.setValueAtTime(0.035, ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.22);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.22);
+                }
+            } catch(e) {}
+        };
+
         const pages = [
             {
-                title: "NULLSCAPE",
-                subtitle: "ENTITY_VOID",
-                desc: "[ 第一頁內容。 ]<br>[ 字體已修正為冰藍漸層質感，不再有抖音特效。 ]",
-                buttons: [
-                    { text: "NEXT PAGE", action: "next" },
-                    { text: "PORTAL", action: "external", url: "#" }
+                tag: "RECORD OF LIBRARIAN",
+                title: "𝑆𝑙𝑒𝑠",
+                subtitle: "BOOK, LIBRARIAN, STAR AND CITY",
+                rows: [
+                    { label: "Identity // Ego", value: "Human // Developer" },
+                    { label: "Likes // Love", value: "Develop // Novel" },
+                    { label: "Age // Birthday", value: "15 // 9/21" }
                 ]
             },
             {
-                title: "LORE // 01",
-                subtitle: "THE ABYSSAL WHISPER",
-                desc: "[ 第二頁內容。 ]<br>[ 點擊切換時會被黑洞整個吸進去。 ]",
-                buttons: [
-                    { text: "PREV PAGE", action: "prev" },
-                    { text: "NEXT PAGE", action: "next" }
+                tag: "ARCHIVE DATABASE",
+                title: "𝐹𝑎𝑣𝑜𝑟𝑖𝑡𝑒𝑠",
+                subtitle: "PREFERENCES // ARCHIVE",
+                rows: [
+                    { label: "Games // Universe", value: "Project Moon (Library of Ruina / Limbus / lobotomy corp)" },
+                    { label: "MusicArtist // Music", value: "Mili // Gone Angels" }
                 ]
             },
             {
-                title: "ARCHIVE",
-                subtitle: "FINAL REALM",
-                desc: "[ 第三頁內容。 ]<br>[ 終點。 ]",
-                buttons: [
-                    { text: "RETURN", action: "home" }
+                tag: "CREATIVE WORKS",
+                title: "𝑊𝑜𝑟𝑘𝑠",
+                subtitle: "CREATIVE & SCRIPTING ARCHIVE",
+                rows: [
+                    { label: "Game Dev // Engine", value: "Roblox Luau & Web Front-end" },
+                    { label: "Status // Activity", value: "Active Development" }
                 ]
             }
         ];
 
         let currentPage = 0;
-        const card = document.getElementById('profile-card');
+        let isTransitioning = false;
+        let mousePos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 
-        function renderPage(pageIdx) {
-            const p = pages[pageIdx];
-            let btnHtml = '';
-            p.buttons.forEach(b => {
-                if(b.action === 'next') btnHtml += `<button class="btn" onclick="switchPage(1)">${b.text}</button>`;
-                else if(b.action === 'prev') btnHtml += `<button class="btn" onclick="switchPage(-1)">${b.text}</button>`;
-                else if(b.action === 'home') btnHtml += `<button class="btn" onclick="goToPage(0)">${b.text}</button>`;
-                else btnHtml += `<a href="${b.url}" class="btn">${b.text}</a>`;
+        const handleMove = (e) => {
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            mousePos.x = clientX;
+            mousePos.y = clientY;
+
+            const rect = uiCard.getBoundingClientRect();
+            uiCard.style.setProperty('--mouse-x', `${clientX - rect.left}px`);
+            uiCard.style.setProperty('--mouse-y', `${clientY - rect.top}px`);
+
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            const tiltX = ((clientX - centerX) / centerX) * 6;
+            const tiltY = ((clientY - centerY) / centerY) * -6;
+
+            uiCard.style.setProperty('--tilt-x', `${tiltX}deg`);
+            uiCard.style.setProperty('--tilt-y', `${tiltY}deg`);
+        };
+
+        document.addEventListener('mousemove', handleMove);
+        document.addEventListener('touchmove', handleMove);
+
+        const createRipple = (e) => {
+            const ripple = document.createElement('div');
+            ripple.className = 'ripple';
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            ripple.style.width = ripple.style.height = `60px`;
+            ripple.style.left = `${clientX}px`;
+            ripple.style.top = `${clientY}px`;
+            rippleContainer.appendChild(ripple);
+            playSfx('click');
+            setTimeout(() => ripple.remove(), 650);
+        };
+
+        document.addEventListener('mousedown', createRipple);
+
+        // 手機 Touch 滑動支援
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        uiCard.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        uiCard.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            const swipeDistance = touchEndX - touchStartX;
+            if (Math.abs(swipeDistance) > 50) {
+                if (swipeDistance < 0) switchPage('next');
+                else switchPage('prev');
+            }
+        }, { passive: true });
+
+        function startEngraving() {
+            titleElem.classList.remove('engraved');
+            subTitleElem.classList.remove('engraved');
+            const rows = dataContainer.querySelectorAll('.data-row');
+            rows.forEach(row => {
+                row.classList.remove('engraved');
+                const val = row.querySelector('.value');
+                if (val) val.classList.remove('engraved');
             });
 
-            card.innerHTML = `
-                <div class="title">${p.title}</div>
-                <div class="subtitle">${p.subtitle}</div>
-                <div class="desc">${p.desc}</div>
-                <div class="btn-group">${btnHtml}</div>
-            `;
+            setTimeout(() => { titleElem.classList.add('engraved'); }, 150);
+            setTimeout(() => { subTitleElem.classList.add('engraved'); }, 400);
+            
+            rows.forEach((row, i) => {
+                setTimeout(() => {
+                    row.classList.add('engraved');
+                    const val = row.querySelector('.value');
+                    if (val) val.classList.add('engraved');
+                }, 700 + (i * 250));
+            });
+        }
+
+        function renderPageContent(pageIndex) {
+            const data = pages[pageIndex];
+            document.querySelector('.card-header-tag').textContent = data.tag;
+            titleElem.textContent = data.title;
+            subTitleElem.textContent = data.subtitle;
+
+            dataContainer.innerHTML = data.rows.map(row => `
+                <div class="data-row">
+                    <span class="label">${row.label}</span>
+                    <span class="value">${row.value}</span>
+                </div>
+            `).join('');
+
+            pageIndicator.textContent = `PAGE 0${pageIndex + 1} / 0${pages.length}`;
         }
 
         function switchPage(direction) {
-            card.classList.add('sucking');
+            if (isTransitioning) return;
+            isTransitioning = true;
+            playSfx('page');
+
+            const targetClass = direction === 'next' ? 'page-switching-next' : 'page-switching-prev';
+            uiCard.classList.add(targetClass);
+
             setTimeout(() => {
-                currentPage = (currentPage + direction + pages.length) % pages.length;
-                renderPage(currentPage);
-                card.classList.remove('sucking');
-                card.classList.add('flying-in');
-                setTimeout(() => card.classList.remove('flying-in'), 50);
-            }, 600);
+                if (direction === 'next') {
+                    currentPage = (currentPage + 1) % pages.length;
+                } else {
+                    currentPage = (currentPage - 1 + pages.length) % pages.length;
+                }
+
+                renderPageContent(currentPage);
+                uiCard.classList.remove(targetClass);
+                startEngraving();
+
+                setTimeout(() => { isTransitioning = false; }, 400);
+            }, 300);
         }
 
-        function goToPage(targetIdx) {
-            card.classList.add('sucking');
-            setTimeout(() => {
-                currentPage = targetIdx;
-                renderPage(currentPage);
-                card.classList.remove('sucking');
-                card.classList.add('flying-in');
-                setTimeout(() => card.classList.remove('flying-in'), 50);
-            }, 600);
-        }
+        document.getElementById('btn-next').addEventListener('click', (e) => {
+            e.stopPropagation();
+            switchPage('next');
+        });
 
-        renderPage(0);
+        document.getElementById('btn-prev').addEventListener('click', (e) => {
+            e.stopPropagation();
+            switchPage('prev');
+        });
 
-        // --- Canvas 渲染核心 ---
-        const canvas = document.getElementById('void-canvas');
-        const ctx = canvas.getContext('2d');
-        
-        let width, height, cx, cy;
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') switchPage('next');
+            if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') switchPage('prev');
+        });
+
+        // 背景柔和光之粒子
+        const cBack = document.getElementById('canvas-back');
+        const cFront = document.getElementById('canvas-front');
+        const ctxBack = cBack.getContext('2d');
+        const ctxFront = cFront.getContext('2d');
         let particles = [];
-        const PARTICLE_COUNT = 160;
-        const MAX_RADIUS = 1300;
 
-        function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-            cx = width / 2;
-            cy = height / 2;
+        function resize() { 
+            cBack.width = cFront.width = window.innerWidth; 
+            cBack.height = cFront.height = window.innerHeight; 
         }
-
         window.addEventListener('resize', resize);
         resize();
 
-        class VoidEntity {
-            constructor() {
-                this.reset(true);
+        class Particle {
+            constructor() { this.reset(true); }
+            reset(initial = false) {
+                this.x = Math.random() * cBack.width;
+                this.y = initial ? Math.random() * cBack.height : cBack.height + 30;
+                this.radius = Math.random() * 1.6 + 0.4;
+                this.speedY = Math.random() * 0.7 + 0.25;    
+                this.speedX = (Math.random() - 0.5) * 0.15;
+                this.opacity = Math.random() * 0.5 + 0.15;
+                this.layer = Math.random() > 0.55 ? 'front' : 'back';
             }
+            update() { 
+                this.y -= this.speedY; 
+                this.x += this.speedX;
 
-            reset(randomizeRadius = false) {
-                this.radius = randomizeRadius ? Math.random() * MAX_RADIUS : MAX_RADIUS;
-                this.angle = Math.random() * Math.PI * 2;
-                this.speed = Math.random() * 2 + 1.2;
-                this.angleSpeed = (Math.random() * 0.02 + 0.005) * (Math.random() > 0.5 ? 1 : -1);
-                
-                const rand = Math.random();
-                if (rand < 0.6) this.type = 'cube';
-                else if (rand < 0.8) this.type = 'meteor';
-                else this.type = 'eye';
-
-                this.size = Math.random() * 22 + 12;
-                this.rotation = Math.random() * Math.PI * 2;
-                this.rotSpeed = (Math.random() - 0.5) * 0.12;
-                
-                const colors = ['#1a0033', '#4a0080', '#9900cc', '#0a0014'];
-                this.color = colors[Math.floor(Math.random() * colors.length)];
-            }
-
-            update() {
-                let gravityPull = Math.max(1, (MAX_RADIUS / Math.max(this.radius, 10)) * 0.45);
-                this.radius -= this.speed * gravityPull;
-                this.angle += this.angleSpeed * gravityPull;
-                this.rotation += this.rotSpeed * gravityPull;
-
-                if (this.radius < 5) {
-                    this.reset();
+                const dx = mousePos.x - this.x;
+                if (Math.abs(dx) < 150) {
+                    this.x += dx * 0.0003;
                 }
-            }
 
+                if (this.y < -30) this.reset(false); 
+            }
             draw() {
-                const x = cx + Math.cos(this.angle) * this.radius;
-                const y = cy + Math.sin(this.angle) * this.radius;
-
-                const scale = Math.min(1, this.radius / 300);
-                const stretch = Math.max(1, 300 / Math.max(this.radius, 10));
-
-                ctx.save();
-                ctx.translate(x, y);
-                ctx.rotate(this.angle + Math.PI/2); 
-                ctx.scale(scale, scale * stretch); 
-                ctx.rotate(this.rotation);
-
-                ctx.globalAlpha = Math.min(1, this.radius / 150);
-
-                if (this.type === 'cube') {
-                    ctx.fillStyle = this.color;
-                    ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
-                    ctx.strokeStyle = '#000';
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(-this.size/2, -this.size/2, this.size, this.size);
-                } 
-                else if (this.type === 'meteor') {
-                    ctx.beginPath();
-                    ctx.moveTo(-this.size/2, -this.size/2);
-                    ctx.lineTo(this.size/2, -this.size/3);
-                    ctx.lineTo(this.size/3, this.size/2);
-                    ctx.lineTo(-this.size/2, this.size/3);
-                    ctx.closePath();
-                    ctx.fillStyle = '#100020';
-                    ctx.fill();
-                    ctx.strokeStyle = '#7a00cc';
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
-                }
-                else if (this.type === 'eye') {
-                    ctx.beginPath();
-                    ctx.moveTo(-this.size, -this.size * 0.2);
-                    ctx.lineTo(0, -this.size * 0.7);
-                    ctx.lineTo(this.size, -this.size * 0.2);
-                    ctx.lineTo(0, this.size * 0.7);
-                    ctx.closePath();
-                    ctx.fillStyle = '#e6ccff';
-                    ctx.fill();
-                    ctx.strokeStyle = '#cc0088';
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
-                    
-                    ctx.beginPath();
-                    ctx.moveTo(-this.size * 0.5, 0); ctx.lineTo(-this.size * 0.2, 0);
-                    ctx.moveTo(this.size * 0.2, 0); ctx.lineTo(this.size * 0.5, 0);
-                    ctx.strokeStyle = '#330011';
-                    ctx.stroke();
-
-                    ctx.beginPath();
-                    ctx.arc(0, 0, this.size * 0.35, 0, Math.PI * 2);
-                    ctx.fillStyle = '#030005';
-                    ctx.fill();
-                    
-                    ctx.beginPath();
-                    ctx.arc(this.size * 0.05, -this.size * 0.05, this.size * 0.12, 0, Math.PI * 2);
-                    ctx.fillStyle = '#00e1ff';
-                    ctx.fill();
-                }
-
-                ctx.restore();
+                const ctx = this.layer === 'front' ? ctxFront : ctxBack;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 234, 149, ${this.opacity})`;
+                ctx.fill();
             }
         }
-
-        for (let i = 0; i < PARTICLE_COUNT; i++) {
-            particles.push(new VoidEntity());
-        }
+        
+        for (let i = 0; i < 45; i++) particles.push(new Particle());
 
         function animate() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
-            ctx.fillRect(0, 0, width, height);
-
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
-
+            ctxBack.clearRect(0, 0, cBack.width, cBack.height);
+            ctxFront.clearRect(0, 0, cFront.width, cFront.height);
+            particles.forEach(p => { p.update(); p.draw(); });
             requestAnimationFrame(animate);
         }
 
-        animate();
+        window.onload = () => {
+            animate();
+            renderPageContent(0);
+            startEngraving();
+        };
     </script>
 </body>
 </html>
