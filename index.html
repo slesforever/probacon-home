@@ -2,408 +2,2274 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NULLSCAPE // VORTEX</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,900&family=Noto+Serif+TC:wght@600;900&display=swap" rel="stylesheet">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <title>NULLSCAPE // PROFILE</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700;6..96,900&family=Noto+Serif+TC:wght@500;700;900&display=swap"
+        rel="stylesheet"
+    >
+
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body, html {
-            width: 100%; height: 100%;
-            background-color: #000;
-            font-family: 'Playfair Display', 'Noto Serif TC', serif;
+        /* =========================================================
+           RESET
+        ========================================================= */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
             overflow: hidden;
+            background: #030307;
+            color: #ffffff;
+            font-family:
+                "Bodoni Moda",
+                "Noto Serif TC",
+                Georgia,
+                serif;
             user-select: none;
         }
 
-        #void-canvas {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 1;
+        button {
+            font: inherit;
         }
 
-        /* 黑洞遮罩：中心死黑，外側帶有強烈的紫色高光暈染 */
-        .event-horizon {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 50%, #000 10%, rgba(15, 0, 30, 0.4) 40%, rgba(70, 0, 130, 0.3) 80%, #030005 100%);
+        /* =========================================================
+           BACKGROUND
+        ========================================================= */
+
+        #void-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            z-index: 0;
+        }
+
+        /*
+            Atmospheric layers.
+            These intentionally remain subtle.
+        */
+
+        .void-atmosphere {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+
+            background:
+                radial-gradient(
+                    ellipse at 50% 50%,
+                    rgba(0, 0, 0, 0) 0%,
+                    rgba(0, 0, 0, 0.12) 28%,
+                    rgba(0, 0, 0, 0.58) 73%,
+                    rgba(0, 0, 0, 0.94) 100%
+                );
+        }
+
+        .void-vignette {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
             z-index: 2;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(0, 0, 0, 0.5),
+                    transparent 24%,
+                    transparent 76%,
+                    rgba(0, 0, 0, 0.5)
+                );
+
+            mix-blend-mode: multiply;
+        }
+
+        .scanline {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 3;
+
+            opacity: 0.035;
+
+            background:
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(255, 255, 255, 0.06) 0px,
+                    rgba(255, 255, 255, 0.06) 1px,
+                    transparent 1px,
+                    transparent 4px
+                );
+        }
+
+        /* =========================================================
+           TOP / BOTTOM HUD
+        ========================================================= */
+
+        .top-line {
+            position: fixed;
+            top: 22px;
+            left: 28px;
+            right: 28px;
+            height: 1px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(190, 153, 255, 0.38),
+                    transparent
+                );
+
+            z-index: 20;
             pointer-events: none;
         }
 
-        /* 左右青藍色菱形切頁按鈕 */
-        .page-nav {
+        .bottom-line {
             position: fixed;
-            top: 50%;
-            width: 48px;
-            height: 48px;
-            background: rgba(0, 240, 255, 0.08);
-            border: 1.5px solid #00f0ff;
-            transform: translateY(-50%) rotate(45deg);
-            cursor: pointer;
-            z-index: 100;
-            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.25);
-            outline: none;
+            bottom: 22px;
+            left: 28px;
+            right: 28px;
+            height: 1px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(190, 153, 255, 0.18),
+                    transparent
+                );
+
+            z-index: 20;
+            pointer-events: none;
         }
 
-        .nav-left { left: 40px; }
-        .nav-right { right: 40px; }
+        .top-label {
+            position: fixed;
+            top: 36px;
+            left: 34px;
 
-        .page-nav::after {
-            content: "";
-            width: 10px;
-            height: 10px;
-            border-right: 2px solid #00f0ff;
-            border-bottom: 2px solid #00f0ff;
-            transform: rotate(-45deg);
-        }
-        .nav-left::after { transform: rotate(135deg); }
-        .nav-right::after { transform: rotate(-45deg); }
+            z-index: 21;
 
-        .page-nav:hover {
-            background: rgba(0, 240, 255, 0.25);
-            box-shadow: 0 0 25px #00f0ff, 0 0 40px #7a00cc;
-            transform: translateY(-50%) rotate(45deg) scale(1.15);
+            color: rgba(236, 228, 250, 0.55);
+
+            font-family: Arial, sans-serif;
+            font-size: 10px;
+            letter-spacing: 0.36em;
+            text-transform: uppercase;
         }
+
+        .system-label {
+            position: fixed;
+            top: 36px;
+            right: 34px;
+
+            z-index: 21;
+
+            color: rgba(160, 132, 196, 0.45);
+
+            font-family: Arial, sans-serif;
+            font-size: 9px;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+        }
+
+        .bottom-label-left {
+            position: fixed;
+            bottom: 34px;
+            left: 34px;
+
+            z-index: 21;
+
+            color: rgba(236, 228, 250, 0.4);
+
+            font-family: Arial, sans-serif;
+            font-size: 9px;
+            letter-spacing: 0.24em;
+        }
+
+        .bottom-label-right {
+            position: fixed;
+            bottom: 34px;
+            right: 34px;
+
+            z-index: 21;
+
+            color: rgba(236, 228, 250, 0.4);
+
+            font-family: Arial, sans-serif;
+            font-size: 9px;
+            letter-spacing: 0.24em;
+        }
+
+        /* =========================================================
+           MAIN CONTENT
+        ========================================================= */
 
         .content-layer {
-            position: relative;
+            position: fixed;
+            inset: 0;
+
             z-index: 10;
+
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100%;
+
+            padding: 90px 90px 100px;
+
             pointer-events: none;
         }
 
-        /* 720px 寬、半透明卡片本體 */
+        /*
+            Profile frame:
+            Much flatter and more transparent than the original.
+        */
+
         .profile-box {
-            width: 720px;
-            max-width: 90vw;
-            background: rgba(8, 0, 15, 0.85);
-            border: 2px solid #550080;
-            padding: 50px;
-            text-align: center;
-            box-shadow: 0 0 50px rgba(136, 0, 255, 0.3), inset 0 0 25px rgba(136, 0, 255, 0.15);
-            backdrop-filter: blur(6px);
+            position: relative;
+
+            width: min(980px, 88vw);
+            min-height: 500px;
+
+            display: grid;
+            grid-template-columns: 350px 1fr;
+
+            overflow: hidden;
+
             pointer-events: auto;
-            clip-path: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% calc(100% - 20px), calc(100% - 20px) 100%, 20px 100%, 0 calc(100% - 20px), 0 20px);
-            
-            transition: transform 0.6s cubic-bezier(0.5, 0, 1, 1), opacity 0.6s ease, filter 0.6s ease;
-            transform: scale(1) rotate(0deg);
-            opacity: 1;
-            filter: blur(0px);
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(17, 12, 28, 0.68),
+                    rgba(4, 4, 9, 0.48)
+                );
+
+            border:
+                1px solid rgba(211, 190, 244, 0.16);
+
+            box-shadow:
+                0 30px 100px rgba(0, 0, 0, 0.75),
+                inset 0 1px 0 rgba(255, 255, 255, 0.045);
+
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+
+            transition:
+                transform 0.52s cubic-bezier(0.22, 0.61, 0.36, 1),
+                opacity 0.4s ease,
+                filter 0.4s ease;
         }
 
-        .profile-box.sucking {
-            transform: scale(0) rotate(720deg);
+        /*
+            Thin angular accent.
+        */
+
+        .profile-box::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+
+            width: 170px;
+            height: 1px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(219, 191, 255, 0.85),
+                    transparent
+                );
+
+            z-index: 5;
+        }
+
+        .profile-box::after {
+            content: "";
+
+            position: absolute;
+            right: 0;
+            bottom: 0;
+
+            width: 210px;
+            height: 1px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(131, 101, 173, 0.55)
+                );
+
+            z-index: 5;
+        }
+
+        /* =========================================================
+           PAGE TRANSITIONS
+        ========================================================= */
+
+        .profile-box.is-exiting-left {
             opacity: 0;
-            filter: blur(15px);
+            filter: blur(8px);
+
+            transform:
+                translateX(-70px)
+                scale(0.985);
         }
 
-        .profile-box.flying-in {
-            transform: scale(1.5) translateX(-100vw) rotate(-45deg);
+        .profile-box.is-exiting-right {
             opacity: 0;
-            filter: blur(10px);
+            filter: blur(8px);
+
+            transform:
+                translateX(70px)
+                scale(0.985);
         }
 
-        .title {
-            font-size: 3.5rem;
-            font-weight: 900;
-            background: linear-gradient(180deg, #ffffff 0%, #00e1ff 35%, #7a00cc 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: 8px;
-            margin-bottom: 10px;
+        .profile-box.is-entering-left {
+            animation: enterFromLeft 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+        }
+
+        .profile-box.is-entering-right {
+            animation: enterFromRight 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+        }
+
+        @keyframes enterFromLeft {
+            from {
+                opacity: 0;
+                filter: blur(8px);
+
+                transform:
+                    translateX(70px)
+                    scale(0.985);
+            }
+
+            to {
+                opacity: 1;
+                filter: blur(0);
+
+                transform:
+                    translateX(0)
+                    scale(1);
+            }
+        }
+
+        @keyframes enterFromRight {
+            from {
+                opacity: 0;
+                filter: blur(8px);
+
+                transform:
+                    translateX(-70px)
+                    scale(0.985);
+            }
+
+            to {
+                opacity: 1;
+                filter: blur(0);
+
+                transform:
+                    translateX(0)
+                    scale(1);
+            }
+        }
+
+        /* =========================================================
+           CHARACTER / AVATAR AREA
+        ========================================================= */
+
+        .profile-visual {
+            position: relative;
+
+            min-height: 500px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            overflow: hidden;
+
+            border-right:
+                1px solid rgba(204, 183, 236, 0.1);
+
+            background:
+                radial-gradient(
+                    circle at 50% 50%,
+                    rgba(117, 76, 169, 0.15),
+                    transparent 55%
+                );
+        }
+
+        .visual-index {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+
+            color: rgba(222, 208, 239, 0.35);
+
+            font-family: Arial, sans-serif;
+            font-size: 9px;
+            letter-spacing: 0.28em;
+        }
+
+        .visual-caption {
+            position: absolute;
+            bottom: 22px;
+            left: 24px;
+
+            color: rgba(222, 208, 239, 0.35);
+
+            font-family: Arial, sans-serif;
+            font-size: 8px;
+            letter-spacing: 0.22em;
             text-transform: uppercase;
-            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.9));
         }
 
-        .subtitle {
-            font-size: 0.95rem;
-            color: #b066ff;
-            letter-spacing: 10px;
-            margin-bottom: 35px;
-            text-shadow: 0 0 8px rgba(176, 102, 255, 0.5);
+        /*
+            Geometric avatar construction.
+            You can replace this later with an actual Roblox render.
+        */
+
+        .avatar-container {
+            position: relative;
+
+            width: 250px;
+            height: 340px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .desc {
-            color: #d4aaff;
-            font-size: 0.95rem;
-            line-height: 2;
+        .avatar-aura {
+            position: absolute;
+
+            width: 220px;
+            height: 220px;
+
+            border-radius: 50%;
+
+            border:
+                1px solid rgba(214, 191, 255, 0.16);
+
+            box-shadow:
+                0 0 80px rgba(118, 74, 180, 0.12),
+                inset 0 0 80px rgba(118, 74, 180, 0.06);
+
+            animation:
+                auraPulse 5s ease-in-out infinite;
+        }
+
+        @keyframes auraPulse {
+            0%,
+            100% {
+                transform: scale(0.96);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: scale(1.04);
+                opacity: 0.8;
+            }
+        }
+
+        .avatar-ring {
+            position: absolute;
+
+            width: 275px;
+            height: 275px;
+
+            border-radius: 50%;
+
+            border:
+                1px dashed rgba(192, 169, 232, 0.12);
+
+            transform: rotate(16deg);
+
+            animation:
+                ringSpin 26s linear infinite;
+        }
+
+        @keyframes ringSpin {
+            from {
+                transform: rotate(16deg);
+            }
+
+            to {
+                transform: rotate(376deg);
+            }
+        }
+
+        .avatar {
+            position: relative;
+
+            width: 150px;
+            height: 210px;
+
+            transform: translateY(8px);
+        }
+
+        /*
+            Head
+        */
+
+        .avatar-head {
+            position: absolute;
+
+            top: 4px;
+            left: 35px;
+
+            width: 80px;
+            height: 92px;
+
+            background:
+                linear-gradient(
+                    155deg,
+                    #f3f0f7 0%,
+                    #d8d1df 45%,
+                    #8e8399 100%
+                );
+
+            clip-path:
+                polygon(
+                    18% 0,
+                    82% 0,
+                    100% 22%,
+                    92% 78%,
+                    64% 100%,
+                    36% 100%,
+                    8% 78%,
+                    0 22%
+                );
+
+            box-shadow:
+                0 0 22px rgba(225, 203, 255, 0.18);
+        }
+
+        /*
+            Dark face mask
+        */
+
+        .avatar-mask {
+            position: absolute;
+
+            top: 34px;
+            left: 42px;
+
+            width: 66px;
+            height: 42px;
+
+            background: #09070e;
+
+            clip-path:
+                polygon(
+                    0 25%,
+                    25% 0,
+                    75% 0,
+                    100% 25%,
+                    82% 100%,
+                    18% 100%
+                );
+        }
+
+        .avatar-eye {
+            position: absolute;
+
+            top: 50px;
+
+            width: 5px;
+            height: 5px;
+
+            background: #e9ddff;
+
+            box-shadow:
+                0 0 12px rgba(208, 174, 255, 0.9);
+        }
+
+        .avatar-eye.left {
+            left: 57px;
+        }
+
+        .avatar-eye.right {
+            left: 88px;
+        }
+
+        /*
+            Torso
+        */
+
+        .avatar-body {
+            position: absolute;
+
+            top: 94px;
+            left: 17px;
+
+            width: 116px;
+            height: 100px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #28212f,
+                    #0c0a10
+                );
+
+            clip-path:
+                polygon(
+                    17% 0,
+                    83% 0,
+                    100% 22%,
+                    88% 100%,
+                    12% 100%,
+                    0 22%
+                );
+
+            border:
+                1px solid rgba(216, 193, 245, 0.12);
+        }
+
+        /*
+            Chest slit
+        */
+
+        .avatar-core {
+            position: absolute;
+
+            top: 111px;
+            left: 71px;
+
+            width: 8px;
+            height: 66px;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    transparent,
+                    rgba(198, 155, 255, 0.75),
+                    transparent
+                );
+
+            box-shadow:
+                0 0 18px rgba(161, 91, 234, 0.5);
+        }
+
+        /*
+            Arms
+        */
+
+        .avatar-arm {
+            position: absolute;
+
+            top: 108px;
+
+            width: 30px;
+            height: 87px;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    #1d1822,
+                    #08070c
+                );
+        }
+
+        .avatar-arm.left {
+            left: -3px;
+
+            transform:
+                rotate(12deg);
+
+            clip-path:
+                polygon(
+                    24% 0,
+                    100% 4%,
+                    82% 100%,
+                    0 90%
+                );
+        }
+
+        .avatar-arm.right {
+            right: -3px;
+
+            transform:
+                rotate(-12deg);
+
+            clip-path:
+                polygon(
+                    0 4%,
+                    76% 0,
+                    100% 90%,
+                    18% 100%
+                );
+        }
+
+        /*
+            Legs
+        */
+
+        .avatar-leg {
+            position: absolute;
+
+            top: 183px;
+
+            width: 42px;
+            height: 27px;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    #201a27,
+                    #09070d
+                );
+        }
+
+        .avatar-leg.left {
+            left: 29px;
+        }
+
+        .avatar-leg.right {
+            right: 29px;
+        }
+
+        /* =========================================================
+           PROFILE INFORMATION
+        ========================================================= */
+
+        .profile-info {
+            position: relative;
+
+            padding: 58px 58px 50px;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+
+            min-width: 0;
+        }
+
+        .profile-category {
+            margin-bottom: 18px;
+
+            color: rgba(204, 175, 238, 0.55);
+
+            font-family: Arial, sans-serif;
+            font-size: 9px;
+            font-weight: 700;
+
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+        }
+
+        .profile-name {
+            margin-bottom: 4px;
+
+            color: #f6f3f9;
+
+            font-size: clamp(2.6rem, 5vw, 4.8rem);
+
+            line-height: 0.95;
+
+            font-weight: 900;
+
+            letter-spacing: 0.025em;
+
+            text-shadow:
+                0 10px 40px rgba(0, 0, 0, 0.65);
+        }
+
+        .profile-subtitle {
+            margin-bottom: 34px;
+
+            color: rgba(184, 152, 221, 0.67);
+
+            font-family: Arial, sans-serif;
+
+            font-size: 10px;
+
+            letter-spacing: 0.34em;
+
+            text-transform: uppercase;
+        }
+
+        .profile-description {
             max-width: 500px;
-            margin: 0 auto 30px auto;
-            border-top: 1px solid rgba(170, 0, 255, 0.25);
-            border-bottom: 1px solid rgba(170, 0, 255, 0.25);
-            padding: 20px 0;
+
+            margin-bottom: 34px;
+
+            color: rgba(230, 224, 236, 0.67);
+
+            font-family:
+                "Noto Serif TC",
+                Georgia,
+                serif;
+
+            font-size: 14px;
+
+            line-height: 2;
+        }
+
+        /* =========================================================
+           STATS
+        ========================================================= */
+
+        .stats-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+
+            gap: 1px;
+
+            margin-top: 4px;
+            margin-bottom: 34px;
+
+            border:
+                1px solid rgba(205, 184, 231, 0.09);
+
+            background:
+                rgba(205, 184, 231, 0.09);
+        }
+
+        .stat {
+            min-width: 0;
+
+            padding: 15px 14px;
+
+            background:
+                rgba(8, 7, 12, 0.68);
+        }
+
+        .stat-label {
+            margin-bottom: 7px;
+
+            color: rgba(215, 198, 231, 0.35);
+
+            font-family: Arial, sans-serif;
+
+            font-size: 8px;
+
+            letter-spacing: 0.2em;
+
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            color: rgba(245, 240, 250, 0.9);
+
+            font-family: Arial, sans-serif;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            letter-spacing: 0.08em;
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* =========================================================
+           FOOTER INSIDE PROFILE
+        ========================================================= */
+
+        .profile-footer {
+            display: flex;
+
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+        }
+
+        .profile-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            color: rgba(219, 207, 230, 0.38);
+
+            font-family: Arial, sans-serif;
+
+            font-size: 8px;
+
+            letter-spacing: 0.2em;
+
+            text-transform: uppercase;
+        }
+
+        .status-dot {
+            width: 5px;
+            height: 5px;
+
+            border-radius: 50%;
+
+            background: #caa9ff;
+
+            box-shadow:
+                0 0 12px rgba(202, 169, 255, 0.7);
         }
 
         .page-indicator {
-            font-size: 0.75rem;
-            color: #00f0ff;
-            letter-spacing: 3px;
-            opacity: 0.6;
+            color: rgba(221, 207, 237, 0.55);
+
+            font-family: Arial, sans-serif;
+
+            font-size: 9px;
+
+            font-weight: 700;
+
+            letter-spacing: 0.25em;
+        }
+
+        /* =========================================================
+           NAVIGATION
+        ========================================================= */
+
+        .page-nav {
+            position: fixed;
+
+            top: 50%;
+
+            width: 60px;
+            height: 120px;
+
+            transform: translateY(-50%);
+
+            border: none;
+
+            background: transparent;
+
+            cursor: pointer;
+
+            z-index: 30;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            opacity: 0.45;
+
+            transition:
+                opacity 0.25s ease,
+                transform 0.25s ease;
+        }
+
+        .page-nav:hover {
+            opacity: 1;
+        }
+
+        .page-nav:focus-visible {
+            outline:
+                1px solid rgba(212, 183, 249, 0.55);
+
+            outline-offset: -8px;
+        }
+
+        .nav-left {
+            left: 8px;
+        }
+
+        .nav-right {
+            right: 8px;
+        }
+
+        .page-nav::before {
+            content: "";
+
+            width: 25px;
+            height: 25px;
+
+            border:
+                1px solid rgba(230, 220, 245, 0.72);
+
+            transition:
+                border-color 0.25s ease,
+                box-shadow 0.25s ease;
+        }
+
+        .page-nav::after {
+            content: "";
+
+            position: absolute;
+
+            width: 8px;
+            height: 8px;
+
+            border-right:
+                1px solid rgba(236, 226, 249, 0.95);
+
+            border-bottom:
+                1px solid rgba(236, 226, 249, 0.95);
+
+            transition:
+                border-color 0.25s ease;
+        }
+
+        .nav-left::before {
+            transform: rotate(45deg);
+        }
+
+        .nav-right::before {
+            transform: rotate(45deg);
+        }
+
+        .nav-left::after {
+            transform: rotate(135deg);
+            margin-left: 3px;
+        }
+
+        .nav-right::after {
+            transform: rotate(-45deg);
+            margin-right: 3px;
+        }
+
+        .page-nav:hover::before {
+            border-color:
+                rgba(202, 165, 255, 0.9);
+
+            box-shadow:
+                0 0 24px rgba(158, 96, 219, 0.18);
+        }
+
+        .page-nav:hover::after {
+            border-color:
+                rgba(220, 191, 255, 1);
+        }
+
+        .page-nav:active {
+            transform:
+                translateY(-50%)
+                scale(0.92);
+        }
+
+        /* =========================================================
+           RESPONSIVE
+        ========================================================= */
+
+        @media (max-width: 900px) {
+            .content-layer {
+                padding:
+                    80px 45px
+                    90px;
+            }
+
+            .profile-box {
+                width: min(800px, 92vw);
+                grid-template-columns: 260px 1fr;
+                min-height: 460px;
+            }
+
+            .profile-visual {
+                min-height: 460px;
+            }
+
+            .profile-info {
+                padding:
+                    48px 42px;
+            }
+
+            .avatar-container {
+                transform: scale(0.84);
+            }
+        }
+
+        @media (max-width: 680px) {
+            body {
+                overflow: auto;
+            }
+
+            .content-layer {
+                position: relative;
+
+                min-height: 100%;
+                height: auto;
+
+                padding:
+                    90px 18px
+                    90px;
+            }
+
+            .profile-box {
+                width: 100%;
+
+                min-height: 0;
+
+                grid-template-columns: 1fr;
+
+                margin: 0 auto;
+            }
+
+            .profile-visual {
+                min-height: 310px;
+
+                border-right: none;
+
+                border-bottom:
+                    1px solid rgba(204, 183, 236, 0.1);
+            }
+
+            .avatar-container {
+                transform: scale(0.7);
+            }
+
+            .profile-info {
+                padding: 34px 28px 32px;
+            }
+
+            .profile-name {
+                font-size: 3rem;
+            }
+
+            .profile-description {
+                font-size: 13px;
+            }
+
+            .page-nav {
+                width: 48px;
+                height: 90px;
+            }
+
+            .nav-left {
+                left: 0;
+            }
+
+            .nav-right {
+                right: 0;
+            }
+
+            .top-label,
+            .system-label,
+            .bottom-label-left,
+            .bottom-label-right {
+                font-size: 7px;
+                letter-spacing: 0.2em;
+            }
+
+            .top-label {
+                left: 18px;
+            }
+
+            .system-label {
+                right: 18px;
+            }
+
+            .bottom-label-left {
+                left: 18px;
+            }
+
+            .bottom-label-right {
+                right: 18px;
+            }
+
+            .top-line,
+            .bottom-line {
+                left: 14px;
+                right: 14px;
+            }
+        }
+
+        @media (max-height: 700px) and (min-width: 681px) {
+            .profile-box {
+                transform: scale(0.88);
+            }
+
+            .content-layer {
+                padding-top: 65px;
+                padding-bottom: 65px;
+            }
+        }
+
+        /* =========================================================
+           REDUCED MOTION
+        ========================================================= */
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.001ms !important;
+            }
         }
     </style>
 </head>
+
 <body>
 
+    <!-- =========================================================
+         BACKGROUND
+    ========================================================== -->
+
     <canvas id="void-canvas"></canvas>
-    <div class="event-horizon"></div>
 
-    <!-- 左右青藍色菱形切頁按鈕 -->
-    <button class="page-nav nav-left" onclick="switchPage(-1)"></button>
-    <button class="page-nav nav-right" onclick="switchPage(1)"></button>
+    <div class="void-atmosphere"></div>
+    <div class="void-vignette"></div>
+    <div class="scanline"></div>
 
-    <div class="content-layer">
-        <div class="profile-box" id="profile-card"></div>
+    <!-- =========================================================
+         OUTER UI
+    ========================================================== -->
+
+    <div class="top-line"></div>
+    <div class="bottom-line"></div>
+
+    <div class="top-label">
+        NULLSCAPE / PROFILE
     </div>
 
+    <div class="system-label">
+        SECTOR // 07
+    </div>
+
+    <div class="bottom-label-left">
+        VOID ARCHIVE
+    </div>
+
+    <div class="bottom-label-right">
+        SYSTEM ONLINE
+    </div>
+
+    <!-- =========================================================
+         NAVIGATION
+    ========================================================== -->
+
+    <button
+        class="page-nav nav-left"
+        id="prevButton"
+        aria-label="上一頁"
+        type="button"
+    ></button>
+
+    <button
+        class="page-nav nav-right"
+        id="nextButton"
+        aria-label="下一頁"
+        type="button"
+    ></button>
+
+    <!-- =========================================================
+         PROFILE
+    ========================================================== -->
+
+    <main class="content-layer">
+
+        <section
+            class="profile-box"
+            id="profileCard"
+            aria-live="polite"
+        >
+
+            <!-- JS will render this -->
+
+        </section>
+
+    </main>
+
     <script>
+        "use strict";
+
+        /* =========================================================
+           PROFILE DATA
+           改這裡就可以改人物資料
+        ========================================================= */
+
         const pages = [
             {
-                title: "NULLSCAPE",
-                subtitle: "ENTITY_VOID",
-                desc: "[ 第一頁內容。 ]<br>[ 背景已加入紫黑色棋盤網格無限向中心收縮的隧道特效。 ]"
+                name: "SLES",
+                subtitle: "THE OBSERVER",
+                category: "ENTITY PROFILE",
+
+                description:
+                    "A presence wandering through the empty spaces between worlds. " +
+                    "The entity observes before it speaks, leaving only traces behind.",
+
+                stats: {
+                    origin: "NULL",
+                    state: "ACTIVE",
+                    class: "VOID"
+                },
+
+                status: "PRESENT",
+                index: "01"
             },
+
             {
-                title: "LORE // 01",
-                subtitle: "THE ABYSSAL WHISPER",
-                desc: "[ 第二頁內容。 ]<br>[ 點擊左右菱形切頁時會觸發黑洞漩渦過場。 ]"
+                name: "VESSEL",
+                subtitle: "UNRESOLVED",
+                category: "ENTITY PROFILE",
+
+                description:
+                    "A form without a fixed destination. Memory, identity and reality " +
+                    "appear to overlap whenever the surrounding space begins to collapse.",
+
+                stats: {
+                    origin: "UNKNOWN",
+                    state: "STABLE",
+                    class: "ANOMALY"
+                },
+
+                status: "OBSERVED",
+                index: "02"
             },
+
             {
-                title: "ARCHIVE",
-                subtitle: "FINAL REALM",
-                desc: "[ 第三頁內容。 ]<br>[ 終點紀錄。 ]"
+                name: "NULL",
+                subtitle: "THE SILENT CORE",
+                category: "ENTITY PROFILE",
+
+                description:
+                    "Nothing is recorded beyond this point. The archive recognizes the " +
+                    "entity, yet refuses to describe what exists beyond its surface.",
+
+                stats: {
+                    origin: "VOID",
+                    state: "UNKNOWN",
+                    class: "NULL"
+                },
+
+                status: "UNRESOLVED",
+                index: "03"
             }
         ];
 
         let currentPage = 0;
-        const card = document.getElementById('profile-card');
+        let isSwitching = false;
+        let switchTimer = null;
 
-        function renderPage(pageIdx) {
-            const p = pages[pageIdx];
+        const card = document.getElementById("profileCard");
+        const prevButton = document.getElementById("prevButton");
+        const nextButton = document.getElementById("nextButton");
+
+        /* =========================================================
+           RENDER PROFILE
+        ========================================================= */
+
+        function renderPage(index) {
+            const page = pages[index];
+
             card.innerHTML = `
-                <div class="title">${p.title}</div>
-                <div class="subtitle">${p.subtitle}</div>
-                <div class="desc">${p.desc}</div>
-                <div class="page-indicator">0${pageIdx + 1} / 0${pages.length}</div>
+                <div class="profile-visual">
+
+                    <div class="visual-index">
+                        ${page.index} / ${String(pages.length).padStart(2, "0")}
+                    </div>
+
+                    <div class="avatar-container" aria-hidden="true">
+                        <div class="avatar-ring"></div>
+                        <div class="avatar-aura"></div>
+
+                        <div class="avatar">
+
+                            <div class="avatar-head"></div>
+
+                            <div class="avatar-mask"></div>
+
+                            <div class="avatar-eye left"></div>
+                            <div class="avatar-eye right"></div>
+
+                            <div class="avatar-body"></div>
+
+                            <div class="avatar-core"></div>
+
+                            <div class="avatar-arm left"></div>
+                            <div class="avatar-arm right"></div>
+
+                            <div class="avatar-leg left"></div>
+                            <div class="avatar-leg right"></div>
+
+                        </div>
+                    </div>
+
+                    <div class="visual-caption">
+                        ${page.category}
+                    </div>
+
+                </div>
+
+                <div class="profile-info">
+
+                    <div class="profile-category">
+                        ${page.category}
+                    </div>
+
+                    <h1 class="profile-name">
+                        ${escapeHTML(page.name)}
+                    </h1>
+
+                    <div class="profile-subtitle">
+                        ${escapeHTML(page.subtitle)}
+                    </div>
+
+                    <p class="profile-description">
+                        ${escapeHTML(page.description)}
+                    </p>
+
+                    <div class="stats-grid">
+
+                        <div class="stat">
+                            <div class="stat-label">
+                                Origin
+                            </div>
+
+                            <div class="stat-value">
+                                ${escapeHTML(page.stats.origin)}
+                            </div>
+                        </div>
+
+                        <div class="stat">
+                            <div class="stat-label">
+                                State
+                            </div>
+
+                            <div class="stat-value">
+                                ${escapeHTML(page.stats.state)}
+                            </div>
+                        </div>
+
+                        <div class="stat">
+                            <div class="stat-label">
+                                Class
+                            </div>
+
+                            <div class="stat-value">
+                                ${escapeHTML(page.stats.class)}
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="profile-footer">
+
+                        <div class="profile-status">
+                            <span class="status-dot"></span>
+                            ${escapeHTML(page.status)}
+                        </div>
+
+                        <div class="page-indicator">
+                            ${page.index}
+                            /
+                            ${String(pages.length).padStart(2, "0")}
+                        </div>
+
+                    </div>
+
+                </div>
             `;
         }
 
+        /*
+            Prevent accidental HTML injection if you later use
+            user-generated profile data.
+        */
+
+        function escapeHTML(value) {
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        /* =========================================================
+           PAGE SWITCH
+        ========================================================= */
+
         function switchPage(direction) {
-            card.classList.add('sucking');
-            setTimeout(() => {
-                currentPage = (currentPage + direction + pages.length) % pages.length;
-                renderPage(currentPage);
-                card.classList.remove('sucking');
-                card.classList.add('flying-in');
-                setTimeout(() => card.classList.remove('flying-in'), 50);
-            }, 600);
-        }
-
-        renderPage(0);
-
-        // --- Canvas 渲染核心 ---
-        const canvas = document.getElementById('void-canvas');
-        const ctx = canvas.getContext('2d');
-        
-        let width, height, cx, cy;
-        let particles = [];
-        const PARTICLE_COUNT = 120;
-        const MAX_RADIUS = 1300;
-
-        function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-            cx = width / 2;
-            cy = height / 2;
-        }
-
-        window.addEventListener('resize', resize);
-        resize();
-
-        // 紫黑棋盤網格動畫變數
-        let gridOffset = 0;
-        let rotationAngle = 0;
-
-        function drawCheckerboardTunnel() {
-            gridOffset = (gridOffset + 1.2) % 90;       // 控制往內收縮的速度
-            rotationAngle += 0.003;                    // 緩慢旋轉角度
-
-            const rings = 12;                          // 網格同心圓環數
-            const segments = 20;                       // 放射狀區段數 (決定棋盤方格密度)
-
-            ctx.save();
-            ctx.translate(cx, cy);
-            ctx.rotate(rotationAngle);
-
-            for (let i = rings; i > 0; i--) {
-                // 計算每一圈向內縮放的半徑
-                let rOuter = (i * 90 - gridOffset);
-                let rInner = ((i - 1) * 90 - gridOffset);
-                
-                if (rOuter < 0) continue;
-
-                // 越靠近中心透明度越低，製造消逝在黑洞裡的感覺
-                let fadeAlpha = Math.min(1, rOuter / (rings * 90));
-
-                for (let j = 0; j < segments; j++) {
-                    let angle1 = (j / segments) * Math.PI * 2;
-                    let angle2 = ((j + 1) / segments) * Math.PI * 2;
-
-                    // 紫色與黑色交替（形成棋盤格）
-                    if ((i + j) % 2 === 0) {
-                        ctx.fillStyle = `rgba(25, 0, 45, ${0.35 * fadeAlpha})`; // 深紫
-                    } else {
-                        ctx.fillStyle = `rgba(5, 0, 10, ${0.7 * fadeAlpha})`;  // 近黑
-                    }
-
-                    ctx.beginPath();
-                    // 畫扇形區塊來組成極座標棋盤格
-                    ctx.arc(0, 0, rOuter, angle1, angle2);
-                    ctx.arc(0, 0, Math.max(0, rInner), angle2, angle1, true);
-                    ctx.closePath();
-                    ctx.fill();
-
-                    // 網格邊線，帶有神祕的紫色光澤
-                    ctx.strokeStyle = `rgba(110, 0, 180, ${0.2 * fadeAlpha})`;
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-                }
+            if (isSwitching) {
+                return;
             }
-            ctx.restore();
+
+            if (pages.length <= 1) {
+                return;
+            }
+
+            isSwitching = true;
+
+            const exitClass =
+                direction > 0
+                    ? "is-exiting-left"
+                    : "is-exiting-right";
+
+            const enterClass =
+                direction > 0
+                    ? "is-entering-left"
+                    : "is-entering-right";
+
+            card.classList.remove(
+                "is-entering-left",
+                "is-entering-right",
+                "is-exiting-left",
+                "is-exiting-right"
+            );
+
+            /*
+                Force reflow so repeated transitions always trigger.
+            */
+
+            void card.offsetWidth;
+
+            card.classList.add(exitClass);
+
+            clearTimeout(switchTimer);
+
+            switchTimer = setTimeout(() => {
+                currentPage =
+                    (
+                        currentPage +
+                        direction +
+                        pages.length
+                    ) %
+                    pages.length;
+
+                renderPage(currentPage);
+
+                card.classList.remove(exitClass);
+
+                void card.offsetWidth;
+
+                card.classList.add(enterClass);
+
+                setTimeout(() => {
+                    card.classList.remove(enterClass);
+                    isSwitching = false;
+                }, 580);
+
+            }, 410);
         }
 
-        class VoidEntity {
+        prevButton.addEventListener("click", () => {
+            switchPage(-1);
+        });
+
+        nextButton.addEventListener("click", () => {
+            switchPage(1);
+        });
+
+        /* =========================================================
+           KEYBOARD CONTROL
+        ========================================================= */
+
+        window.addEventListener("keydown", (event) => {
+            if (event.key === "ArrowLeft") {
+                switchPage(-1);
+            }
+
+            if (event.key === "ArrowRight") {
+                switchPage(1);
+            }
+        });
+
+        /* =========================================================
+           TOUCH SWIPE
+        ========================================================= */
+
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        window.addEventListener(
+            "touchstart",
+            (event) => {
+                if (!event.touches.length) {
+                    return;
+                }
+
+                touchStartX = event.touches[0].clientX;
+                touchStartY = event.touches[0].clientY;
+            },
+            { passive: true }
+        );
+
+        window.addEventListener(
+            "touchend",
+            (event) => {
+                if (!event.changedTouches.length) {
+                    return;
+                }
+
+                const touch = event.changedTouches[0];
+
+                const dx = touch.clientX - touchStartX;
+                const dy = touch.clientY - touchStartY;
+
+                /*
+                    Ignore vertical scrolling gestures.
+                */
+
+                if (Math.abs(dx) < 50) {
+                    return;
+                }
+
+                if (Math.abs(dx) < Math.abs(dy)) {
+                    return;
+                }
+
+                if (dx < 0) {
+                    switchPage(1);
+                } else {
+                    switchPage(-1);
+                }
+            },
+            { passive: true }
+        );
+
+        /* =========================================================
+           INITIAL RENDER
+        ========================================================= */
+
+        renderPage(currentPage);
+
+        /* =========================================================
+           CANVAS VOID WORLD
+        ========================================================= */
+
+        const canvas = document.getElementById("void-canvas");
+        const ctx = canvas.getContext("2d", {
+            alpha: false
+        });
+
+        let width = 0;
+        let height = 0;
+        let centerX = 0;
+        let centerY = 0;
+        let dpr = 1;
+
+        const particles = [];
+        const shards = [];
+
+        /*
+            Keep the amount reasonable so this remains smooth.
+        */
+
+        const PARTICLE_COUNT = 105;
+        const SHARD_COUNT = 18;
+
+        let time = 0;
+
+        /* =========================================================
+           RESIZE
+        ========================================================= */
+
+        function resizeCanvas() {
+            dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+            width = window.innerWidth;
+            height = window.innerHeight;
+
+            centerX = width * 0.5;
+            centerY = height * 0.5;
+
+            canvas.width = Math.floor(width * dpr);
+            canvas.height = Math.floor(height * dpr);
+
+            canvas.style.width = `${width}px`;
+            canvas.style.height = `${height}px`;
+
+            ctx.setTransform(
+                dpr,
+                0,
+                0,
+                dpr,
+                0,
+                0
+            );
+        }
+
+        window.addEventListener("resize", resizeCanvas);
+
+        resizeCanvas();
+
+        /* =========================================================
+           RANDOM HELPERS
+        ========================================================= */
+
+        function random(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        function randomSign() {
+            return Math.random() > 0.5 ? 1 : -1;
+        }
+
+        /* =========================================================
+           BACKGROUND PARTICLE
+        ========================================================= */
+
+        class VoidParticle {
             constructor() {
                 this.reset(true);
             }
 
-            reset(randomizeRadius = false) {
-                this.radius = randomizeRadius ? Math.random() * MAX_RADIUS : MAX_RADIUS;
-                this.angle = Math.random() * Math.PI * 2;
-                this.speed = Math.random() * 2 + 1.2;
-                this.angleSpeed = (Math.random() * 0.02 + 0.005) * (Math.random() > 0.5 ? 1 : -1);
-                
-                const rand = Math.random();
-                if (rand < 0.6) this.type = 'cube';
-                else if (rand < 0.8) this.type = 'meteor';
-                else this.type = 'eye';
+            reset(initial = false) {
+                this.angle =
+                    random(0, Math.PI * 2);
 
-                this.size = Math.random() * 22 + 12;
-                this.rotation = Math.random() * Math.PI * 2;
-                this.rotSpeed = (Math.random() - 0.5) * 0.12;
-                
-                const colors = ['#1a0033', '#4a0080', '#9900cc', '#0a0014'];
-                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.radius =
+                    initial
+                        ? random(120, Math.max(width, height) * 0.8)
+                        : random(550, Math.max(width, height) * 0.85);
+
+                this.depth =
+                    random(0.15, 1);
+
+                this.speed =
+                    random(0.08, 0.36) *
+                    this.depth;
+
+                this.size =
+                    random(0.4, 1.8) *
+                    this.depth;
+
+                this.twinkle =
+                    random(0, Math.PI * 2);
+
+                this.twinkleSpeed =
+                    random(0.005, 0.025);
+
+                this.drift =
+                    random(0.0003, 0.0016) *
+                    randomSign();
             }
 
             update() {
-                let gravityPull = Math.max(1, (MAX_RADIUS / Math.max(this.radius, 10)) * 0.45);
-                this.radius -= this.speed * gravityPull;
-                this.angle += this.angleSpeed * gravityPull;
-                this.rotation += this.rotSpeed * gravityPull;
+                this.radius -= this.speed;
 
-                if (this.radius < 5) {
-                    this.reset();
+                this.angle += this.drift;
+
+                this.twinkle += this.twinkleSpeed;
+
+                /*
+                    Recycle once close to the void center.
+                */
+
+                if (this.radius < 35) {
+                    this.reset(false);
                 }
             }
 
             draw() {
-                const x = cx + Math.cos(this.angle) * this.radius;
-                const y = cy + Math.sin(this.angle) * this.radius;
+                const x =
+                    centerX +
+                    Math.cos(this.angle) *
+                    this.radius;
 
-                const scale = Math.min(1, this.radius / 300);
-                const stretch = Math.max(1, 300 / Math.max(this.radius, 10));
+                const y =
+                    centerY +
+                    Math.sin(this.angle) *
+                    this.radius;
+
+                /*
+                    Very subtle breathing brightness.
+                */
+
+                const alpha =
+                    (0.10 + (
+                        Math.sin(this.twinkle) + 1
+                    ) * 0.12) *
+                    this.depth;
+
+                ctx.beginPath();
+
+                ctx.arc(
+                    x,
+                    y,
+                    this.size,
+                    0,
+                    Math.PI * 2
+                );
+
+                ctx.fillStyle =
+                    `rgba(214, 192, 238, ${alpha})`;
+
+                ctx.fill();
+            }
+        }
+
+        /* =========================================================
+           FLOATING SHARD
+        ========================================================= */
+
+        class VoidShard {
+            constructor() {
+                this.reset(true);
+            }
+
+            reset(initial = false) {
+                this.angle =
+                    random(0, Math.PI * 2);
+
+                this.radius =
+                    initial
+                        ? random(260, Math.max(width, height) * 0.72)
+                        : random(620, Math.max(width, height) * 0.82);
+
+                this.size =
+                    random(10, 34);
+
+                this.rotation =
+                    random(0, Math.PI * 2);
+
+                this.rotationSpeed =
+                    random(
+                        -0.0015,
+                        0.0015
+                    );
+
+                this.speed =
+                    random(0.12, 0.42);
+
+                this.skew =
+                    random(0.6, 1.6);
+
+                this.alpha =
+                    random(0.12, 0.42);
+            }
+
+            update() {
+                this.radius -= this.speed;
+
+                this.angle +=
+                    0.00025 *
+                    randomSign();
+
+                this.rotation +=
+                    this.rotationSpeed;
+
+                if (this.radius < 70) {
+                    this.reset(false);
+                }
+            }
+
+            draw() {
+                const x =
+                    centerX +
+                    Math.cos(this.angle) *
+                    this.radius;
+
+                const y =
+                    centerY +
+                    Math.sin(this.angle) *
+                    this.radius;
+
+                const pulse =
+                    0.75 +
+                    Math.sin(
+                        time * 0.001 +
+                        this.radius
+                    ) *
+                    0.15;
 
                 ctx.save();
+
                 ctx.translate(x, y);
-                ctx.rotate(this.angle + Math.PI/2); 
-                ctx.scale(scale, scale * stretch); 
+
                 ctx.rotate(this.rotation);
 
-                ctx.globalAlpha = Math.min(1, this.radius / 150);
+                ctx.scale(
+                    this.skew,
+                    1
+                );
 
-                if (this.type === 'cube') {
-                    ctx.fillStyle = this.color;
-                    ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
-                    ctx.strokeStyle = '#000';
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(-this.size/2, -this.size/2, this.size, this.size);
-                } 
-                else if (this.type === 'meteor') {
-                    ctx.beginPath();
-                    ctx.moveTo(-this.size/2, -this.size/2);
-                    ctx.lineTo(this.size/2, -this.size/3);
-                    ctx.lineTo(this.size/3, this.size/2);
-                    ctx.lineTo(-this.size/2, this.size/3);
-                    ctx.closePath();
-                    ctx.fillStyle = '#100020';
-                    ctx.fill();
-                    ctx.strokeStyle = '#7a00cc';
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
-                }
-                else if (this.type === 'eye') {
-                    ctx.beginPath();
-                    ctx.moveTo(-this.size, -this.size * 0.2);
-                    ctx.lineTo(0, -this.size * 0.7);
-                    ctx.lineTo(this.size, -this.size * 0.2);
-                    ctx.lineTo(0, this.size * 0.7);
-                    ctx.closePath();
-                    ctx.fillStyle = '#e6ccff';
-                    ctx.fill();
-                    ctx.strokeStyle = '#cc0088';
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
-                    
-                    ctx.beginPath();
-                    ctx.moveTo(-this.size * 0.5, 0); ctx.lineTo(-this.size * 0.2, 0);
-                    ctx.moveTo(this.size * 0.2, 0); ctx.lineTo(this.size * 0.5, 0);
-                    ctx.strokeStyle = '#330011';
-                    ctx.stroke();
+                ctx.beginPath();
 
-                    ctx.beginPath();
-                    ctx.arc(0, 0, this.size * 0.35, 0, Math.PI * 2);
-                    ctx.fillStyle = '#030005';
-                    ctx.fill();
-                    
-                    ctx.beginPath();
-                    ctx.arc(this.size * 0.05, -this.size * 0.05, this.size * 0.12, 0, Math.PI * 2);
-                    ctx.fillStyle = '#00e1ff';
-                    ctx.fill();
-                }
+                ctx.moveTo(
+                    0,
+                    -this.size
+                );
+
+                ctx.lineTo(
+                    this.size * 0.45,
+                    0
+                );
+
+                ctx.lineTo(
+                    0,
+                    this.size
+                );
+
+                ctx.lineTo(
+                    -this.size * 0.45,
+                    0
+                );
+
+                ctx.closePath();
+
+                /*
+                    Fill is deliberately very dark.
+                */
+
+                ctx.fillStyle =
+                    `rgba(19, 13, 27, ${this.alpha * pulse})`;
+
+                ctx.fill();
+
+                /*
+                    Thin Nullscape-style outline.
+                */
+
+                ctx.strokeStyle =
+                    `rgba(196, 157, 235, ${this.alpha * 0.75})`;
+
+                ctx.lineWidth = 0.8;
+
+                ctx.stroke();
 
                 ctx.restore();
             }
         }
 
-        for (let i = 0; i < PARTICLE_COUNT; i++) {
-            particles.push(new VoidEntity());
+        /* =========================================================
+           CENTRAL VOID
+        ========================================================= */
+
+        function drawVoidCore() {
+            const maxRadius =
+                Math.min(width, height) * 0.32;
+
+            /*
+                Outer diffuse glow.
+            */
+
+            const glow =
+                ctx.createRadialGradient(
+                    centerX,
+                    centerY,
+                    maxRadius * 0.28,
+                    centerX,
+                    centerY,
+                    maxRadius
+                );
+
+            glow.addColorStop(
+                0,
+                "rgba(55, 24, 78, 0.02)"
+            );
+
+            glow.addColorStop(
+                0.45,
+                "rgba(100, 55, 135, 0.06)"
+            );
+
+            glow.addColorStop(
+                0.72,
+                "rgba(95, 51, 132, 0.04)"
+            );
+
+            glow.addColorStop(
+                1,
+                "rgba(0, 0, 0, 0)"
+            );
+
+            ctx.beginPath();
+
+            ctx.arc(
+                centerX,
+                centerY,
+                maxRadius,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fillStyle = glow;
+            ctx.fill();
+
+            /*
+                Thin rings.
+            */
+
+            const pulse =
+                Math.sin(time * 0.001) * 5;
+
+            ctx.save();
+
+            ctx.translate(
+                centerX,
+                centerY
+            );
+
+            ctx.rotate(
+                time * 0.00006
+            );
+
+            for (let i = 0; i < 3; i++) {
+                const radius =
+                    maxRadius *
+                    (0.54 + i * 0.13) +
+                    pulse;
+
+                ctx.beginPath();
+
+                ctx.ellipse(
+                    0,
+                    0,
+                    radius,
+                    radius * (
+                        0.86 +
+                        i * 0.025
+                    ),
+                    0,
+                    0,
+                    Math.PI * 2
+                );
+
+                ctx.strokeStyle =
+                    `rgba(
+                        183,
+                        136,
+                        225,
+                        ${0.055 - i * 0.012}
+                    )`;
+
+                ctx.lineWidth = 1;
+
+                ctx.stroke();
+            }
+
+            ctx.restore();
+
+            /*
+                Black central void.
+            */
+
+            const coreRadius =
+                Math.min(width, height) *
+                0.055;
+
+            const core =
+                ctx.createRadialGradient(
+                    centerX,
+                    centerY,
+                    coreRadius * 0.1,
+                    centerX,
+                    centerY,
+                    coreRadius * 1.9
+                );
+
+            core.addColorStop(
+                0,
+                "rgba(0, 0, 0, 1)"
+            );
+
+            core.addColorStop(
+                0.62,
+                "rgba(0, 0, 0, 0.96)"
+            );
+
+            core.addColorStop(
+                1,
+                "rgba(0, 0, 0, 0)"
+            );
+
+            ctx.beginPath();
+
+            ctx.arc(
+                centerX,
+                centerY,
+                coreRadius * 1.9,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fillStyle = core;
+            ctx.fill();
         }
 
+        /* =========================================================
+           DISTANT GEOMETRY
+        ========================================================= */
+
+        function drawDistantGeometry() {
+            ctx.save();
+
+            ctx.translate(
+                centerX,
+                centerY
+            );
+
+            const scale =
+                Math.min(width, height) / 900;
+
+            ctx.scale(
+                scale,
+                scale
+            );
+
+            const rotation =
+                time * 0.000018;
+
+            ctx.rotate(rotation);
+
+            const distance =
+                420 + (
+                    Math.sin(
+                        time * 0.00035
+                    ) * 15
+                );
+
+            /*
+                Large extremely dark geometric planes.
+            */
+
+            for (let i = 0; i < 7; i++) {
+                const a =
+                    (Math.PI * 2 / 7) * i;
+
+                const x =
+                    Math.cos(a) * distance;
+
+                const y =
+                    Math.sin(a) * distance;
+
+                const s =
+                    38 + i * 7;
+
+                ctx.save();
+
+                ctx.translate(x, y);
+
+                ctx.rotate(
+                    -a +
+                    Math.sin(time * 0.0002 + i) * 0.08
+                );
+
+                ctx.beginPath();
+
+                ctx.moveTo(
+                    -s,
+                    -s * 0.52
+                );
+
+                ctx.lineTo(
+                    s * 0.75,
+                    -s * 0.35
+                );
+
+                ctx.lineTo(
+                    s,
+                    s * 0.48
+                );
+
+                ctx.lineTo(
+                    -s * 0.65,
+                    s * 0.78
+                );
+
+                ctx.closePath();
+
+                ctx.fillStyle =
+                    "rgba(13, 9, 18, 0.66)";
+
+                ctx.fill();
+
+                ctx.strokeStyle =
+                    "rgba(151, 108, 187, 0.12)";
+
+                ctx.lineWidth = 1;
+
+                ctx.stroke();
+
+                ctx.restore();
+            }
+
+            ctx.restore();
+        }
+
+        /* =========================================================
+           MAIN ANIMATION
+        ========================================================= */
+
         function animate() {
-            // 清空畫布留下殘影
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-            ctx.fillRect(0, 0, width, height);
+            time += 16;
 
-            // 1. 渲染紫黑棋盤無限收縮隧道
-            drawCheckerboardTunnel();
+            /*
+                Background.
+            */
 
-            // 2. 渲染原本被吸入的方塊、隕石與眼睛粒子
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
+            ctx.fillStyle = "#030307";
+
+            ctx.fillRect(
+                0,
+                0,
+                width,
+                height
+            );
+
+            /*
+                Distant geometry.
+            */
+
+            drawDistantGeometry();
+
+            /*
+                Particles.
+            */
+
+            for (const particle of particles) {
+                particle.update();
+                particle.draw();
+            }
+
+            /*
+                Floating shards.
+            */
+
+            for (const shard of shards) {
+                shard.update();
+                shard.draw();
+            }
+
+            /*
+                Central void on top.
+            */
+
+            drawVoidCore();
 
             requestAnimationFrame(animate);
+        }
+
+        /* =========================================================
+           CREATE PARTICLES
+        ========================================================= */
+
+        for (
+            let i = 0;
+            i < PARTICLE_COUNT;
+            i++
+        ) {
+            particles.push(
+                new VoidParticle()
+            );
+        }
+
+        for (
+            let i = 0;
+            i < SHARD_COUNT;
+            i++
+        ) {
+            shards.push(
+                new VoidShard()
+            );
         }
 
         animate();
