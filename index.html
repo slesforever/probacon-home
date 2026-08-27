@@ -3,159 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NULL // PROFILE</title>
+    <title>NULLSCAPE // PROFILE</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Noto+Sans+TC:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background-color: #030306;
-            color: #e0e0e5;
+            background-color: #05020a; /* 極黑紫基底 */
+            color: #e2d1f9;
             font-family: 'Space Mono', 'Noto Sans TC', monospace;
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; position: relative;
         }
 
-        #bg-canvas {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 1;
+        /* 虛空紫霧效果 */
+        .void-fog {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(138, 43, 226, 0.08) 0%, rgba(26, 8, 38, 0.6) 60%, #05020a 100%);
+            z-index: 2; pointer-events: none;
         }
+
+        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
 
         .profile-card {
-            position: relative;
-            z-index: 10;
-            width: 90%;
-            max-width: 440px;
-            padding: 40px;
-            background: rgba(10, 10, 15, 0.65);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(16px);
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), inset 0 0 1px rgba(255, 255, 255, 0.2);
-            transition: border-color 0.4s, transform 0.3s;
+            position: relative; z-index: 10;
+            width: 90%; max-width: 440px; padding: 40px;
+            background: rgba(15, 5, 25, 0.6);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 0 50px rgba(109, 40, 217, 0.15), inset 0 0 20px rgba(168, 85, 247, 0.05);
+            transition: all 0.4s ease;
         }
 
         .profile-card:hover {
-            border-color: rgba(255, 255, 255, 0.3);
+            border-color: rgba(168, 85, 247, 0.5);
+            box-shadow: 0 0 60px rgba(139, 92, 246, 0.3), inset 0 0 20px rgba(168, 85, 247, 0.1);
             transform: translateY(-2px);
         }
 
         .avatar-box {
-            width: 72px; height: 72px;
-            margin: 0 auto 24px auto;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            width: 76px; height: 76px; margin: 0 auto 24px auto;
+            border: 1px solid rgba(168, 85, 247, 0.4);
             display: flex; align-items: center; justify-content: center;
-            position: relative;
-            background: rgba(255, 255, 255, 0.03);
+            position: relative; background: rgba(168, 85, 247, 0.05);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
         }
 
-        .avatar-box::after {
-            content: '';
-            position: absolute;
-            width: 8px; height: 8px;
-            border-right: 2px solid #fff;
-            border-bottom: 2px solid #fff;
-            right: -4px; bottom: -4px;
-        }
-
-        .avatar-box span {
-            font-size: 24px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            color: #fff;
-        }
+        .avatar-box span { font-size: 24px; font-weight: bold; letter-spacing: 2px; color: #d8b4fe; }
 
         .user-name {
-            font-size: 1.5rem;
-            font-weight: 700;
-            text-align: center;
-            letter-spacing: 4px;
-            color: #ffffff;
-            margin-bottom: 6px;
-            text-transform: uppercase;
+            font-size: 1.6rem; font-weight: 700; text-align: center;
+            letter-spacing: 4px; color: #f3e8ff; margin-bottom: 6px;
+            text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
         }
 
-        .user-tag {
-            font-size: 0.75rem;
-            text-align: center;
-            color: #8a8a9e;
-            letter-spacing: 2px;
-            margin-bottom: 28px;
-        }
+        .user-tag { font-size: 0.75rem; text-align: center; color: #a78bfa; letter-spacing: 2px; margin-bottom: 28px; }
 
         .bio-text {
-            font-size: 0.85rem;
-            line-height: 1.7;
-            color: #a0a0b5;
-            text-align: center;
-            margin-bottom: 32px;
-            border-top: 1px dashed rgba(255, 255, 255, 0.1);
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
-            padding: 16px 0;
+            font-size: 0.85rem; line-height: 1.7; color: #c4b5fd; text-align: center;
+            margin-bottom: 32px; border-top: 1px dashed rgba(168, 85, 247, 0.2);
+            border-bottom: 1px dashed rgba(168, 85, 247, 0.2); padding: 16px 0;
         }
 
-        .links-container {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+        .links-container { display: flex; flex-direction: column; gap: 12px; }
 
         .link-btn {
-            display: block;
-            text-decoration: none;
-            color: #c5c5d0;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 12px;
-            text-align: center;
-            font-size: 0.8rem;
-            letter-spacing: 2px;
+            display: block; text-decoration: none; color: #ddd6fe;
+            background: rgba(168, 85, 247, 0.05); border: 1px solid rgba(168, 85, 247, 0.15);
+            padding: 12px; text-align: center; font-size: 0.8rem; letter-spacing: 2px;
             transition: all 0.3s ease;
         }
 
         .link-btn:hover {
-            background: rgba(255, 255, 255, 0.95);
-            color: #030306;
-            border-color: #ffffff;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+            background: rgba(168, 85, 247, 0.2); color: #ffffff;
+            border-color: #a855f7; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
         }
 
         .status-footer {
-            margin-top: 28px;
-            font-size: 0.65rem;
-            color: #555566;
-            text-align: center;
-            letter-spacing: 3px;
+            margin-top: 28px; font-size: 0.65rem; color: #7c3aed;
+            text-align: center; letter-spacing: 3px;
         }
     </style>
 </head>
 <body>
+    <div class="void-fog"></div>
     <canvas id="bg-canvas"></canvas>
 
     <div class="profile-card">
         <div class="avatar-box">
-            <span>NV</span>
+            <span>[ICON]</span>
         </div>
-        <div class="user-name">NULL_VOID</div>
-        <div class="user-tag">// GEOMETRIC ARCHITECT</div>
+        <div class="user-name">[USERNAME]</div>
+        <div class="user-tag">// [USER_TITLE_OR_ROLE]</div>
         
         <div class="bio-text">
-            Exploring edge spaces, void aesthetic, and procedural geometry within non-Euclidean environments.
+            [這裡輸入簡介。描述個人的特質、興趣，或是任何想放在這裡的文字內容。]
         </div>
 
         <div class="links-container">
-            <a href="#" class="link-btn">ROBLOX PROFILE</a>
-            <a href="#" class="link-btn">DISCORD COMMUNITY</a>
-            <a href="#" class="link-btn">PORTFOLIO WORK</a>
+            <a href="#" class="link-btn">[LINK 1 / 連結一]</a>
+            <a href="#" class="link-btn">[LINK 2 / 連結二]</a>
+            <a href="#" class="link-btn">[LINK 3 / 連結三]</a>
         </div>
 
-        <div class="status-footer">
-            SYS.LOC // SECTOR-00 • ONLINE
-        </div>
+        <div class="status-footer">SYS_LOC // THE_NULLSCAPE</div>
     </div>
 
     <script>
@@ -163,48 +114,36 @@
         const ctx = canvas.getContext('2d');
         let pts = [];
 
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            initPoints();
-        }
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; initPoints(); }
 
         function initPoints() {
             pts = [];
-            const count = Math.floor((canvas.width * canvas.height) / 18000);
+            const count = Math.floor((canvas.width * canvas.height) / 16000);
             for(let i=0; i<count; i++) {
                 pts.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    vx: (Math.random() - 0.5) * 0.4,
-                    vy: (Math.random() - 0.5) * 0.4,
-                    size: Math.random() * 2 + 1
+                    x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3,
+                    size: Math.random() * 1.5 + 0.5
                 });
             }
         }
 
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.fillStyle = 'rgba(168, 85, 247, 0.6)';
+            ctx.strokeStyle = 'rgba(139, 92, 246, 0.08)';
 
             for(let i=0; i<pts.length; i++) {
                 let p = pts[i];
                 p.x += p.vx; p.y += p.vy;
-
                 if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
                 if(p.y < 0 || p.y > canvas.height) p.vy *= -1;
-
                 ctx.fillRect(p.x, p.y, p.size, p.size);
 
                 for(let j=i+1; j<pts.length; j++) {
-                    let p2 = pts[j];
-                    let dist = Math.hypot(p.x - p2.x, p.y - p2.y);
-                    if(dist < 120) {
-                        ctx.beginPath();
-                        ctx.moveTo(p.x, p.y);
-                        ctx.lineTo(p2.x, p2.y);
-                        ctx.stroke();
+                    let p2 = pts[j]; let dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+                    if(dist < 130) {
+                        ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
                     }
                 }
             }
@@ -212,8 +151,7 @@
         }
 
         window.addEventListener('resize', resize);
-        resize();
-        animate();
+        resize(); animate();
     </script>
 </body>
 </html>
