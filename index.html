@@ -10,11 +10,11 @@
 
     <style>
         :root {
-            --void-bg: #020005;
-            --null-purple: #8c00ff;
+            --void-bg: #010003;
+            --null-purple: #9d00ff;
             --null-crimson: #ff0044;
             --null-cyan: #00f0ff;
-            --card-glass: rgba(8, 2, 16, 0.88);
+            --card-glass: rgba(6, 2, 12, 0.90);
             --mouse-x: 50%;
             --mouse-y: 50%;
             --tilt-x: 0deg;
@@ -38,7 +38,6 @@
             font-family: 'Cinzel Decorative', serif;
         }
 
-        /* 全螢幕背景與開場 Canvas */
         #null-canvas {
             position: fixed;
             inset: 0;
@@ -47,17 +46,27 @@
             z-index: 1;
         }
 
-        /* 噪點暗角覆蓋層 (提升質感) */
+        /* SVG 電影級底片噪點疊加層 (去除廉價平滑感) */
+        .film-grain {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            opacity: 0.12;
+            pointer-events: none;
+            mix-blend-mode: overlay;
+        }
+
         .vignette-overlay {
             position: fixed;
             inset: 0;
-            z-index: 2;
+            z-index: 3;
             pointer-events: none;
-            background: radial-gradient(circle at center, transparent 30%, rgba(2, 0, 5, 0.85) 80%, #020005 100%);
-            box-shadow: inset 0 0 100px rgba(0,0,0,0.9);
+            background: radial-gradient(circle at center, transparent 20%, rgba(1, 0, 3, 0.8) 75%, #010003 100%);
         }
 
-        /* --- 沉浸式開場封印層 --- */
+        /* --- 開場層 --- */
         #splash-screen {
             position: fixed;
             inset: 0;
@@ -67,20 +76,18 @@
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            background: rgba(2, 0, 5, 0.4);
-            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s ease, filter 1s ease;
+            transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), filter 1.2s ease;
         }
 
         #splash-screen.dissolve {
             opacity: 0;
-            filter: blur(30px) contrast(300%) brightness(1.5);
-            transform: scale(1.2);
+            filter: blur(40px) contrast(300%) brightness(2);
             pointer-events: none;
         }
 
         .splash-text-container {
             position: absolute;
-            bottom: 18%;
+            bottom: 15%;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -89,11 +96,11 @@
 
         .splash-title {
             font-family: 'Pirata One', cursive;
-            font-size: clamp(2.5rem, 6vw, 4.5rem);
-            letter-spacing: 16px;
+            font-size: clamp(2.8rem, 7vw, 4.8rem);
+            letter-spacing: 18px;
             color: #fff;
             text-shadow: 0 0 20px var(--null-purple), 0 0 40px var(--null-crimson);
-            animation: pulseGlow 2.5s infinite alternate ease-in-out;
+            animation: breatheTitle 3s infinite alternate ease-in-out;
         }
 
         .splash-sub {
@@ -102,18 +109,18 @@
             color: var(--null-cyan);
             letter-spacing: 6px;
             margin-top: 15px;
-            text-shadow: 0 0 8px var(--null-cyan);
-            animation: blinkSub 1.2s infinite;
+            opacity: 0.8;
+            animation: pulseSub 1.5s infinite alternate;
         }
 
-        @keyframes pulseGlow {
-            0% { text-shadow: 0 0 15px var(--null-purple), 0 0 30px var(--null-crimson); transform: scale(0.98); }
-            100% { text-shadow: 0 0 30px var(--null-purple), 0 0 60px var(--null-crimson), 0 0 90px var(--null-cyan); transform: scale(1.02); }
+        @keyframes breatheTitle {
+            0% { transform: scale(0.97); text-shadow: 0 0 15px var(--null-purple); }
+            100% { transform: scale(1.03); text-shadow: 0 0 35px var(--null-purple), 0 0 60px var(--null-crimson); }
         }
 
-        @keyframes blinkSub { 0%, 100% { opacity: 0.9; } 50% { opacity: 0.2; } }
+        @keyframes pulseSub { 0% { opacity: 0.3; } 100% { opacity: 1; } }
 
-        /* --- 主 3D 卡片 UI --- */
+        /* --- 主 UI 卡片 --- */
         .main-container {
             position: relative;
             z-index: 10;
@@ -124,7 +131,7 @@
             align-items: center;
             perspective: 1200px;
             opacity: 0;
-            transform: scale(0.88);
+            transform: scale(0.9);
             transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
             pointer-events: none;
         }
@@ -137,16 +144,16 @@
 
         .null-card {
             background: var(--card-glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
             width: 90%;
             max-width: 580px;
             padding: 55px 45px;
             position: relative;
-            border: 1px solid rgba(140, 0, 255, 0.45);
-            box-shadow: 0 0 50px rgba(0,0,0,0.95), inset 0 0 35px rgba(140, 0, 255, 0.15);
+            border: 1px solid rgba(157, 0, 255, 0.35);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.95), inset 0 0 40px rgba(157, 0, 255, 0.12);
             transform: rotateX(var(--tilt-y)) rotateY(var(--tilt-x));
-            transition: transform 0.12s ease-out, opacity 0.4s ease;
+            transition: transform 0.1s ease-out;
             overflow: hidden;
         }
 
@@ -154,7 +161,7 @@
             content: "";
             position: absolute;
             inset: 0;
-            background: radial-gradient(700px circle at var(--mouse-x) var(--mouse-y), rgba(255, 0, 68, 0.12), transparent 70%);
+            background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(255, 0, 68, 0.14), transparent 70%);
             pointer-events: none;
         }
 
@@ -202,7 +209,7 @@
         .data-row:hover {
             border-left-color: var(--null-crimson);
             box-shadow: -8px 0 20px rgba(255, 0, 68, 0.3);
-            transform: translateX(4px);
+            transform: translateX(5px);
         }
 
         .data-label {
@@ -219,19 +226,18 @@
             color: #ffffff;
             letter-spacing: 1px;
             font-family: 'Cinzel Decorative', serif;
-            text-shadow: 0 0 8px rgba(140, 0, 255, 0.6);
+            text-shadow: 0 0 8px rgba(157, 0, 255, 0.6);
         }
 
-        /* 切頁按鈕 */
         .nav-btn {
             position: fixed;
             top: 50%;
             transform: translateY(-50%);
             width: 52px;
             height: 52px;
-            background: rgba(8, 2, 16, 0.9);
+            background: rgba(6, 2, 12, 0.9);
             border: 1px solid var(--null-purple);
-            box-shadow: 0 0 20px rgba(140, 0, 255, 0.4);
+            box-shadow: 0 0 20px rgba(157, 0, 255, 0.4);
             cursor: pointer;
             z-index: 20;
             display: flex;
@@ -260,7 +266,6 @@
             transform: translateY(-50%) scale(1.15);
         }
 
-        /* 角邊印記 */
         .corner-glyph {
             position: absolute;
             width: 12px;
@@ -283,21 +288,17 @@
             letter-spacing: 2px;
             opacity: 0.6;
         }
-
-        /* 震盪視覺特效 Class */
-        .screen-shake {
-            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
-        }
-
-        @keyframes shake {
-            10%, 90% { transform: translate3d(-2px, 1px, 0); }
-            20%, 80% { transform: translate3d(4px, -2px, 0); }
-            30%, 50%, 70% { transform: translate3d(-6px, 3px, 0); }
-            40%, 60% { transform: translate3d(6px, -3px, 0); }
-        }
     </style>
 </head>
 <body>
+
+    <!-- SVG 電影噪點濾鏡產生器 -->
+    <svg class="film-grain">
+        <filter id="noiseFilter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/>
+        </filter>
+        <rect width="100%" height="100%" filter="url(#noiseFilter)"/>
+    </svg>
 
     <canvas id="null-canvas"></canvas>
     <div class="vignette-overlay"></div>
@@ -330,7 +331,7 @@
     </div>
 
     <script>
-        /* --- Web Audio 音效與低音虛空聲學 --- */
+        /* --- Web Audio 音效引擎 --- */
         class NullAudioEngine {
             constructor() { this.ctx = null; }
             init() {
@@ -343,24 +344,23 @@
                 const gain = this.ctx.createGain();
                 const filter = this.ctx.createBiquadFilter();
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(40, this.ctx.currentTime);
+                osc.frequency.setValueAtTime(38, this.ctx.currentTime);
                 filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(120, this.ctx.currentTime);
+                filter.frequency.setValueAtTime(100, this.ctx.currentTime);
                 gain.gain.setValueAtTime(0.01, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.25, this.ctx.currentTime + 3);
+                gain.gain.exponentialRampToValueAtTime(0.22, this.ctx.currentTime + 3);
                 osc.connect(filter); filter.connect(gain); gain.connect(this.ctx.destination);
                 osc.start();
             }
             playSealBreakSfx() {
                 if (!this.ctx) return;
-                // 低頻破印衝擊波音效
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(180, this.ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 0.8);
-                gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.8);
+                osc.frequency.setValueAtTime(160, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(25, this.ctx.currentTime + 0.9);
+                gain.gain.setValueAtTime(0.5, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.9);
                 osc.connect(gain); gain.connect(this.ctx.destination);
                 osc.start();
             }
@@ -426,21 +426,21 @@
         document.getElementById('btn-next').addEventListener('click', () => switchPage('next'));
         document.getElementById('btn-prev').addEventListener('click', () => switchPage('prev'));
 
-        /* --- 3D 傾斜效果 --- */
+        /* 3D 卡片傾斜 */
         let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
         document.addEventListener('mousemove', (e) => {
             mouseX = e.clientX; mouseY = e.clientY;
             const rect = nullCard.getBoundingClientRect();
             nullCard.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
             nullCard.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
-            const tiltX = ((e.clientX - window.innerWidth / 2) / (window.innerWidth / 2)) * 7;
-            const tiltY = ((e.clientY - window.innerHeight / 2) / (window.innerHeight / 2)) * -7;
+            const tiltX = ((e.clientX - window.innerWidth / 2) / (window.innerWidth / 2)) * 6;
+            const tiltY = ((e.clientY - window.innerHeight / 2) / (window.innerHeight / 2)) * -6;
             nullCard.style.setProperty('--tilt-x', `${tiltX}deg`);
             nullCard.style.setProperty('--tilt-y', `${tiltY}deg`);
         });
 
         /* ==========================================================================
-           高精度程式化怪誕巨獸與眼花繪製引擎 (Procedural Eldritch Engine)
+           高質感 Canvas 渲染系統：有機流體虛空、真實微眼動與動態骨骼觸手
            ========================================================================== */
         const canvas = document.getElementById('null-canvas');
         const ctx = canvas.getContext('2d');
@@ -451,206 +451,254 @@
 
         let animTime = 0;
         let isOpened = false;
-        let shockwaveRadius = 0;
+        let shockwave = { active: false, radius: 0, alpha: 1 };
 
-        // 寫實眼球結構繪製函數
-        function drawRealisticEye(x, y, radius, lookX, lookY, blinkRatio = 1, irisColor = '#ff0055') {
+        // 1. 虛空粒塵粒子系統 (Organic Void Dust)
+        const particles = Array.from({ length: 60 }, () => ({
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            size: Math.random() * 2 + 0.5,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: -Math.random() * 0.6 - 0.2,
+            alpha: Math.random()
+        }));
+
+        // 2. 多節點動態觸手/肌肉鏈 (Spring Physics Tentacle Chain)
+        class EldritchTentacle {
+            constructor(angle, length, nodeCount) {
+                this.angle = angle;
+                this.length = length;
+                this.nodeCount = nodeCount;
+                this.nodes = [];
+                for (let i = 0; i < nodeCount; i++) {
+                    this.nodes.push({ x: 0, y: 0 });
+                }
+            }
+
+            update(rootX, rootY, time, targetX, targetY) {
+                this.nodes[0].x = rootX;
+                this.nodes[0].y = rootY;
+
+                const segmentLen = this.length / this.nodeCount;
+                
+                for (let i = 1; i < this.nodeCount; i++) {
+                    // 加上波浪與朝滑鼠擺動的彈性物理
+                    const wave = Math.sin(time * 2 + i * 0.4 + this.angle) * (i * 1.5);
+                    const targetAngle = this.angle + (wave * 0.02);
+                    
+                    const prev = this.nodes[i - 1];
+                    let desiredX = prev.x + Math.cos(targetAngle) * segmentLen;
+                    let desiredY = prev.y + Math.sin(targetAngle) * segmentLen;
+
+                    // Spring Lerp 彈性追隨
+                    this.nodes[i].x += (desiredX - this.nodes[i].x) * 0.35;
+                    this.nodes[i].y += (desiredY - this.nodes[i].y) * 0.35;
+                }
+            }
+
+            draw(ctx) {
+                ctx.beginPath();
+                ctx.moveTo(this.nodes[0].x, this.nodes[0].y);
+                for (let i = 1; i < this.nodeCount - 1; i++) {
+                    const xc = (this.nodes[i].x + this.nodes[i + 1].x) / 2;
+                    const yc = (this.nodes[i].y + this.nodes[i + 1].y) / 2;
+                    ctx.quadraticCurveTo(this.nodes[i].x, this.nodes[i].y, xc, yc);
+                }
+                ctx.strokeStyle = 'rgba(157, 0, 255, 0.45)';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                // 末端附生微型眼球
+                const tip = this.nodes[this.nodeCount - 1];
+                drawHighDetailEye(tip.x, tip.y, 11, mouseX, mouseY, 1, '#00f0ff');
+            }
+        }
+
+        const tentacles = Array.from({ length: 8 }, (_, i) => 
+            new EldritchTentacle((i / 8) * Math.PI * 2, 130, 7)
+        );
+
+        // 3. 高細節寫實眼球（包含微眼動 Saccades 計算）
+        let eyeLookLerp = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+        let saccadeOffset = { x: 0, y: 0 };
+        let saccadeTimer = 0;
+
+        function drawHighDetailEye(x, y, radius, targetX, targetY, blinkRatio = 1, irisColor = '#ff0055') {
             ctx.save();
             ctx.translate(x, y);
 
-            // 1. 杏仁狀眼瞼輪廓 (Clipping Path)
+            // 杏仁眼瞼（帶有機肌肉流線）
+            const w = radius * 1.85;
+            const h = radius * 1.15 * blinkRatio;
             ctx.beginPath();
-            const width = radius * 1.8;
-            const height = radius * 1.1 * blinkRatio;
-            ctx.moveTo(-width, 0);
-            ctx.bezierCurveTo(-width * 0.5, -height, width * 0.5, -height, width, 0);
-            ctx.bezierCurveTo(width * 0.5, height, -width * 0.5, height, -width, 0);
+            ctx.moveTo(-w, 0);
+            ctx.bezierCurveTo(-w * 0.5, -h * 1.1, w * 0.5, -h * 1.1, w, 0);
+            ctx.bezierCurveTo(w * 0.5, h * 1.1, -w * 0.5, h * 1.1, -w, 0);
             ctx.closePath();
 
-            // 如果閉眼過度則不繪製內部
-            if (blinkRatio < 0.05) {
-                ctx.strokeStyle = '#8c00ff';
-                ctx.lineWidth = 3;
+            if (blinkRatio < 0.08) {
+                ctx.strokeStyle = 'rgba(255, 0, 68, 0.8)';
+                ctx.lineWidth = 2.5;
                 ctx.stroke();
                 ctx.restore();
                 return;
             }
 
             ctx.save();
-            ctx.clip(); // 將眼球內容裁切在眼瞼內
+            ctx.clip();
 
-            // 2. 鞏膜 (Sclera / 眼白) - 帶血管與深色漸層
-            const scleraGrad = ctx.createRadialGradient(0, 0, radius * 0.2, 0, 0, radius * 1.5);
-            scleraGrad.addColorStop(0, '#1c1524');
-            scleraGrad.addColorStop(0.7, '#0d0414');
-            scleraGrad.addColorStop(1, '#050008');
-            ctx.fillStyle = scleraGrad;
+            // 鞏膜 (Sclera) 漸層
+            const sclera = ctx.createRadialGradient(0, 0, radius * 0.1, 0, 0, radius * 1.4);
+            sclera.addColorStop(0, '#22162e');
+            sclera.addColorStop(0.65, '#0d0317');
+            sclera.addColorStop(1, '#030007');
+            ctx.fillStyle = sclera;
             ctx.fill();
 
-            // 繪製微細血管紋路
-            ctx.strokeStyle = 'rgba(255, 0, 68, 0.25)';
+            // 血絲紋路
+            ctx.strokeStyle = 'rgba(255, 0, 68, 0.2)';
             ctx.lineWidth = 1;
-            for (let i = 0; i < 8; i++) {
-                const angle = (i / 8) * Math.PI * 2;
+            for (let i = 0; i < 6; i++) {
+                const a = (i / 6) * Math.PI * 2;
                 ctx.beginPath();
-                ctx.moveTo(Math.cos(angle) * radius * 0.4, Math.sin(angle) * radius * 0.4);
-                ctx.lineTo(Math.cos(angle) * radius * 1.2, Math.sin(angle) * radius * 1.2);
+                ctx.moveTo(Math.cos(a) * radius * 0.3, Math.sin(a) * radius * 0.3);
+                ctx.lineTo(Math.cos(a) * radius * 1.1, Math.sin(a) * radius * 1.1);
                 ctx.stroke();
             }
 
-            // 3. 瞳孔與虹幕偏移計算 (視線跟隨)
-            const dx = lookX - (x);
-            const dy = lookY - (y);
+            // 微眼動（Micro-saccades）與平滑視線追蹤 (Lerp)
+            const dx = (targetX + saccadeOffset.x) - x;
+            const dy = (targetY + saccadeOffset.y) - y;
             const dist = Math.hypot(dx, dy) || 1;
-            const maxOffset = radius * 0.45;
-            const offsetX = (dx / dist) * Math.min(dist, maxOffset);
-            const offsetY = (dy / dist) * Math.min(dist, maxOffset);
+            const maxOffset = radius * 0.42;
+            const offX = (dx / dist) * Math.min(dist, maxOffset);
+            const offY = (dy / dist) * Math.min(dist, maxOffset);
 
-            // 4. 虹膜 (Iris) - 多層次發光放射紋
-            ctx.translate(offsetX, offsetY);
-            const irisRadius = radius * 0.55;
+            ctx.translate(offX, offY);
 
-            const irisGrad = ctx.createRadialGradient(0, 0, 2, 0, 0, irisRadius);
+            // 虹膜 (Iris) 質感紋路
+            const irisR = radius * 0.54;
+            const irisGrad = ctx.createRadialGradient(0, 0, 1, 0, 0, irisR);
             irisGrad.addColorStop(0, '#ffffff');
-            irisGrad.addColorStop(0.2, '#00f0ff');
-            irisGrad.addColorStop(0.6, irisColor);
-            irisGrad.addColorStop(1, '#05000a');
+            irisGrad.addColorStop(0.25, '#00f0ff');
+            irisGrad.addColorStop(0.65, irisColor);
+            irisGrad.addColorStop(1, '#04000a');
 
             ctx.beginPath();
-            ctx.arc(0, 0, irisRadius, 0, Math.PI * 2);
+            ctx.arc(0, 0, irisR, 0, Math.PI * 2);
             ctx.fillStyle = irisGrad;
             ctx.fill();
 
-            // 虹膜放射狀肌肉纖維紋路
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-            ctx.lineWidth = 0.8;
-            for (let a = 0; a < Math.PI * 2; a += 0.2) {
+            // 虹膜放射狀纖維
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+            ctx.lineWidth = 0.75;
+            for (let a = 0; a < Math.PI * 2; a += 0.25) {
                 ctx.beginPath();
-                ctx.moveTo(Math.cos(a) * (irisRadius * 0.3), Math.sin(a) * (irisRadius * 0.3));
-                ctx.lineTo(Math.cos(a) * irisRadius, Math.sin(a) * irisRadius);
+                ctx.moveTo(Math.cos(a) * (irisR * 0.25), Math.sin(a) * (irisR * 0.25));
+                ctx.lineTo(Math.cos(a) * irisR, Math.sin(a) * irisR);
                 ctx.stroke();
             }
 
-            // 5. 貓眼/虛空狹長瞳孔 (Slit Pupil)
+            // 虛空狹長瞳孔 (Slit Pupil)
             ctx.beginPath();
-            const pupilWidth = irisRadius * 0.25;
-            const pupilHeight = irisRadius * 0.75;
-            ctx.ellipse(0, 0, pupilWidth, pupilHeight, 0, 0, Math.PI * 2);
-            ctx.fillStyle = '#020005';
+            ctx.ellipse(0, 0, irisR * 0.22, irisR * 0.78, 0, 0, Math.PI * 2);
+            ctx.fillStyle = '#010003';
             ctx.fill();
 
-            // 6. 頂部高光 (Specular Highlight)
+            // 高光
             ctx.beginPath();
-            ctx.arc(-irisRadius * 0.3, -irisRadius * 0.3, irisRadius * 0.15, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+            ctx.arc(-irisR * 0.3, -irisR * 0.3, irisR * 0.14, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
             ctx.fill();
 
-            ctx.restore(); // 結束眼球內部 Clip
+            ctx.restore(); // Clip end
 
-            // 7. 肉感眼瞼邊框與陰影
-            ctx.strokeStyle = 'rgba(140, 0, 255, 0.7)';
-            ctx.lineWidth = 2.5;
+            ctx.strokeStyle = 'rgba(157, 0, 255, 0.8)';
+            ctx.lineWidth = 2;
             ctx.stroke();
 
             ctx.restore();
         }
 
-        // 繪製圍繞主眼的怪誕花瓣/觸手花（Nullscape Monster Flower）
-        function drawMonsterPetals(cx, cy, count, radius, time) {
-            ctx.save();
-            ctx.translate(cx, cy);
-            for (let i = 0; i < count; i++) {
-                const angle = (i / count) * Math.PI * 2 + Math.sin(time * 0.5 + i) * 0.05;
-                ctx.save();
-                ctx.rotate(angle);
-
-                ctx.beginPath();
-                ctx.moveTo(0, 0);
-                ctx.bezierCurveTo(radius * 0.4, -radius * 0.3, radius * 0.8, -radius * 0.2, radius * 1.3, 0);
-                ctx.bezierCurveTo(radius * 0.8, radius * 0.2, radius * 0.4, radius * 0.3, 0, 0);
-
-                const petalGrad = ctx.createLinearGradient(0, 0, radius * 1.3, 0);
-                petalGrad.addColorStop(0, '#10001f');
-                petalGrad.addColorStop(0.5, '#5900b3');
-                petalGrad.addColorStop(0.85, '#ff0055');
-                petalGrad.addColorStop(1, 'transparent');
-
-                ctx.fillStyle = petalGrad;
-                ctx.fill();
-                ctx.strokeStyle = 'rgba(0, 240, 255, 0.3)';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-
-                // 在花瓣尖端繪製附生小眼球
-                if (i % 2 === 0) {
-                    const blink = Math.abs(Math.sin(time * 2 + i));
-                    drawRealisticEye(radius * 1.1, 0, 14, mouseX, mouseY, blink, '#00f0ff');
-                }
-
-                ctx.restore();
-            }
-            ctx.restore();
-        }
-
-        /* --- 主繪製迴圈 (Render Loop) --- */
+        /* --- 繪製迴圈 (Render Loop) --- */
         function render() {
-            animTime += 0.025;
+            animTime += 0.02;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             const cx = canvas.width / 2;
             const cy = canvas.height / 2;
 
-            // 1. 扭曲動態虛空背景 (Winding Void Grid)
+            // 1. 動態虛空流體星雲與粒塵
+            particles.forEach(p => {
+                p.y += p.vy;
+                p.x += p.vx + Math.sin(animTime + p.y * 0.01) * 0.3;
+                if (p.y < 0) { p.y = canvas.height; p.x = Math.random() * canvas.width; }
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(157, 0, 255, ${0.15 + Math.sin(animTime + p.alpha) * 0.15})`;
+                ctx.fill();
+            });
+
+            // 2. 旋轉哥德幾何陣印 (Gothic Void Seal)
             ctx.save();
             ctx.translate(cx, cy);
-            ctx.rotate(Math.sin(animTime * 0.2) * 0.1);
+            ctx.rotate(animTime * 0.05);
 
-            const gridRings = 14;
-            for (let r = gridRings; r > 0; r--) {
-                const rad = Math.pow(r / gridRings, 2.5) * Math.max(cx, cy) * 1.2;
-                const prevRad = Math.pow((r - 1) / gridRings, 2.5) * Math.max(cx, cy) * 1.2;
+            ctx.strokeStyle = 'rgba(157, 0, 255, 0.12)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(0, 0, 180, 0, Math.PI * 2);
+            ctx.stroke();
 
-                for (let s = 0; s < 20; s++) {
-                    const a1 = (s / 20) * Math.PI * 2 + (r * 0.04) + (animTime * 0.1);
-                    const a2 = ((s + 1) / 20) * Math.PI * 2 + (r * 0.04) + (animTime * 0.1);
-
-                    ctx.beginPath();
-                    ctx.arc(0, 0, rad, a1, a2);
-                    ctx.arc(0, 0, prevRad, a2, a1, true);
-                    ctx.closePath();
-
-                    ctx.fillStyle = (r + s) % 2 === 0 ? 'rgba(140, 0, 255, 0.08)' : 'rgba(2, 0, 5, 0.9)';
-                    ctx.fill();
-                    ctx.strokeStyle = 'rgba(140, 0, 255, 0.12)';
-                    ctx.stroke();
-                }
+            for (let i = 0; i < 4; i++) {
+                ctx.rotate(Math.PI / 2);
+                ctx.strokeRect(-120, -120, 240, 240);
             }
             ctx.restore();
 
-            // 2. 開場畫面上：繪製中央主巨獸花與大眼 (Only on Splash Screen)
-            if (!isOpened) {
-                const mainEyeRadius = Math.min(canvas.width, canvas.height) * 0.14;
-                
-                // 繪製周圍肉質花瓣與小眼
-                drawMonsterPetals(cx, cy - 40, 12, mainEyeRadius * 1.4, animTime);
-
-                // 自然眨眼計算
-                const mainBlink = Math.sin(animTime * 1.5) > 0.96 ? 0.1 : 1;
-
-                // 繪製中央主眼
-                drawRealisticEye(cx, cy - 40, mainEyeRadius, mouseX, mouseY, mainBlink, '#ff0055');
+            // 3. 微眼動（Micro-saccades）隨機觸發計算
+            saccadeTimer++;
+            if (saccadeTimer > 120 && Math.random() < 0.05) {
+                saccadeOffset.x = (Math.random() - 0.5) * 18;
+                saccadeOffset.y = (Math.random() - 0.5) * 18;
+                saccadeTimer = 0;
+            } else {
+                saccadeOffset.x *= 0.92;
+                saccadeOffset.y *= 0.92;
             }
 
-            // 3. 破印衝擊波特效
-            if (shockwaveRadius > 0) {
-                shockwaveRadius += 25;
-                ctx.beginPath();
-                ctx.arc(cx, cy, shockwaveRadius, 0, Math.PI * 2);
-                ctx.strokeStyle = `rgba(0, 240, 255, ${Math.max(0, 1 - shockwaveRadius / (canvas.width * 0.8))})`;
-                ctx.lineWidth = 8;
-                ctx.stroke();
+            // 4. 開場層：繪製中央主巨獸花與骨骼觸手 (Only on Splash Screen)
+            if (!isOpened) {
+                const mainEyeRadius = Math.min(canvas.width, canvas.height) * 0.13;
+                
+                // 更新並繪製觸手鏈
+                tentacles.forEach(t => {
+                    t.update(cx, cy - 30, animTime, mouseX, mouseY);
+                    t.draw(ctx);
+                });
 
-                if (shockwaveRadius > canvas.width * 0.8) shockwaveRadius = 0;
+                // 不規則自然眨眼
+                const blinkRatio = Math.sin(animTime * 1.2) > 0.97 ? 0.05 : 1;
+
+                // 主眼繪製
+                drawHighDetailEye(cx, cy - 30, mainEyeRadius, mouseX, mouseY, blinkRatio, '#ff0044');
+            }
+
+            // 5. 破印流體衝擊波
+            if (shockwave.active) {
+                shockwave.radius += 18;
+                shockwave.alpha *= 0.95;
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(cx, cy, shockwave.radius, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(0, 240, 255, ${shockwave.alpha})`;
+                ctx.lineWidth = 6;
+                ctx.stroke();
+                ctx.restore();
+
+                if (shockwave.alpha < 0.01) shockwave.active = false;
             }
 
             requestAnimationFrame(render);
@@ -660,7 +708,7 @@
         renderPage(0);
         render();
 
-        /* --- 點擊破印開場邏輯 --- */
+        /* --- 點擊解鎖 --- */
         const splash = document.getElementById('splash-screen');
         const mainContainer = document.getElementById('main-container');
 
@@ -668,15 +716,13 @@
             audioEngine.init();
             audioEngine.playSealBreakSfx();
 
-            shockwaveRadius = 10; // 觸發衝擊波
-            document.body.classList.add('screen-shake');
+            shockwave = { active: true, radius: 20, alpha: 1 };
             splash.classList.add('dissolve');
 
             setTimeout(() => {
-                isOpened = true; // 隱藏主眼，進入主介面
+                isOpened = true;
                 splash.style.display = 'none';
                 mainContainer.classList.add('active');
-                document.body.classList.remove('screen-shake');
             }, 800);
         });
     </script>
