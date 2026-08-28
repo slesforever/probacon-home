@@ -2,23 +2,16 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>probaocon // NULLSCAPE VOID ARCHIVE</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Pirata+One&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Profile - Eye Zoom Transition</title>
     <style>
         :root {
-            --void-bg: #010003;
-            --null-purple: #9d00ff;
-            --null-crimson: #ff0044;
-            --null-cyan: #00f0ff;
-            --card-glass: rgba(6, 2, 12, 0.90);
-            --mouse-x: 50%;
-            --mouse-y: 50%;
-            --tilt-x: 0deg;
-            --tilt-y: 0deg;
+            --bg-dark: #050508;
+            --accent-crimson: #ff2a5f;
+            --accent-gold: #ffb700;
+            --accent-cyan: #00f0ff;
+            --glass-bg: rgba(15, 15, 25, 0.75);
+            --glass-border: rgba(255, 42, 95, 0.3);
         }
 
         * {
@@ -26,704 +19,429 @@
             margin: 0;
             padding: 0;
             user-select: none;
-            -webkit-tap-highlight-color: transparent;
         }
 
         body, html {
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: var(--void-bg);
-            color: #ebd9ff;
-            font-family: 'Cinzel Decorative', serif;
+            background-color: var(--bg-dark);
+            font-family: 'Segoe UI', Roboto, 'Noto Sans TC', sans-serif;
+            color: #fff;
         }
 
-        #null-canvas {
-            position: fixed;
-            inset: 0;
+        /* 暗黑質感背景與掃描線 */
+        .viewport-bg {
+            position: absolute;
             width: 100%;
             height: 100%;
+            background: 
+                radial-gradient(circle at center, rgba(30, 10, 20, 0.6) 0%, var(--bg-dark) 80%),
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 4px;
             z-index: 1;
         }
 
-        /* SVG 電影級底片噪點疊加層 (去除廉價平滑感) */
-        .film-grain {
-            position: fixed;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 2;
-            opacity: 0.12;
-            pointer-events: none;
-            mix-blend-mode: overlay;
-        }
-
-        .vignette-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 3;
-            pointer-events: none;
-            background: radial-gradient(circle at center, transparent 20%, rgba(1, 0, 3, 0.8) 75%, #010003 100%);
-        }
-
-        /* --- 開場層 --- */
-        #splash-screen {
-            position: fixed;
-            inset: 0;
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), filter 1.2s ease;
-        }
-
-        #splash-screen.dissolve {
-            opacity: 0;
-            filter: blur(40px) contrast(300%) brightness(2);
-            pointer-events: none;
-        }
-
-        .splash-text-container {
+        /* 噪點紋理覆蓋 */
+        .noise-overlay {
             position: absolute;
-            bottom: 15%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            inset: 0;
+            background: repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.015) 0, rgba(0,0,0,0.15) 2px, transparent 4px);
             pointer-events: none;
+            z-index: 2;
         }
 
-        .splash-title {
-            font-family: 'Pirata One', cursive;
-            font-size: clamp(2.8rem, 7vw, 4.8rem);
-            letter-spacing: 18px;
-            color: #fff;
-            text-shadow: 0 0 20px var(--null-purple), 0 0 40px var(--null-crimson);
-            animation: breatheTitle 3s infinite alternate ease-in-out;
-        }
-
-        .splash-sub {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.8rem;
-            color: var(--null-cyan);
-            letter-spacing: 6px;
-            margin-top: 15px;
-            opacity: 0.8;
-            animation: pulseSub 1.5s infinite alternate;
-        }
-
-        @keyframes breatheTitle {
-            0% { transform: scale(0.97); text-shadow: 0 0 15px var(--null-purple); }
-            100% { transform: scale(1.03); text-shadow: 0 0 35px var(--null-purple), 0 0 60px var(--null-crimson); }
-        }
-
-        @keyframes pulseSub { 0% { opacity: 0.3; } 100% { opacity: 1; } }
-
-        /* --- 主 UI 卡片 --- */
-        .main-container {
-            position: relative;
-            z-index: 10;
+        /* 眼睛容器與放大轉場 */
+        .eye-stage {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            perspective: 1200px;
+            z-index: 10;
+            transition: transform 1.2s cubic-bezier(0.7, 0, 0.2, 1), opacity 0.8s ease;
+        }
+
+        .eye-wrapper {
+            position: relative;
+            width: 280px;
+            height: 160px;
+            cursor: pointer;
+            filter: drop-shadow(0 0 25px rgba(255, 42, 95, 0.4));
+            transition: filter 0.3s ease;
+        }
+
+        .eye-wrapper:hover {
+            filter: drop-shadow(0 0 35px rgba(255, 42, 95, 0.8));
+        }
+
+        .eye-svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        /* 眼瞼與虹膜動畫 */
+        .eyelid-top, .eyelid-bottom {
+            fill: #0a0a12;
+            stroke: var(--accent-crimson);
+            stroke-width: 2;
+            transition: d 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .iris {
+            transform-origin: center;
+            transition: transform 0.6s ease, fill 0.5s ease;
+        }
+
+        .pupil {
+            transform-origin: center;
+            transition: transform 0.4s ease;
+        }
+
+        .click-hint {
+            margin-top: 30px;
+            font-size: 14px;
+            letter-spacing: 4px;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(0.98); }
+            50% { opacity: 0.9; transform: scale(1); }
+        }
+
+        /* 特效過渡：鏡頭推進眼睛內部 */
+        .eye-stage.zooming {
+            transform: scale(45);
             opacity: 0;
-            transform: scale(0.9);
-            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
             pointer-events: none;
         }
 
-        .main-container.active {
+        /* Flash 閃光與 Glitch 效果 */
+        .flash-overlay {
+            position: absolute;
+            inset: 0;
+            background: #fff;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 20;
+            transition: opacity 0.4s ease;
+        }
+
+        .flash-overlay.active {
+            opacity: 0.85;
+        }
+
+        /* 個人資料卡 Container */
+        .profile-container {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+            opacity: 0;
+            transform: scale(0.85);
+            pointer-events: none;
+            transition: opacity 1s ease 0.4s, transform 1s cubic-bezier(0.16, 1, 0.3, 1) 0.4s;
+        }
+
+        .profile-container.active {
             opacity: 1;
             transform: scale(1);
-            pointer-events: auto;
+            pointer-events: all;
         }
 
-        .null-card {
-            background: var(--card-glass);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            width: 90%;
-            max-width: 580px;
-            padding: 55px 45px;
+        .profile-card {
+            width: 720px;
+            max-width: 90%;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(16px);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(255, 42, 95, 0.15);
             position: relative;
-            border: 1px solid rgba(157, 0, 255, 0.35);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.95), inset 0 0 40px rgba(157, 0, 255, 0.12);
-            transform: rotateX(var(--tilt-y)) rotateY(var(--tilt-x));
-            transition: transform 0.1s ease-out;
-            overflow: hidden;
+            clip-path: polygon(
+                0 0, 
+                calc(100% - 20px) 0, 100% 20px, 
+                100% 100%, 
+                20px 100%, 0 calc(100% - 20px)
+            );
         }
 
-        .null-card::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(255, 0, 68, 0.14), transparent 70%);
-            pointer-events: none;
-        }
-
-        .header-tag {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.65rem;
-            color: var(--null-cyan);
-            letter-spacing: 6px;
-            text-align: center;
-            margin-bottom: 12px;
-        }
-
-        h1.user-name {
-            font-family: 'Pirata One', cursive;
-            font-size: clamp(3rem, 8vw, 4.2rem);
-            letter-spacing: 12px;
-            text-align: center;
-            color: #fff;
-            text-shadow: 0 0 18px var(--null-purple), 0 0 35px var(--null-crimson);
-            margin-bottom: 6px;
-        }
-
-        .sub-tag {
-            text-align: center;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.7rem;
-            letter-spacing: 4px;
-            color: rgba(235, 217, 255, 0.6);
-            margin-bottom: 40px;
-        }
-
-        .data-list {
+        .card-header {
             display: flex;
-            flex-direction: column;
-            gap: 24px;
-            min-height: 180px;
+            align-items: center;
+            gap: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
         }
 
-        .data-row {
-            border-left: 2px solid var(--null-purple);
-            padding-left: 18px;
-            transition: all 0.3s ease;
+        .avatar-mini {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-crimson);
+            background: #111 url('https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=300') center/cover;
+            box-shadow: 0 0 15px rgba(255, 42, 95, 0.5);
         }
 
-        .data-row:hover {
-            border-left-color: var(--null-crimson);
-            box-shadow: -8px 0 20px rgba(255, 0, 68, 0.3);
-            transform: translateX(5px);
+        .header-text h2 {
+            font-size: 26px;
+            letter-spacing: 2px;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 42, 95, 0.5);
+        }
+
+        .header-text p {
+            font-size: 13px;
+            color: var(--accent-cyan);
+            letter-spacing: 1px;
+        }
+
+        .card-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .data-group {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 15px 20px;
+            border-left: 3px solid var(--accent-crimson);
+            border-radius: 4px;
         }
 
         .data-label {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.7rem;
-            color: var(--null-cyan);
-            letter-spacing: 2px;
-            margin-bottom: 4px;
-            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 1.5px;
+            margin-bottom: 5px;
         }
 
         .data-value {
-            font-size: 1rem;
-            color: #ffffff;
-            letter-spacing: 1px;
-            font-family: 'Cinzel Decorative', serif;
-            text-shadow: 0 0 8px rgba(157, 0, 255, 0.6);
+            font-size: 15px;
+            color: #eee;
+            font-weight: 500;
         }
 
-        .nav-btn {
-            position: fixed;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 52px;
-            height: 52px;
-            background: rgba(6, 2, 12, 0.9);
-            border: 1px solid var(--null-purple);
-            box-shadow: 0 0 20px rgba(157, 0, 255, 0.4);
-            cursor: pointer;
-            z-index: 20;
+        .bgm-controls {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .music-tag {
+            font-size: 12px;
+            color: var(--accent-gold);
             display: flex;
             align-items: center;
-            justify-content: center;
-            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            gap: 8px;
         }
 
-        .nav-btn-left { left: clamp(15px, 4vw, 45px); }
-        .nav-btn-right { right: clamp(15px, 4vw, 45px); }
-
-        .nav-btn::after {
-            content: "";
-            width: 12px;
-            height: 12px;
-            border-top: 2px solid var(--null-cyan);
-            border-right: 2px solid var(--null-cyan);
+        .btn-reset {
+            background: transparent;
+            border: 1px solid var(--accent-crimson);
+            color: var(--accent-crimson);
+            padding: 8px 18px;
+            font-size: 12px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .nav-btn-left::after { transform: rotate(-135deg); }
-        .nav-btn-right::after { transform: rotate(45deg); }
-
-        .nav-btn:hover {
-            background: var(--null-purple);
-            box-shadow: 0 0 30px var(--null-purple), 0 0 50px var(--null-crimson);
-            transform: translateY(-50%) scale(1.15);
+        .btn-reset:hover {
+            background: var(--accent-crimson);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 42, 95, 0.6);
         }
 
-        .corner-glyph {
+        /* 隱藏的 YouTube Player */
+        #youtube-player {
             position: absolute;
-            width: 12px;
-            height: 12px;
-            border: 1px solid var(--null-cyan);
-            transform: rotate(45deg);
-        }
-        .cg-tl { top: 10px; left: 10px; }
-        .cg-tr { top: 10px; right: 10px; }
-        .cg-bl { bottom: 10px; left: 10px; }
-        .cg-br { bottom: 10px; right: 10px; }
-
-        .page-indicator {
-            position: absolute;
-            bottom: 18px;
-            right: 22px;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.65rem;
-            color: var(--null-cyan);
-            letter-spacing: 2px;
-            opacity: 0.6;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
 
-    <!-- SVG 電影噪點濾鏡產生器 -->
-    <svg class="film-grain">
-        <filter id="noiseFilter">
-            <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/>
-        </filter>
-        <rect width="100%" height="100%" filter="url(#noiseFilter)"/>
-    </svg>
+    <div class="viewport-bg"></div>
+    <div class="noise-overlay"></div>
+    <div class="flash-overlay" id="flash"></div>
 
-    <canvas id="null-canvas"></canvas>
-    <div class="vignette-overlay"></div>
+    <!-- 眼球開合與放大轉場舞台 -->
+    <div class="eye-stage" id="eyeStage">
+        <div class="eye-wrapper" id="eyeButton">
+            <svg class="eye-svg" viewBox="0 0 200 100">
+                <defs>
+                    <radialGradient id="irisGrad" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#000" />
+                        <stop offset="60%" stop-color="#ff1a4a" />
+                        <stop offset="100%" stop-color="#7a001e" />
+                    </radialGradient>
+                    <filter id="glow">
+                        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                        <feMerge>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
 
-    <!-- 開場層 -->
-    <div id="splash-screen">
-        <div class="splash-text-container">
-            <div class="splash-title">NULLSCAPE</div>
-            <div class="splash-sub">[ BREAK THE VOID SEAL ]</div>
+                <!-- 外眼眶線條 -->
+                <path d="M 10,50 Q 100,-10 190,50 Q 100,110 10,50 Z" fill="none" stroke="rgba(255,42,95,0.3)" stroke-width="1.5" />
+
+                <!-- 虹膜與瞳孔 -->
+                <g class="iris-group">
+                    <circle class="iris" cx="100" cy="50" r="30" fill="url(#irisGrad)" filter="url(#glow)" />
+                    <circle class="pupil" id="pupil" cx="100" cy="50" r="12" fill="#000" />
+                    <circle cx="92" cy="42" r="3" fill="#fff" opacity="0.8" />
+                </g>
+
+                <!-- 上下眼瞼（初始呈半閉合狀態） -->
+                <path class="eyelid-top" id="eyelidTop" d="M 10,50 Q 100,35 190,50 Q 100,-10 10,50 Z" />
+                <path class="eyelid-bottom" id="eyelidBottom" d="M 10,50 Q 100,65 190,50 Q 100,110 10,50 Z" />
+            </svg>
+        </div>
+        <div class="click-hint">[ 點擊凝視 · 喚醒資料庫 ]</div>
+    </div>
+
+    <!-- 個人資料卡 -->
+    <div class="profile-container" id="profileContainer">
+        <div class="profile-card">
+            <div class="card-header">
+                <div class="avatar-mini"></div>
+                <div class="header-text">
+                    <h2>SLES // ARCHIVE</h2>
+                    <p>STATUS: AWAKENED / GAME DEVELOPER & WRITER</p>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="data-group">
+                    <div class="data-label">Identity Alias</div>
+                    <div class="data-value">Sles (創作者 / 腳本師)</div>
+                </div>
+                <div class="data-group">
+                    <div class="data-label">Core Domain</div>
+                    <div class="data-value">Roblox Luau & Web Frontend</div>
+                </div>
+                <div class="data-group">
+                    <div class="data-label">Narrative Style</div>
+                    <div class="data-value">Dark Gothic / Tragedy / Emotional Mechanics</div>
+                </div>
+                <div class="data-group">
+                    <div class="data-label">Active Project</div>
+                    <div class="data-value">Project Moon Style Web Archive</div>
+                </div>
+            </div>
+            <div class="bgm-controls">
+                <div class="music-tag">
+                    <span>♫ BGM: FIND YOUR FLAME (feat. @hongmika)</span>
+                </div>
+                <button class="btn-reset" id="btnReset">CLOSE EYE</button>
+            </div>
         </div>
     </div>
 
-    <!-- 導航按鈕 -->
-    <button class="nav-btn nav-btn-left" id="btn-prev" aria-label="Previous"></button>
-    <button class="nav-btn nav-btn-right" id="btn-next" aria-label="Next"></button>
-
-    <!-- 主 UI 卡片 -->
-    <div class="main-container" id="main-container">
-        <div class="null-card" id="null-card">
-            <div class="corner-glyph cg-tl"></div><div class="corner-glyph cg-tr"></div>
-            <div class="corner-glyph cg-bl"></div><div class="corner-glyph cg-br"></div>
-
-            <div class="header-tag" id="card-tag">// NULL_PROFILE_ARCHIVE</div>
-            <h1 class="user-name">probaocon</h1>
-            <div class="sub-tag" id="card-sub">VOID WALKER // UNKNOWN ENTITY</div>
-
-            <div class="data-list" id="data-list"></div>
-            <div class="page-indicator" id="page-indicator">SECTOR 01 / 03</div>
-        </div>
-    </div>
+    <!-- YouTube 音樂播放器載入 -->
+    <div id="youtube-player"></div>
 
     <script>
-        /* --- Web Audio 音效引擎 --- */
-        class NullAudioEngine {
-            constructor() { this.ctx = null; }
-            init() {
-                if (this.ctx) return;
-                this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-                this.playDrone();
-            }
-            playDrone() {
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                const filter = this.ctx.createBiquadFilter();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(38, this.ctx.currentTime);
-                filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(100, this.ctx.currentTime);
-                gain.gain.setValueAtTime(0.01, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.22, this.ctx.currentTime + 3);
-                osc.connect(filter); filter.connect(gain); gain.connect(this.ctx.destination);
-                osc.start();
-            }
-            playSealBreakSfx() {
-                if (!this.ctx) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(160, this.ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(25, this.ctx.currentTime + 0.9);
-                gain.gain.setValueAtTime(0.5, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.9);
-                osc.connect(gain); gain.connect(this.ctx.destination);
-                osc.start();
-            }
-        }
-        const audioEngine = new NullAudioEngine();
+        // YouTube API 載入
+        let player;
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-        /* --- 頁面資料集 --- */
-        const profilePages = [
-            {
-                tag: "// NULL_PROFILE_ARCHIVE",
-                sub: "VOID WALKER // UNKNOWN ENTITY",
-                rows: [
-                    { label: "ENTITY_ID", value: "[ EMPTY FIELD ]" },
-                    { label: "STATUS / EGO", value: "[ EMPTY FIELD ]" },
-                    { label: "ALIGNMENT", value: "[ UNKNOWN ]" }
-                ]
-            },
-            {
-                tag: "// RECORDS_DATABASE",
-                sub: "ARCHIVED TRANSMISSIONS",
-                rows: [
-                    { label: "PROJECT_LOG_01", value: "[ UNASSIGNED DATA ]" },
-                    { label: "PROJECT_LOG_02", value: "[ UNASSIGNED DATA ]" }
-                ]
-            },
-            {
-                tag: "// VOID_COMMUNICATIONS",
-                sub: "CONNECTIVITY LINK",
-                rows: [
-                    { label: "SIGNAL_SOURCE", value: "[ DISCONNECTED ]" },
-                    { label: "EXTERNAL_LINK", value: "[ NONE ]" }
-                ]
-            }
-        ];
-
-        let currentPage = 0;
-        const nullCard = document.getElementById('null-card');
-        const dataList = document.getElementById('data-list');
-        const cardTag = document.getElementById('card-tag');
-        const cardSub = document.getElementById('card-sub');
-        const pageIndicator = document.getElementById('page-indicator');
-
-        function renderPage(index) {
-            const data = profilePages[index];
-            cardTag.textContent = data.tag;
-            cardSub.textContent = data.sub;
-            dataList.innerHTML = data.rows.map(row => `
-                <div class="data-row">
-                    <span class="data-label">${row.label}</span>
-                    <span class="data-value">${row.value}</span>
-                </div>
-            `).join('');
-            pageIndicator.textContent = `SECTOR 0${index + 1} / 0${profilePages.length}`;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('youtube-player', {
+                height: '0',
+                width: '0',
+                videoId: 'V35svE-8XtA', // FIND YOUR FLAME
+                playerVars: {
+                    'autoplay': 0,
+                    'controls': 0,
+                    'loop': 1,
+                    'playlist': 'V35svE-8XtA'
+                }
+            });
         }
 
-        function switchPage(dir) {
-            audioEngine.playSealBreakSfx();
-            if (dir === 'next') currentPage = (currentPage + 1) % profilePages.length;
-            else currentPage = (currentPage - 1 + profilePages.length) % profilePages.length;
-            renderPage(currentPage);
-        }
+        // DOM 元素控制
+        const eyeButton = document.getElementById('eyeButton');
+        const eyeStage = document.getElementById('eyeStage');
+        const eyelidTop = document.getElementById('eyelidTop');
+        const eyelidBottom = document.getElementById('eyelidBottom');
+        const pupil = document.getElementById('pupil');
+        const flash = document.getElementById('flash');
+        const profileContainer = document.getElementById('profileContainer');
+        const btnReset = document.getElementById('btnReset');
 
-        document.getElementById('btn-next').addEventListener('click', () => switchPage('next'));
-        document.getElementById('btn-prev').addEventListener('click', () => switchPage('prev'));
+        let isOpened = false;
 
-        /* 3D 卡片傾斜 */
-        let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
-        document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX; mouseY = e.clientY;
-            const rect = nullCard.getBoundingClientRect();
-            nullCard.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
-            nullCard.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
-            const tiltX = ((e.clientX - window.innerWidth / 2) / (window.innerWidth / 2)) * 6;
-            const tiltY = ((e.clientY - window.innerHeight / 2) / (window.innerHeight / 2)) * -6;
-            nullCard.style.setProperty('--tilt-x', `${tiltX}deg`);
-            nullCard.style.setProperty('--tilt-y', `${tiltY}deg`);
+        // 觸發開眼與放大轉場
+        eyeButton.addEventListener('click', () => {
+            if (isOpened) return;
+            isOpened = true;
+
+            // 步驟 1: 眼瞼完全張開，瞳孔放大
+            eyelidTop.setAttribute('d', 'M 10,50 Q 100,-25 190,50 Q 100,-10 10,50 Z');
+            eyelidBottom.setAttribute('d', 'M 10,50 Q 100,125 190,50 Q 100,110 10,50 Z');
+            pupil.style.transform = 'scale(1.8)';
+
+            // 播放背景音樂
+            if (player && typeof player.playVideo === 'function') {
+                player.playVideo();
+            }
+
+            // 步驟 2: 延遲後進行極速放大（Zoom In into pupil）
+            setTimeout(() => {
+                eyeStage.classList.add('zooming');
+                flash.classList.add('active');
+
+                setTimeout(() => {
+                    flash.classList.remove('active');
+                }, 400);
+
+                // 步驟 3: 展示個人資料卡
+                setTimeout(() => {
+                    profileContainer.classList.add('active');
+                }, 600);
+            }, 500);
         });
 
-        /* ==========================================================================
-           高質感 Canvas 渲染系統：有機流體虛空、真實微眼動與動態骨骼觸手
-           ========================================================================== */
-        const canvas = document.getElementById('null-canvas');
-        const ctx = canvas.getContext('2d');
-
-        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        window.addEventListener('resize', resize);
-        resize();
-
-        let animTime = 0;
-        let isOpened = false;
-        let shockwave = { active: false, radius: 0, alpha: 1 };
-
-        // 1. 虛空粒塵粒子系統 (Organic Void Dust)
-        const particles = Array.from({ length: 60 }, () => ({
-            x: Math.random() * window.innerWidth,
-            y: Math.random() * window.innerHeight,
-            size: Math.random() * 2 + 0.5,
-            vx: (Math.random() - 0.5) * 0.4,
-            vy: -Math.random() * 0.6 - 0.2,
-            alpha: Math.random()
-        }));
-
-        // 2. 多節點動態觸手/肌肉鏈 (Spring Physics Tentacle Chain)
-        class EldritchTentacle {
-            constructor(angle, length, nodeCount) {
-                this.angle = angle;
-                this.length = length;
-                this.nodeCount = nodeCount;
-                this.nodes = [];
-                for (let i = 0; i < nodeCount; i++) {
-                    this.nodes.push({ x: 0, y: 0 });
-                }
-            }
-
-            update(rootX, rootY, time, targetX, targetY) {
-                this.nodes[0].x = rootX;
-                this.nodes[0].y = rootY;
-
-                const segmentLen = this.length / this.nodeCount;
-                
-                for (let i = 1; i < this.nodeCount; i++) {
-                    // 加上波浪與朝滑鼠擺動的彈性物理
-                    const wave = Math.sin(time * 2 + i * 0.4 + this.angle) * (i * 1.5);
-                    const targetAngle = this.angle + (wave * 0.02);
-                    
-                    const prev = this.nodes[i - 1];
-                    let desiredX = prev.x + Math.cos(targetAngle) * segmentLen;
-                    let desiredY = prev.y + Math.sin(targetAngle) * segmentLen;
-
-                    // Spring Lerp 彈性追隨
-                    this.nodes[i].x += (desiredX - this.nodes[i].x) * 0.35;
-                    this.nodes[i].y += (desiredY - this.nodes[i].y) * 0.35;
-                }
-            }
-
-            draw(ctx) {
-                ctx.beginPath();
-                ctx.moveTo(this.nodes[0].x, this.nodes[0].y);
-                for (let i = 1; i < this.nodeCount - 1; i++) {
-                    const xc = (this.nodes[i].x + this.nodes[i + 1].x) / 2;
-                    const yc = (this.nodes[i].y + this.nodes[i + 1].y) / 2;
-                    ctx.quadraticCurveTo(this.nodes[i].x, this.nodes[i].y, xc, yc);
-                }
-                ctx.strokeStyle = 'rgba(157, 0, 255, 0.45)';
-                ctx.lineWidth = 3;
-                ctx.stroke();
-
-                // 末端附生微型眼球
-                const tip = this.nodes[this.nodeCount - 1];
-                drawHighDetailEye(tip.x, tip.y, 11, mouseX, mouseY, 1, '#00f0ff');
-            }
-        }
-
-        const tentacles = Array.from({ length: 8 }, (_, i) => 
-            new EldritchTentacle((i / 8) * Math.PI * 2, 130, 7)
-        );
-
-        // 3. 高細節寫實眼球（包含微眼動 Saccades 計算）
-        let eyeLookLerp = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-        let saccadeOffset = { x: 0, y: 0 };
-        let saccadeTimer = 0;
-
-        function drawHighDetailEye(x, y, radius, targetX, targetY, blinkRatio = 1, irisColor = '#ff0055') {
-            ctx.save();
-            ctx.translate(x, y);
-
-            // 杏仁眼瞼（帶有機肌肉流線）
-            const w = radius * 1.85;
-            const h = radius * 1.15 * blinkRatio;
-            ctx.beginPath();
-            ctx.moveTo(-w, 0);
-            ctx.bezierCurveTo(-w * 0.5, -h * 1.1, w * 0.5, -h * 1.1, w, 0);
-            ctx.bezierCurveTo(w * 0.5, h * 1.1, -w * 0.5, h * 1.1, -w, 0);
-            ctx.closePath();
-
-            if (blinkRatio < 0.08) {
-                ctx.strokeStyle = 'rgba(255, 0, 68, 0.8)';
-                ctx.lineWidth = 2.5;
-                ctx.stroke();
-                ctx.restore();
-                return;
-            }
-
-            ctx.save();
-            ctx.clip();
-
-            // 鞏膜 (Sclera) 漸層
-            const sclera = ctx.createRadialGradient(0, 0, radius * 0.1, 0, 0, radius * 1.4);
-            sclera.addColorStop(0, '#22162e');
-            sclera.addColorStop(0.65, '#0d0317');
-            sclera.addColorStop(1, '#030007');
-            ctx.fillStyle = sclera;
-            ctx.fill();
-
-            // 血絲紋路
-            ctx.strokeStyle = 'rgba(255, 0, 68, 0.2)';
-            ctx.lineWidth = 1;
-            for (let i = 0; i < 6; i++) {
-                const a = (i / 6) * Math.PI * 2;
-                ctx.beginPath();
-                ctx.moveTo(Math.cos(a) * radius * 0.3, Math.sin(a) * radius * 0.3);
-                ctx.lineTo(Math.cos(a) * radius * 1.1, Math.sin(a) * radius * 1.1);
-                ctx.stroke();
-            }
-
-            // 微眼動（Micro-saccades）與平滑視線追蹤 (Lerp)
-            const dx = (targetX + saccadeOffset.x) - x;
-            const dy = (targetY + saccadeOffset.y) - y;
-            const dist = Math.hypot(dx, dy) || 1;
-            const maxOffset = radius * 0.42;
-            const offX = (dx / dist) * Math.min(dist, maxOffset);
-            const offY = (dy / dist) * Math.min(dist, maxOffset);
-
-            ctx.translate(offX, offY);
-
-            // 虹膜 (Iris) 質感紋路
-            const irisR = radius * 0.54;
-            const irisGrad = ctx.createRadialGradient(0, 0, 1, 0, 0, irisR);
-            irisGrad.addColorStop(0, '#ffffff');
-            irisGrad.addColorStop(0.25, '#00f0ff');
-            irisGrad.addColorStop(0.65, irisColor);
-            irisGrad.addColorStop(1, '#04000a');
-
-            ctx.beginPath();
-            ctx.arc(0, 0, irisR, 0, Math.PI * 2);
-            ctx.fillStyle = irisGrad;
-            ctx.fill();
-
-            // 虹膜放射狀纖維
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
-            ctx.lineWidth = 0.75;
-            for (let a = 0; a < Math.PI * 2; a += 0.25) {
-                ctx.beginPath();
-                ctx.moveTo(Math.cos(a) * (irisR * 0.25), Math.sin(a) * (irisR * 0.25));
-                ctx.lineTo(Math.cos(a) * irisR, Math.sin(a) * irisR);
-                ctx.stroke();
-            }
-
-            // 虛空狹長瞳孔 (Slit Pupil)
-            ctx.beginPath();
-            ctx.ellipse(0, 0, irisR * 0.22, irisR * 0.78, 0, 0, Math.PI * 2);
-            ctx.fillStyle = '#010003';
-            ctx.fill();
-
-            // 高光
-            ctx.beginPath();
-            ctx.arc(-irisR * 0.3, -irisR * 0.3, irisR * 0.14, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-            ctx.fill();
-
-            ctx.restore(); // Clip end
-
-            ctx.strokeStyle = 'rgba(157, 0, 255, 0.8)';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
-            ctx.restore();
-        }
-
-        /* --- 繪製迴圈 (Render Loop) --- */
-        function render() {
-            animTime += 0.02;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            const cx = canvas.width / 2;
-            const cy = canvas.height / 2;
-
-            // 1. 動態虛空流體星雲與粒塵
-            particles.forEach(p => {
-                p.y += p.vy;
-                p.x += p.vx + Math.sin(animTime + p.y * 0.01) * 0.3;
-                if (p.y < 0) { p.y = canvas.height; p.x = Math.random() * canvas.width; }
-
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(157, 0, 255, ${0.15 + Math.sin(animTime + p.alpha) * 0.15})`;
-                ctx.fill();
-            });
-
-            // 2. 旋轉哥德幾何陣印 (Gothic Void Seal)
-            ctx.save();
-            ctx.translate(cx, cy);
-            ctx.rotate(animTime * 0.05);
-
-            ctx.strokeStyle = 'rgba(157, 0, 255, 0.12)';
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.arc(0, 0, 180, 0, Math.PI * 2);
-            ctx.stroke();
-
-            for (let i = 0; i < 4; i++) {
-                ctx.rotate(Math.PI / 2);
-                ctx.strokeRect(-120, -120, 240, 240);
-            }
-            ctx.restore();
-
-            // 3. 微眼動（Micro-saccades）隨機觸發計算
-            saccadeTimer++;
-            if (saccadeTimer > 120 && Math.random() < 0.05) {
-                saccadeOffset.x = (Math.random() - 0.5) * 18;
-                saccadeOffset.y = (Math.random() - 0.5) * 18;
-                saccadeTimer = 0;
-            } else {
-                saccadeOffset.x *= 0.92;
-                saccadeOffset.y *= 0.92;
-            }
-
-            // 4. 開場層：繪製中央主巨獸花與骨骼觸手 (Only on Splash Screen)
-            if (!isOpened) {
-                const mainEyeRadius = Math.min(canvas.width, canvas.height) * 0.13;
-                
-                // 更新並繪製觸手鏈
-                tentacles.forEach(t => {
-                    t.update(cx, cy - 30, animTime, mouseX, mouseY);
-                    t.draw(ctx);
-                });
-
-                // 不規則自然眨眼
-                const blinkRatio = Math.sin(animTime * 1.2) > 0.97 ? 0.05 : 1;
-
-                // 主眼繪製
-                drawHighDetailEye(cx, cy - 30, mainEyeRadius, mouseX, mouseY, blinkRatio, '#ff0044');
-            }
-
-            // 5. 破印流體衝擊波
-            if (shockwave.active) {
-                shockwave.radius += 18;
-                shockwave.alpha *= 0.95;
-
-                ctx.save();
-                ctx.beginPath();
-                ctx.arc(cx, cy, shockwave.radius, 0, Math.PI * 2);
-                ctx.strokeStyle = `rgba(0, 240, 255, ${shockwave.alpha})`;
-                ctx.lineWidth = 6;
-                ctx.stroke();
-                ctx.restore();
-
-                if (shockwave.alpha < 0.01) shockwave.active = false;
-            }
-
-            requestAnimationFrame(render);
-        }
-
-        // 初始化
-        renderPage(0);
-        render();
-
-        /* --- 點擊解鎖 --- */
-        const splash = document.getElementById('splash-screen');
-        const mainContainer = document.getElementById('main-container');
-
-        splash.addEventListener('click', () => {
-            audioEngine.init();
-            audioEngine.playSealBreakSfx();
-
-            shockwave = { active: true, radius: 20, alpha: 1 };
-            splash.classList.add('dissolve');
+        // 重置回到閉眼狀態
+        btnReset.addEventListener('click', () => {
+            profileContainer.classList.remove('active');
 
             setTimeout(() => {
-                isOpened = true;
-                splash.style.display = 'none';
-                mainContainer.classList.add('active');
-            }, 800);
+                eyeStage.classList.remove('zooming');
+                eyelidTop.setAttribute('d', 'M 10,50 Q 100,35 190,50 Q 100,-10 10,50 Z');
+                eyelidBottom.setAttribute('d', 'M 10,50 Q 100,65 190,50 Q 100,110 10,50 Z');
+                pupil.style.transform = 'scale(1)';
+                isOpened = false;
+
+                if (player && typeof player.pauseVideo === 'function') {
+                    player.pauseVideo();
+                }
+            }, 600);
         });
     </script>
 </body>
