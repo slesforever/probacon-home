@@ -2,20 +2,24 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NULLSCAPE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NULLSCAPE // DIGITAL DESCENDANT</title>
+    
+    <!-- 字體載入：Nullscape 襯線斜體 & 科技單色字體 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:ital,wght@1,700;1,900&family=EB+Garamond:ital,wght@1,600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:ital,wght@1,700;1,900&family=EB+Garamond:ital,wght@1,600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg-void: #08020f;
+            --bg-void: #04010a;
             --null-cyan: #00d2ff;
-            --null-magenta: #e100ff;
-            --null-purple: #4a0080;
-            --panel-bg: rgba(13, 5, 25, 0.82);
-            --border-purple: rgba(160, 32, 240, 0.4);
+            --null-magenta: #ff0055;
+            --null-purple: #8a00ff;
+            --panel-width: 720px;
+            --panel-bg: rgba(10, 4, 22, 0.85);
+            --border-purple: rgba(138, 0, 255, 0.4);
+            --border-cyan: rgba(0, 210, 255, 0.3);
         }
 
         * {
@@ -23,6 +27,7 @@
             margin: 0;
             padding: 0;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body, html {
@@ -30,12 +35,14 @@
             height: 100%;
             overflow: hidden;
             background-color: var(--bg-void);
-            color: #e5d0ff;
+            color: #ebd9ff;
             font-family: 'Share Tech Mono', monospace;
         }
 
-        /* 3D 棋盤格虛空 Canvas */
-        #void-canvas {
+        /* --------------------------------------------------
+           全螢幕畫布與視覺濾鏡 (Canvas & Overlays)
+        -------------------------------------------------- */
+        #null-canvas {
             position: fixed;
             inset: 0;
             width: 100vw;
@@ -43,120 +50,243 @@
             z-index: 1;
         }
 
-        /* 雜訊噪點質感 */
-        .noise-overlay {
+        /* 噪點 overlay */
+        .noise-layer {
             position: fixed;
             inset: 0;
             z-index: 2;
-            opacity: 0.18;
+            opacity: 0.16;
             pointer-events: none;
             mix-blend-mode: overlay;
         }
 
-        .vignette-overlay {
+        /* Scanline 掃描線 */
+        .scanline-layer {
             position: fixed;
             inset: 0;
             z-index: 3;
             pointer-events: none;
-            background: radial-gradient(circle at center, transparent 30%, rgba(8, 2, 15, 0.85) 75%, #08020f 100%);
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(0, 0, 0, 0.35) 50%,
+                rgba(0, 0, 0, 0.35)
+            );
+            background-size: 100% 4px;
         }
 
-        /* 螢幕兩側半透明菱形按鈕 */
+        /* 暗角暈影 (Vignette) */
+        .vignette-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 4;
+            pointer-events: none;
+            background: radial-gradient(circle at center, transparent 30%, rgba(4, 1, 10, 0.82) 75%, #04010a 100%);
+        }
+
+        /* 白閃轉場層 */
+        .flash-overlay {
+            position: fixed;
+            inset: 0;
+            background: #ffffff;
+            z-index: 50;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .flash-overlay.active {
+            opacity: 0.95;
+        }
+
+        /* --------------------------------------------------
+           開場凝視眼睛層 (Splash Eye Stage)
+        -------------------------------------------------- */
+        #splash-stage {
+            position: fixed;
+            inset: 0;
+            z-index: 30;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 1.2s cubic-bezier(0.7, 0, 0.2, 1), opacity 0.8s ease;
+        }
+
+        #splash-stage.zooming {
+            transform: scale(38);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .eye-container-splash {
+            width: 220px;
+            height: 130px;
+            filter: drop-shadow(0 0 18px rgba(255, 0, 85, 0.5));
+            transition: transform 0.2s ease-out;
+        }
+
+        .eye-container-splash:hover {
+            transform: scale(1.06);
+        }
+
+        .splash-hint {
+            margin-top: 35px;
+            font-family: 'Cinzel Decorative', serif;
+            font-style: italic;
+            font-size: 0.85rem;
+            letter-spacing: 5px;
+            color: var(--null-cyan);
+            text-shadow: 0 0 12px var(--null-cyan);
+            animation: pulseHint 2s infinite alternate ease-in-out;
+        }
+
+        @keyframes pulseHint {
+            0% { opacity: 0.4; transform: scale(0.98); }
+            100% { opacity: 1; transform: scale(1.02); }
+        }
+
+        /* --------------------------------------------------
+           螢幕兩側半透明菱形切頁按鈕 (Diamond Nav Buttons)
+        -------------------------------------------------- */
         .nav-diamond {
             position: fixed;
             top: 50%;
             transform: translateY(-50%) rotate(45deg);
-            width: 50px;
-            height: 50px;
-            background: rgba(0, 210, 255, 0.08);
+            width: 52px;
+            height: 52px;
+            background: rgba(0, 210, 255, 0.06);
             border: 1.5px solid var(--null-cyan);
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.25);
             cursor: pointer;
             z-index: 20;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            opacity: 0;
+            pointer-events: none;
         }
 
-        .nav-diamond.left { left: clamp(15px, 4vw, 45px); }
-        .nav-diamond.right { 
-            right: clamp(15px, 4vw, 45px); 
+        .nav-diamond.active {
+            opacity: 0.8;
+            pointer-events: auto;
+        }
+
+        .nav-diamond.left-btn { left: clamp(15px, 3.5vw, 45px); }
+        .nav-diamond.right-btn { 
+            right: clamp(15px, 3.5vw, 45px); 
             border-color: var(--null-magenta);
-            background: rgba(225, 0, 255, 0.08);
-            box-shadow: 0 0 15px rgba(225, 0, 255, 0.3);
+            background: rgba(255, 0, 85, 0.06);
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.25);
         }
 
         .nav-diamond:hover {
-            transform: translateY(-50%) rotate(45deg) scale(1.12);
-            background: rgba(0, 210, 255, 0.25);
+            opacity: 1;
+            transform: translateY(-50%) rotate(45deg) scale(1.15);
+            background: rgba(0, 210, 255, 0.22);
             box-shadow: 0 0 25px var(--null-cyan);
         }
 
-        .nav-diamond.right:hover {
-            background: rgba(225, 0, 255, 0.25);
+        .nav-diamond.right-btn:hover {
+            background: rgba(255, 0, 85, 0.22);
             box-shadow: 0 0 25px var(--null-magenta);
         }
 
-        .nav-diamond span {
+        .nav-diamond-icon {
             transform: rotate(-45deg);
             font-size: 1.2rem;
-            color: #fff;
             font-weight: bold;
+            color: #ffffff;
+            text-shadow: 0 0 8px #ffffff;
         }
 
-        /* 720px 核心主面板 */
-        .stage-container {
+        /* --------------------------------------------------
+           720px 核心主介面面板 (Main 720px Panel Stage)
+        -------------------------------------------------- */
+        .main-stage {
             position: fixed;
             inset: 0;
             z-index: 10;
             display: flex;
             justify-content: center;
             align-items: center;
+            opacity: 0;
+            transform: scale(0.88);
+            pointer-events: none;
+            transition: opacity 1s ease 0.3s, transform 1s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
         }
 
-        .main-panel {
-            width: 720px;
-            max-width: 90vw;
+        .main-stage.active {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+
+        .null-panel {
+            width: var(--panel-width);
+            max-width: 92vw;
             background: var(--panel-bg);
             border: 1px solid var(--border-purple);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.95), 0 0 30px rgba(74, 0, 128, 0.3);
-            backdrop-filter: blur(12px);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), inset 0 0 30px rgba(138, 0, 255, 0.15);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             padding: 35px 40px;
             position: relative;
+            clip-path: polygon(
+                0 16px, 16px 0, 
+                calc(100% - 16px) 0, 100% 16px, 
+                100% calc(100% - 16px), calc(100% - 16px) 100%, 
+                16px 100%, 0 calc(100% - 16px)
+            );
         }
 
-        /* HEADER 區域與原生藝術眼睛 */
+        /* 面板四角裝飾標籤 */
+        .corner-tag {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border: 1px solid var(--null-cyan);
+            transform: rotate(45deg);
+        }
+        .ct-tl { top: 12px; left: 12px; }
+        .ct-tr { top: 12px; right: 12px; }
+        .ct-bl { bottom: 12px; left: 12px; }
+        .ct-br { bottom: 12px; right: 12px; }
+
+        /* HEADER 區塊 */
         .panel-header {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 25px;
-            border-bottom: 1px solid rgba(225, 0, 255, 0.2);
+            border-bottom: 1px solid rgba(255, 0, 85, 0.25);
             padding-bottom: 20px;
+            margin-bottom: 25px;
         }
 
-        .eye-wrapper {
-            width: 150px;
-            height: 90px;
-            margin-bottom: 12px;
-            filter: drop-shadow(0 0 12px rgba(225, 0, 255, 0.4));
-            transition: transform 0.3s ease;
+        .mini-eye-wrapper {
+            width: 120px;
+            height: 70px;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 10px rgba(255, 0, 85, 0.4));
             cursor: pointer;
+            transition: transform 0.25s ease;
         }
 
-        .eye-wrapper:hover {
-            transform: scale(1.05);
+        .mini-eye-wrapper:hover {
+            transform: scale(1.08);
         }
 
-        /* 重現圖片同款 Nullscape Italic Gradient 標題 */
+        /* 致敬 image_460bac.jpg 的 Italic Gradient 標題 */
         .nullscape-title {
-            font-family: 'Cinzel', serif;
+            font-family: 'Cinzel Decorative', serif;
             font-style: italic;
             font-weight: 900;
             font-size: clamp(2.2rem, 5vw, 3.2rem);
             letter-spacing: 6px;
-            background: linear-gradient(135deg, #00d2ff 0%, #9000ff 50%, #ff0055 100%);
+            background: linear-gradient(135deg, #00d2ff 0%, #8a00ff 50%, #ff0055 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-shadow: 0 0 20px rgba(0, 210, 255, 0.3);
@@ -165,80 +295,88 @@
         .nullscape-sub {
             font-family: 'EB Garamond', serif;
             font-style: italic;
-            font-size: 0.9rem;
-            color: rgba(229, 208, 255, 0.7);
-            letter-spacing: 3px;
+            font-size: 0.85rem;
+            color: rgba(235, 217, 255, 0.7);
+            letter-spacing: 4px;
             margin-top: 4px;
         }
 
-        /* 音樂列 */
+        /* 音樂控制列 */
         .audio-bar {
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(0, 210, 255, 0.25);
-            padding: 12px 18px;
+            background: rgba(0, 0, 0, 0.55);
+            border: 1px solid var(--border-cyan);
+            padding: 12px 20px;
             margin-bottom: 25px;
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
 
-        .audio-info {
-            font-size: 0.8rem;
+        .audio-text {
+            font-size: 0.78rem;
             color: var(--null-cyan);
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
         }
 
         .audio-btn {
             background: transparent;
             border: 1px solid var(--null-cyan);
             color: var(--null-cyan);
-            padding: 5px 14px;
+            padding: 5px 15px;
             font-family: 'Share Tech Mono', monospace;
             font-size: 0.75rem;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.25s ease;
         }
 
         .audio-btn:hover {
             background: var(--null-cyan);
             color: #000;
-            box-shadow: 0 0 10px var(--null-cyan);
+            box-shadow: 0 0 12px var(--null-cyan);
         }
 
-        /* 資料顯示區（純淨無個人資訊） */
+        /* 資料顯示區塊 (純空值系統標籤) */
         .data-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 20px;
+            gap: 18px;
+            margin-bottom: 25px;
+            min-height: 160px;
         }
 
-        .data-box {
-            background: rgba(5, 2, 12, 0.7);
-            border-left: 2px solid var(--null-magenta);
-            padding: 12px 15px;
+        .data-card {
+            background: rgba(4, 1, 10, 0.75);
+            border-left: 3px solid var(--null-magenta);
+            padding: 12px 16px;
+            transition: border-color 0.3s;
+        }
+
+        .data-card:hover {
+            border-left-color: var(--null-cyan);
         }
 
         .data-label {
-            font-size: 0.7rem;
-            color: rgba(229, 208, 255, 0.5);
-            letter-spacing: 1.5px;
-            margin-bottom: 4px;
+            font-size: 0.65rem;
+            color: rgba(235, 217, 255, 0.5);
+            letter-spacing: 2px;
+            margin-bottom: 5px;
         }
 
-        .data-val {
+        .data-value {
             font-size: 0.9rem;
             color: #ffffff;
             letter-spacing: 1px;
+            text-shadow: 0 0 6px rgba(0, 210, 255, 0.3);
         }
 
         .panel-footer {
             display: flex;
             justify-content: space-between;
-            font-size: 0.7rem;
-            color: rgba(229, 208, 255, 0.4);
+            font-size: 0.68rem;
+            color: rgba(235, 217, 255, 0.4);
+            letter-spacing: 2px;
             border-top: 1px solid rgba(255, 255, 255, 0.08);
-            padding-top: 12px;
+            padding-top: 15px;
         }
 
         #youtube-player {
@@ -252,122 +390,124 @@
 </head>
 <body>
 
-    <!-- 畫布與濾鏡 -->
-    <canvas id="void-canvas"></canvas>
+    <!-- 畫布與全螢幕濾鏡 -->
+    <canvas id="null-canvas"></canvas>
 
-    <svg class="noise-overlay">
-        <filter id="noise">
-            <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/>
+    <svg class="noise-layer">
+        <filter id="noiseFilter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="3" stitchTiles="stitch"/>
         </filter>
-        <rect width="100%" height="100%" filter="url(#noise)"/>
+        <rect width="100%" height="100%" filter="url(#noiseFilter)"/>
     </svg>
-    <div class="vignette-overlay"></div>
+    <div class="scanline-layer"></div>
+    <div class="vignette-layer"></div>
+    <div class="flash-overlay" id="flash-overlay"></div>
+
+    <!-- 開場眼睛凝視層 (Splash Eye Stage) -->
+    <div id="splash-stage">
+        <div class="eye-container-splash">
+            <!-- 根據 image_4608fe.png 原版視覺繪製的向量 SVG 眼睛 -->
+            <svg viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- 紅色最外層包邊 -->
+                <path d="M 15 60 Q 100 -5 185 60 Q 100 125 15 60 Z" stroke="#cc0011" stroke-width="12" stroke-linejoin="round"/>
+                <!-- 白色中間描邊 -->
+                <path d="M 15 60 Q 100 -5 185 60 Q 100 125 15 60 Z" stroke="#ffffff" stroke-width="6" stroke-linejoin="round"/>
+                <!-- 黑色鋸齒刺狀睫毛 -->
+                <path d="M 22 60 
+                    C 35 35, 50 18, 65 22 C 72 10, 85 12, 100 15 C 115 12, 128 10, 135 22 C 150 18, 165 35, 178 60 
+                    C 165 85, 150 102, 135 98 C 128 110, 115 108, 100 105 C 85 108, 72 110, 65 98 C 50 102, 35 85, 22 60 Z" 
+                    fill="#000000" stroke="#0a0314" stroke-width="3"/>
+                <!-- 眼球內膜深藍紫漸層 -->
+                <path d="M 30 60 Q 100 22 170 60 Q 100 98 30 60 Z" fill="url(#eyeGradSplash)"/>
+                <!-- 電光紋路 -->
+                <path d="M 45 55 L 70 50 L 85 58 M 155 55 L 130 52 L 115 60" stroke="#8a40ff" stroke-width="1.5" opacity="0.8"/>
+                <!-- 深藍紫/黑色瞳孔 -->
+                <path d="M 72 60 C 72 40, 128 40, 128 60 C 128 80, 72 80, 72 60 Z" fill="url(#pupilGradSplash)"/>
+
+                <defs>
+                    <linearGradient id="eyeGradSplash" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#4d2b99"/>
+                        <stop offset="50%" stop-color="#24105c"/>
+                        <stop offset="100%" stop-color="#0e0426"/>
+                    </linearGradient>
+                    <radialGradient id="pupilGradSplash" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#020008"/>
+                        <stop offset="70%" stop-color="#0a1240"/>
+                        <stop offset="100%" stop-color="#18277a"/>
+                    </radialGradient>
+                </defs>
+            </svg>
+        </div>
+        <div class="splash-hint">[ CLICK EYE TO ENTER VOID ]</div>
+    </div>
 
     <!-- 左右螢幕半透明菱形按鈕 -->
-    <div class="nav-diamond left" onclick="changePage(-1)">
-        <span>&lt;</span>
+    <div class="nav-diamond left-btn" id="btn-prev">
+        <span class="nav-diamond-icon">&lt;</span>
     </div>
-    <div class="nav-diamond right" onclick="changePage(1)">
-        <span>&gt;</span>
+    <div class="nav-diamond right-btn" id="btn-next">
+        <span class="nav-diamond-icon">&gt;</span>
     </div>
 
-    <!-- 720px 主面板 -->
-    <div class="stage-container">
-        <div class="main-panel">
-            
+    <!-- 720px 主面板階段 -->
+    <div class="main-stage" id="main-stage">
+        <div class="null-panel">
+            <div class="corner-tag ct-tl"></div><div class="corner-tag ct-tr"></div>
+            <div class="corner-tag ct-bl"></div><div class="corner-tag ct-br"></div>
+
             <div class="panel-header">
-                <!-- 精確還原 image_4608fe.png 造型的向量眼睛 SVG -->
-                <div class="eye-wrapper" onclick="toggleAudio()">
+                <div class="mini-eye-wrapper" id="mini-eye-trigger">
                     <svg viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <!-- 最外層紅邊 -->
                         <path d="M 15 60 Q 100 -5 185 60 Q 100 125 15 60 Z" stroke="#cc0011" stroke-width="12" stroke-linejoin="round"/>
-                        <!-- 第二層白邊 -->
                         <path d="M 15 60 Q 100 -5 185 60 Q 100 125 15 60 Z" stroke="#ffffff" stroke-width="6" stroke-linejoin="round"/>
-                        
-                        <!-- 鋸齒刺狀黑色睫毛外框 -->
                         <path d="M 22 60 
                             C 35 35, 50 18, 65 22 C 72 10, 85 12, 100 15 C 115 12, 128 10, 135 22 C 150 18, 165 35, 178 60 
                             C 165 85, 150 102, 135 98 C 128 110, 115 108, 100 105 C 85 108, 72 110, 65 98 C 50 102, 35 85, 22 60 Z" 
                             fill="#000000" stroke="#0a0314" stroke-width="3"/>
-                        
-                        <!-- 眼睛內膜底色（深藍紫漸層） -->
-                        <path d="M 30 60 Q 100 22 170 60 Q 100 98 30 60 Z" fill="url(#eyeGrad)"/>
-                        
-                        <!-- 電光紋路 -->
-                        <path d="M 45 55 L 70 50 L 85 58 M 155 55 L 130 52 L 115 60" stroke="#8a40ff" stroke-width="1.5" opacity="0.8"/>
-
-                        <!-- 深藍/黑 瞳孔 -->
-                        <path d="M 72 60 C 72 40, 128 40, 128 60 C 128 80, 72 80, 72 60 Z" fill="url(#pupilGrad)"/>
-
-                        <defs>
-                            <linearGradient id="eyeGrad" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stop-color="#4d2b99"/>
-                                <stop offset="50%" stop-color="#24105c"/>
-                                <stop offset="100%" stop-color="#0e0426"/>
-                            </linearGradient>
-                            <radialGradient id="pupilGrad" cx="50%" cy="50%" r="50%">
-                                <stop offset="0%" stop-color="#020008"/>
-                                <stop offset="70%" stop-color="#0a1240"/>
-                                <stop offset="100%" stop-color="#18277a"/>
-                            </radialGradient>
-                        </defs>
+                        <path d="M 30 60 Q 100 22 170 60 Q 100 98 30 60 Z" fill="url(#eyeGradSplash)"/>
+                        <path d="M 72 60 C 72 40, 128 40, 128 60 C 128 80, 72 80, 72 60 Z" fill="url(#pupilGradSplash)"/>
                     </svg>
                 </div>
 
                 <div class="nullscape-title">NULLSCAPE</div>
-                <div class="nullscape-sub">DIGITAL DESCENDANT</div>
+                <div class="nullscape-sub" id="sector-sub">DIGITAL DESCENDANT // VOID ARCHIVE</div>
             </div>
 
             <!-- 音樂播放控制區 -->
             <div class="audio-bar">
-                <div class="audio-info" id="track-name">TRACK: #1 NULLSCAPE</div>
-                <button class="audio-btn" id="play-btn" onclick="toggleAudio()">[ PLAY BGM ]</button>
+                <div class="audio-text">♫ TRACK: #1 NULLSCAPE - DIGITAL DESCENDANT</div>
+                <button class="audio-btn" id="audio-toggle-btn">[ PAUSE BGM ]</button>
             </div>
 
-            <!-- 數據資料區 -->
-            <div class="data-grid">
-                <div class="data-box">
-                    <div class="data-label">ARCHIVE_ID</div>
-                    <div class="data-val">[ NULL ]</div>
-                </div>
-                <div class="data-box">
-                    <div class="data-label">SECTOR</div>
-                    <div class="data-val">[ VOID_01 ]</div>
-                </div>
-                <div class="data-box">
-                    <div class="data-label">ENTRY_LOG</div>
-                    <div class="data-val">[ VACANT ]</div>
-                </div>
-                <div class="data-box">
-                    <div class="data-label">STATUS</div>
-                    <div class="data-val">[ UNBOUND ]</div>
-                </div>
-            </div>
+            <!-- 資料網格 -->
+            <div class="data-grid" id="data-grid"></div>
 
             <div class="panel-footer">
-                <span id="page-num">PAGE 1 / 3</span>
-                <span>NULLSCAPE ARCHIVE</span>
+                <span id="page-index">PAGE 01 / 03</span>
+                <span>SYSTEM_STATUS: AWAKENED</span>
             </div>
         </div>
     </div>
 
-    <!-- YouTube 背景音樂控制 -->
+    <!-- YouTube 背景音樂音源 -->
     <div id="youtube-player"></div>
 
     <script>
-        /* --- 背景音樂播放器 API --- */
-        let player = null;
-        let isPlaying = false;
+        /* --------------------------------------------------
+           1. YouTube Iframe API 控制器
+        -------------------------------------------------- */
+        let ytPlayer = null;
+        let isAudioPlaying = false;
 
-        const tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        document.head.appendChild(tag);
+        const ytScript = document.createElement('script');
+        ytScript.src = "https://www.youtube.com/iframe_api";
+        document.head.appendChild(ytScript);
 
         function onYouTubeIframeAPIReady() {
-            player = new YT.Player('youtube-player', {
+            ytPlayer = new YT.Player('youtube-player', {
                 height: '0',
                 width: '0',
-                videoId: 'Sts__Z-Qe7s',
+                videoId: 'Sts__Z-Qe7s', // #1 Nullscape by DIGITAL DESCENDANT
                 playerVars: {
                     'autoplay': 0,
                     'controls': 0,
@@ -377,47 +517,102 @@
             });
         }
 
-        function toggleAudio() {
-            const btn = document.getElementById('play-btn');
-            if (!player) return;
-            
-            if (!isPlaying) {
-                player.playVideo();
-                btn.innerText = '[ PAUSE BGM ]';
-                btn.style.borderColor = 'var(--null-magenta)';
-                btn.style.color = 'var(--null-magenta)';
-            } else {
-                player.pauseVideo();
-                btn.innerText = '[ PLAY BGM ]';
-                btn.style.borderColor = 'var(--null-cyan)';
-                btn.style.color = 'var(--null-cyan)';
+        /* --------------------------------------------------
+           2. 多 Sector 資料分頁 (純系統佔位標籤，零個人資訊)
+        -------------------------------------------------- */
+        const archiveSectors = [
+            {
+                sub: "DIGITAL DESCENDANT // SECTOR 01",
+                data: [
+                    { label: "ARCHIVE_ID", value: "[ NULL ]" },
+                    { label: "CLEARANCE", value: "[ UNKNOWN ]" },
+                    { label: "EGO_STATE", value: "[ VACANT_SLOT ]" },
+                    { label: "ALIGNMENT", value: "[ UNBOUND ]" }
+                ]
+            },
+            {
+                sub: "RECORDS DATABASE // SECTOR 02",
+                data: [
+                    { label: "LOG_ENTRY_01", value: "[ UNASSIGNED DATA ]" },
+                    { label: "LOG_ENTRY_02", value: "[ UNASSIGNED DATA ]" },
+                    { label: "LOG_ENTRY_03", value: "[ UNASSIGNED DATA ]" },
+                    { label: "ENCRYPTION", value: "[ NONE ]" }
+                ]
+            },
+            {
+                sub: "VOID CONNECTIVITY // SECTOR 03",
+                data: [
+                    { label: "SIGNAL_SOURCE", value: "[ DISCONNECTED ]" },
+                    { label: "NODE_STATUS", value: "[ STANDBY ]" },
+                    { label: "LINK_PROTOCOL", value: "[ NULL_PORT ]" },
+                    { label: "DESTINATION", value: "[ VACANT ]" }
+                ]
             }
-            isPlaying = !isPlaying;
+        ];
+
+        let currentSectorIndex = 0;
+
+        function renderSector(index) {
+            const sector = archiveSectors[index];
+            document.getElementById('sector-sub').textContent = sector.sub;
+            document.getElementById('page-index').textContent = `PAGE 0${index + 1} / 0${archiveSectors.length}`;
+
+            const grid = document.getElementById('data-grid');
+            grid.innerHTML = sector.data.map(item => `
+                <div class="data-card">
+                    <div class="data-label">${item.label}</div>
+                    <div class="data-value">${item.value}</div>
+                </div>
+            `).join('');
         }
 
-        let currentPage = 1;
-        function changePage(dir) {
-            currentPage += dir;
-            if (currentPage > 3) currentPage = 1;
-            if (currentPage < 1) currentPage = 3;
-            document.getElementById('page-num').innerText = `PAGE ${currentPage} / 3`;
+        function switchSector(dir) {
+            if (dir === 'next') {
+                currentSectorIndex = (currentSectorIndex + 1) % archiveSectors.length;
+            } else {
+                currentSectorIndex = (currentSectorIndex - 1 + archiveSectors.length) % archiveSectors.length;
+            }
+            renderSector(currentSectorIndex);
         }
 
-        /* --- 3D 棋盤格超現實虛空 Canvas (致敬 image_460bac.jpg 氛圍) --- */
-        const canvas = document.getElementById('void-canvas');
+        document.getElementById('btn-next').addEventListener('click', () => switchSector('next'));
+        document.getElementById('btn-prev').addEventListener('click', () => switchSector('prev'));
+
+        /* --------------------------------------------------
+           3. 複合 Canvas 畫布引擎 (3D 棋盤格 + 虛空鎖鏈 + 漂浮粒塵)
+        -------------------------------------------------- */
+        const canvas = document.getElementById('null-canvas');
         const ctx = canvas.getContext('2d');
 
-        function resize() {
+        function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         }
-        window.addEventListener('resize', resize);
-        resize();
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
-        let time = 0;
+        let animTime = 0;
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let isAwakened = false;
 
-        function drawCheckerboardVoid() {
-            time += 0.015;
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        // 漂浮虛空粒塵 (Void Dust)
+        const particles = Array.from({ length: 90 }, () => ({
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            size: Math.random() * 2.5 + 0.6,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: -Math.random() * 0.6 - 0.2,
+            alpha: Math.random()
+        }));
+
+        function drawCanvasScene() {
+            animTime += 0.015;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             const w = canvas.width;
@@ -425,49 +620,48 @@
             const cx = w / 2;
             const cy = h / 2;
 
-            // 背景紫藍深邃漸層
-            const bgGrad = ctx.createRadialGradient(cx, cy, 10, cx, cy, Math.max(w, h) * 0.8);
-            bgGrad.addColorStop(0, '#1c0336');
-            bgGrad.addColorStop(0.5, '#0a0117');
-            bgGrad.addColorStop(1, '#04000a');
+            // 1. 深邃虛空漸層背景
+            const bgGrad = ctx.createRadialGradient(cx, cy, 20, cx, cy, Math.max(w, h) * 0.85);
+            bgGrad.addColorStop(0, '#1a0433');
+            bgGrad.addColorStop(0.55, '#080114');
+            bgGrad.addColorStop(1, '#04010a');
             ctx.fillStyle = bgGrad;
             ctx.fillRect(0, 0, w, h);
 
-            // 繪製滾動扭曲的 3D 棋盤格路徑 (Checkerboard Ribbon)
+            // 2. 滾動扭曲 3D 棋盤格隧道 (Checkerboard Void Tunnel)
             ctx.save();
             ctx.translate(cx, cy);
 
-            const totalRings = 22;
+            const totalRings = 20;
             for (let i = totalRings; i > 0; i--) {
-                const z = i - (time % 1);
-                const scale = 400 / (z * 1.8);
-                const rot = time * 0.15 + z * 0.08;
+                const z = i - (animTime % 1);
+                const scale = 380 / (z * 1.8);
+                const rot = animTime * 0.12 + z * 0.07;
 
                 ctx.save();
-                ctx.rotate(Math.sin(rot) * 0.2);
+                ctx.rotate(Math.sin(rot) * 0.18);
 
-                const size = 120 * scale;
+                const size = 110 * scale;
                 const segments = 12;
 
                 for (let j = 0; j < segments; j++) {
-                    const angle1 = (j / segments) * Math.PI * 2;
-                    const angle2 = ((j + 1) / segments) * Math.PI * 2;
+                    const a1 = (j / segments) * Math.PI * 2;
+                    const a2 = ((j + 1) / segments) * Math.PI * 2;
 
                     ctx.beginPath();
-                    ctx.moveTo(Math.cos(angle1) * size, Math.sin(angle1) * size);
-                    ctx.lineTo(Math.cos(angle2) * size, Math.sin(angle2) * size);
-                    ctx.lineTo(Math.cos(angle2) * (size * 1.15), Math.sin(angle2) * (size * 1.15));
-                    ctx.lineTo(Math.cos(angle1) * (size * 1.15), Math.sin(angle1) * (size * 1.15));
+                    ctx.moveTo(Math.cos(a1) * size, Math.sin(a1) * size);
+                    ctx.lineTo(Math.cos(a2) * size, Math.sin(a2) * size);
+                    ctx.lineTo(Math.cos(a2) * (size * 1.14), Math.sin(a2) * (size * 1.14));
+                    ctx.lineTo(Math.cos(a1) * (size * 1.14), Math.sin(a1) * (size * 1.14));
                     ctx.closePath();
 
-                    // 黑白藍紫交錯棋盤格
                     if ((i + j) % 2 === 0) {
-                        ctx.fillStyle = `rgba(0, 210, 255, ${0.12 + (1 - z / totalRings) * 0.25})`;
+                        ctx.fillStyle = `rgba(0, 210, 255, ${0.1 + (1 - z / totalRings) * 0.22})`;
                     } else {
-                        ctx.fillStyle = `rgba(10, 2, 20, ${0.4 + (1 - z / totalRings) * 0.5})`;
+                        ctx.fillStyle = `rgba(12, 3, 25, ${0.45 + (1 - z / totalRings) * 0.45})`;
                     }
                     ctx.fill();
-                    ctx.strokeStyle = `rgba(180, 0, 255, ${0.1 + (1 - z / totalRings) * 0.2})`;
+                    ctx.strokeStyle = `rgba(138, 0, 255, ${0.08 + (1 - z / totalRings) * 0.18})`;
                     ctx.lineWidth = 0.8;
                     ctx.stroke();
                 }
@@ -475,10 +669,99 @@
             }
             ctx.restore();
 
-            requestAnimationFrame(drawCheckerboardVoid);
+            // 3. 旋轉哥德鎖鏈幾何印記 (Gothic Chain Ring)
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(-animTime * 0.05);
+
+            ctx.strokeStyle = 'rgba(255, 0, 85, 0.15)';
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.arc(0, 0, 210, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.strokeStyle = 'rgba(0, 210, 255, 0.12)';
+            for (let k = 0; k < 4; k++) {
+                ctx.rotate(Math.PI / 2);
+                ctx.strokeRect(-140, -140, 280, 280);
+            }
+            ctx.restore();
+
+            // 4. 漂浮虛空粒塵 (Void Dust)
+            particles.forEach(p => {
+                p.y += p.vy;
+                p.x += p.vx + Math.sin(animTime + p.y * 0.01) * 0.3;
+                if (p.y < 0) { p.y = h; p.x = Math.random() * w; }
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(0, 210, 255, ${0.2 + Math.sin(animTime + p.alpha) * 0.15})`;
+                ctx.fill();
+            });
+
+            requestAnimationFrame(drawCanvasScene);
         }
 
-        drawCheckerboardVoid();
+        /* --------------------------------------------------
+           4. 轉場互動 (Splash Zoom-In & Awakened State)
+        -------------------------------------------------- */
+        const splashStage = document.getElementById('splash-stage');
+        const mainStage = document.getElementById('main-stage');
+        const flashOverlay = document.getElementById('flash-overlay');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const audioBtn = document.getElementById('audio-toggle-btn');
+
+        function triggerAwaken() {
+            if (isAwakened) return;
+            isAwakened = true;
+
+            // 啟動背景音樂
+            if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
+                ytPlayer.playVideo();
+                isAudioPlaying = true;
+            }
+
+            // 眼睛極速放大 35 倍 + 白閃轉場
+            splashStage.classList.add('zooming');
+            flashOverlay.classList.add('active');
+
+            setTimeout(() => {
+                flashOverlay.classList.remove('active');
+                splashStage.style.display = 'none';
+
+                // 喚醒 720px 主面板與兩側菱形按鈕
+                mainStage.classList.add('active');
+                btnPrev.classList.add('active');
+                btnNext.classList.add('active');
+            }, 650);
+        }
+
+        splashStage.addEventListener('click', triggerAwaken);
+        document.getElementById('mini-eye-trigger').addEventListener('click', toggleAudio);
+
+        // 音樂開關 Toggle
+        function toggleAudio() {
+            if (!ytPlayer) return;
+            if (isAudioPlaying) {
+                ytPlayer.pauseVideo();
+                audioBtn.textContent = '[ PLAY BGM ]';
+                audioBtn.style.borderColor = 'var(--null-cyan)';
+                audioBtn.style.color = 'var(--null-cyan)';
+            } else {
+                ytPlayer.playVideo();
+                audioBtn.textContent = '[ PAUSE BGM ]';
+                audioBtn.style.borderColor = 'var(--null-magenta)';
+                audioBtn.style.color = 'var(--null-magenta)';
+            }
+            isAudioPlaying = !isAudioPlaying;
+        }
+
+        audioBtn.addEventListener('click', toggleAudio);
+
+        // 初始化渲染
+        renderSector(0);
+        drawCanvasScene();
     </script>
 </body>
 </html>
