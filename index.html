@@ -2,321 +2,634 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NULL_SCAPE // ARCHIVE</title>
-    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>probaocon // NULLSCAPE VOID ARCHIVE</title>
+    <!-- 導入哥德風格與暗黑 serif 字體 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Pirata+One&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --bg-color: #06010d;
-            --primary-neon: #a100ff;
-            --secondary-neon: #00f0ff;
-            --accent-pink: #ff0055;
-            --panel-bg: rgba(18, 6, 36, 0.75);
-            --text-glow: 0 0 8px rgba(161, 0, 255, 0.8);
+            --void-bg: #030007;
+            --null-purple: #9d00ff;
+            --null-crimson: #ff0055;
+            --null-cyan: #00f0ff;
+            --glow-purple: rgba(157, 0, 255, 0.6);
+            --card-glass: rgba(12, 4, 24, 0.82);
+            --mouse-x: 50%;
+            --mouse-y: 50%;
+            --tilt-x: 0deg;
+            --tilt-y: 0deg;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Share Tech Mono', 'Chakra Petch', monospace;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        body {
-            background-color: var(--bg-color);
-            color: #fff;
+        body, html {
+            width: 100%;
+            height: 100%;
             overflow: hidden;
-            height: 100vh;
-            width: 100vw;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            background-color: var(--void-bg);
+            color: #ebd9ff;
+            font-family: 'Cinzel', serif;
         }
 
-        /* 擬真 CRT 掃描線與棋盤格背景 */
-        .crt-overlay {
+        /* --- 視覺 Canvas 圖層 --- */
+        #null-canvas {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            background-size: 100% 4px, 6px 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
             pointer-events: none;
-            z-index: 100;
         }
 
-        .checker-bg {
-            position: fixed;
-            width: 200%; height: 200%;
-            top: -50%; left: -50%;
-            background-image: 
-                linear-gradient(45deg, #120324 25%, transparent 25%), 
-                linear-gradient(-45deg, #120324 25%, transparent 25%),
-                linear-gradient(45deg, transparent 75%, #120324 75%),
-                linear-gradient(-45deg, transparent 75%, #120324 75%);
-            background-size: 60px 60px;
-            background-position: 0 0, 0 30px, 30px -30px, -30px 0px;
-            opacity: 0.35;
-            transform: rotateX(60deg) rotateZ(-20deg);
-            animation: moveGrid 20s linear infinite;
-            z-index: 0;
-        }
-
-        @keyframes moveGrid {
-            0% { background-position: 0 0, 0 30px, 30px -30px, -30px 0px; }
-            100% { background-position: 0 600px, 0 630px, 30px 570px, -30px 600px; }
-        }
-
-        /* 開場點擊覆蓋層 (Splash Screen) */
+        /* --- 開場觸發動畫 (Splash Layer) --- */
         #splash-screen {
             position: fixed;
             inset: 0;
-            background: #040008;
-            z-index: 200;
+            z-index: 100;
+            background: #020005;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            transition: opacity 0.8s ease, filter 0.8s ease;
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s ease, filter 0.8s ease;
         }
 
-        .eye-container {
-            width: 180px;
-            height: 100px;
+        #splash-screen.dissolve {
+            opacity: 0;
+            filter: blur(20px) contrast(200%);
+            transform: scale(1.15);
+            pointer-events: none;
+        }
+
+        /* 開場多眼巨獸標誌 (Inspired by Nullscape Monster) */
+        .splash-entity {
             position: relative;
-            animation: pulseEye 2s infinite alternate;
+            width: 180px;
+            height: 180px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: pulseEntity 3s infinite ease-in-out;
         }
 
-        .eye-svg {
-            width: 100%;
-            height: 100%;
-            filter: drop-shadow(0 0 12px var(--primary-neon));
+        @keyframes pulseEntity {
+            0%, 100% { transform: scale(0.96); filter: drop-shadow(0 0 15px var(--null-purple)); }
+            50% { transform: scale(1.06); filter: drop-shadow(0 0 35px var(--null-crimson)); }
         }
 
-        @keyframes pulseEye {
-            0% { transform: scale(0.95); filter: drop-shadow(0 0 8px var(--primary-neon)); }
-            100% { transform: scale(1.05); filter: drop-shadow(0 0 20px var(--accent-pink)); }
-        }
-
-        .splash-text {
+        .splash-title {
             margin-top: 30px;
-            font-size: 1.1rem;
-            letter-spacing: 2px;
-            color: var(--secondary-neon);
-            text-shadow: 0 0 8px var(--secondary-neon);
-            animation: blink 1.2s infinite;
+            font-family: 'Pirata One', cursive, serif;
+            font-size: 2rem;
+            letter-spacing: 8px;
+            color: #fff;
+            text-shadow: 0 0 12px var(--null-purple), 0 0 25px var(--null-crimson);
         }
 
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .splash-sub {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--null-cyan);
+            letter-spacing: 3px;
+            margin-top: 10px;
+            opacity: 0.8;
+            animation: blink 1.5s infinite;
+        }
 
-        /* 主主頁佈局 (Dashboard) */
-        #main-dashboard {
+        @keyframes blink { 0%, 100% { opacity: 0.9; } 50% { opacity: 0.2; } }
+
+        /* --- 主 UI 佈局 --- */
+        .main-container {
             position: relative;
             z-index: 10;
-            width: 90vw;
-            max-width: 1200px;
-            height: 85vh;
-            display: grid;
-            grid-template-rows: auto 1fr;
-            gap: 15px;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
             opacity: 0;
-            transform: scale(0.95);
-            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: scale(0.92);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        #main-dashboard.active {
+        .main-container.active {
             opacity: 1;
             transform: scale(1);
         }
 
-        header {
-            background: var(--panel-bg);
-            border: 2px solid var(--primary-neon);
-            box-shadow: inset 0 0 15px rgba(161, 0, 255, 0.3), 0 0 15px rgba(161, 0, 255, 0.4);
-            padding: 15px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            clip-path: polygon(0 0, 100% 0, 98% 100%, 0% 100%);
-        }
-
-        .brand-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #fff;
-            text-shadow: var(--text-glow);
-        }
-
-        .nav-tabs {
-            display: flex;
-            gap: 10px;
-        }
-
-        .nav-btn {
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--secondary-neon);
-            color: var(--secondary-neon);
-            padding: 8px 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-        }
-
-        .nav-btn:hover, .nav-btn.active {
-            background: var(--secondary-neon);
-            color: #000;
-            box-shadow: 0 0 12px var(--secondary-neon);
-        }
-
-        /* 內容面板 */
-        .content-area {
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            gap: 15px;
-            height: 100%;
+        /* --- 懸浮卡片容器 (3D Tilt) --- */
+        .null-card {
+            background: var(--card-glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            width: 88%;
+            max-width: 580px;
+            padding: 50px 40px;
+            position: relative;
+            border: 1px solid rgba(157, 0, 255, 0.4);
+            box-shadow: 0 0 40px rgba(0,0,0,0.9), inset 0 0 30px rgba(157, 0, 255, 0.12);
+            transform: rotateX(var(--tilt-y)) rotateY(var(--tilt-x));
+            transition: transform 0.15s ease-out, opacity 0.4s ease, filter 0.4s ease;
             overflow: hidden;
         }
 
-        .panel {
-            background: var(--panel-bg);
-            border: 1px solid var(--primary-neon);
-            box-shadow: 0 0 10px rgba(161, 0, 255, 0.2);
-            padding: 20px;
-            position: relative;
-            overflow-y: auto;
-            backdrop-filter: blur(4px);
-        }
-
-        .panel::before {
+        /* 卡片光感掠影 */
+        .null-card::before {
             content: "";
             position: absolute;
-            top: 0; left: 0; width: 6px; height: 100%;
-            background: var(--accent-pink);
+            inset: 0;
+            background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(189, 0, 255, 0.15), transparent 60%);
+            pointer-events: none;
         }
 
-        .panel-title {
-            font-size: 1rem;
-            color: var(--secondary-neon);
-            border-bottom: 1px solid rgba(0, 240, 255, 0.3);
-            padding-bottom: 8px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .empty-field {
-            border: 1px dashed rgba(161, 0, 255, 0.4);
-            padding: 15px;
-            margin-top: 10px;
-            color: #8a73a6;
-            font-size: 0.85rem;
+        /* 標題與內文 */
+        .header-tag {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--null-cyan);
+            letter-spacing: 5px;
             text-align: center;
+            margin-bottom: 12px;
+            opacity: 0.8;
         }
 
-        /* 切頁過渡動畫 */
-        .tab-content {
-            display: none;
-            animation: glitchIn 0.4s ease-out forwards;
+        h1.user-name {
+            font-family: 'Pirata One', cursive, serif;
+            font-size: clamp(2.8rem, 8vw, 4rem);
+            letter-spacing: 12px;
+            text-align: center;
+            color: #fff;
+            text-shadow: 0 0 15px var(--null-purple), 0 0 30px rgba(255, 0, 85, 0.6);
+            margin-bottom: 5px;
         }
 
-        .tab-content.active {
+        .sub-tag {
+            text-align: center;
+            font-size: 0.7rem;
+            letter-spacing: 4px;
+            color: rgba(235, 217, 255, 0.6);
+            margin-bottom: 35px;
+        }
+
+        /* 資料列樣式 */
+        .data-list {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            min-height: 180px;
+        }
+
+        .data-row {
+            border-left: 2px solid var(--null-purple);
+            padding-left: 15px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .data-row:hover {
+            border-left-color: var(--null-crimson);
+            box-shadow: -5px 0 15px rgba(255, 0, 85, 0.3);
+        }
+
+        .data-label {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--null-cyan);
+            letter-spacing: 2px;
+            margin-bottom: 4px;
             display: block;
         }
 
-        @keyframes glitchIn {
-            0% { opacity: 0; transform: translateX(-10px); filter: hue-rotate(90deg); }
-            50% { opacity: 0.5; transform: translateX(5px); }
-            100% { opacity: 1; transform: translateX(0); filter: hue-rotate(0deg); }
+        .data-value {
+            font-size: 1.05rem;
+            color: #ffffff;
+            letter-spacing: 1px;
+            text-shadow: 0 0 8px rgba(157, 0, 255, 0.5);
+        }
+
+        /* --- 兩側導航按鈕 --- */
+        .nav-btn {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 48px;
+            height: 48px;
+            background: rgba(12, 4, 24, 0.85);
+            border: 1px solid var(--null-purple);
+            box-shadow: 0 0 15px var(--glow-purple);
+            cursor: pointer;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .nav-btn-left { left: clamp(15px, 4vw, 40px); }
+        .nav-btn-right { right: clamp(15px, 4vw, 40px); }
+
+        .nav-btn::after {
+            content: "";
+            width: 12px;
+            height: 12px;
+            border-top: 2px solid var(--null-cyan);
+            border-right: 2px solid var(--null-cyan);
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn-left::after { transform: rotate(-135deg); }
+        .nav-btn-right::after { transform: rotate(45deg); }
+
+        .nav-btn:hover {
+            background: var(--null-purple);
+            box-shadow: 0 0 25px var(--null-purple), 0 0 40px var(--null-crimson);
+            transform: translateY(-50%) scale(1.15);
+        }
+
+        .nav-btn:hover::after { border-color: #fff; }
+
+        /* 角邊幾何印記 (Nullscape Cube Sign) */
+        .corner-glyph {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border: 1px solid var(--null-cyan);
+            transform: rotate(45deg);
+        }
+        .cg-tl { top: 8px; left: 8px; }
+        .cg-tr { top: 8px; right: 8px; }
+        .cg-bl { bottom: 8px; left: 8px; }
+        .cg-br { bottom: 8px; right: 8px; }
+
+        .page-indicator {
+            position: absolute;
+            bottom: 15px;
+            right: 20px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--null-cyan);
+            letter-spacing: 2px;
+            opacity: 0.6;
+        }
+
+        /* 切頁動畫 */
+        .null-card.page-next { animation: pageSlideNext 0.4s ease forwards; }
+        .null-card.page-prev { animation: pageSlidePrev 0.4s ease forwards; }
+
+        @keyframes pageSlideNext {
+            0% { opacity: 1; transform: rotateX(var(--tilt-y)) rotateY(var(--tilt-x)) translateX(0); }
+            50% { opacity: 0; transform: rotateX(var(--tilt-y)) rotateY(var(--tilt-x)) translateX(-40px) scale(0.95); filter: blur(10px); }
+            100% { opacity: 1; transform: rotateX(var(--tilt-y)) rotateY(var(--tilt-x)) translateX(0); }
+        }
+
+        @keyframes pageSlidePrev {
+            0% { opacity: 1; transform: rotateX(var(--tilt-y)) rotateY(var(--tilt-x)) translateX(0); }
+            50% { opacity: 0; transform: rotateX(var(--tilt-y)) rotateY(var(--tilt-x)) translateX(40px) scale(0.95); filter: blur(10px); }
+            100% { opacity: 1; transform: rotateX(var(--tilt-y)) rotateY(var(--tilt-x)) translateX(0); }
         }
     </style>
 </head>
 <body>
 
-    <div class="crt-overlay"></div>
-    <div class="checker-bg"></div>
+    <!-- 視覺渲染 Canvas -->
+    <canvas id="null-canvas"></canvas>
 
+    <!-- 開頭點擊動畫層 (Splash Screen) -->
     <div id="splash-screen">
-        <div class="eye-container">
-            <svg class="eye-svg" viewBox="0 0 100 60">
-                <path d="M5 30 Q50 -10 95 30 Q50 70 5 30 Z" fill="none" stroke="#a100ff" stroke-width="3"/>
-                <circle cx="50" cy="30" r="14" fill="#00f0ff" />
-                <circle cx="50" cy="30" r="6" fill="#06010d" />
+        <div class="splash-entity">
+            <!-- 擬真超現實多眼符號 SVG -->
+            <svg viewBox="0 0 200 200" width="160" height="160">
+                <path d="M100 20 C130 60 180 80 180 100 C180 120 130 140 100 180 C70 140 20 120 20 100 C20 80 70 60 100 20 Z" fill="none" stroke="#bd00ff" stroke-width="2"/>
+                <circle cx="100" cy="100" r="35" fill="#030007" stroke="#ff0055" stroke-width="2"/>
+                <rect x="88" y="88" width="24" height="24" fill="none" stroke="#00f0ff" stroke-width="2" transform="rotate(45 100 100)"/>
+                <!-- 散落的小眼精靈 -->
+                <circle cx="65" cy="75" r="6" fill="#00f0ff"/><circle cx="135" cy="75" r="6" fill="#00f0ff"/>
+                <circle cx="65" cy="125" r="6" fill="#ff0055"/><circle cx="135" cy="125" r="6" fill="#ff0055"/>
             </svg>
         </div>
-        <div class="splash-text">[ INITIATE DATA UPLINK // TRIGGER AUDIO // ACCESS NULL_SCAPE ]</div>
+        <div class="splash-title">NULLSCAPE</div>
+        <div class="splash-sub">[ CLICK TO ENTER THE VOID ]</div>
     </div>
 
-    <div id="main-dashboard">
-        <header>
-            <div class="brand-title">NULL_SCAPE // ARCHIVE // VOID_WALKER</div>
-            <div class="nav-tabs">
-                <button class="nav-btn active" onclick="switchTab('nav-system')">NAV_SYSTEM [_]</button>
-                <button class="nav-btn" onclick="switchTab('archive-deep')">ARCHIVE_DEEP [_]</button>
-                <button class="nav-btn" onclick="switchTab('comm-link')">COMM_LINK [_]</button>
+    <!-- 導航按鈕 -->
+    <button class="nav-btn nav-btn-left" id="btn-prev" aria-label="Previous"></button>
+    <button class="nav-btn nav-btn-right" id="btn-next" aria-label="Next"></button>
+
+    <!-- 主 UI 卡片 -->
+    <div class="main-container" id="main-container">
+        <div class="null-card" id="null-card">
+            <div class="corner-glyph cg-tl"></div><div class="corner-glyph cg-tr"></div>
+            <div class="corner-glyph cg-bl"></div><div class="corner-glyph cg-br"></div>
+
+            <div class="header-tag" id="card-tag">// NULL_PROFILE_ARCHIVE</div>
+            <h1 class="user-name">probaocon</h1>
+            <div class="sub-tag" id="card-sub">VOID WALKER // UNKNOWN ENTITY</div>
+
+            <div class="data-list" id="data-list">
+                <!-- 資料項目預留區 (Data Field Templates) -->
             </div>
-        </header>
 
-        <div class="content-area">
-            <div class="panel">
-                <div class="panel-title">DATA METRICS</div>
-                <div class="empty-field">[EMPTY DATA FIELD]</div>
-                <div class="empty-field" style="height: 180px; margin-top: 15px;">[EMPTY AVATAR / PROFILE]</div>
-            </div>
-
-            <div class="panel">
-                <div id="nav-system" class="tab-content active">
-                    <div class="panel-title">PROJECT CHRONICLE <span>// LOG_01</span></div>
-                    <p style="line-height: 1.6; color: #d3c2e5;">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Void walker link established.
-                    </p>
-                    <div class="empty-field" style="margin-top: 20px;">[EMPTY DATA FIELD]</div>
-                    <div class="empty-field" style="margin-top: 10px;">[EMPTY DATA FIELD]</div>
-                </div>
-
-                <div id="archive-deep" class="tab-content">
-                    <div class="panel-title">DATASTREAM LOGS <span>// DEEP_ARCHIVE</span></div>
-                    <div class="empty-field" style="height: 250px;">[EMPTY DATA FIELD - PROJECT LIST]</div>
-                </div>
-
-                <div id="comm-link" class="tab-content">
-                    <div class="panel-title">VOID-LINK TRANSMISSIONS <span>// CONNECT</span></div>
-                    <div class="empty-field" style="height: 150px;">[EMPTY DATA FIELD - CONTACT / LINKS]</div>
-                </div>
-            </div>
+            <div class="page-indicator" id="page-indicator">SECTOR 01 / 03</div>
         </div>
     </div>
 
-    <script type="module">
-        import { MusicController } from './music_module.js';
+    <script>
+        /* --- Web Audio API 音效與低音合成器 (Nullscape Ambient Drone) --- */
+        class NullAudioEngine {
+            constructor() {
+                this.ctx = null;
+                this.isStarted = false;
+            }
 
-        // 初始化音樂模組 (若有音效檔可傳入路徑: new MusicController('bgm.mp3'))
-        const audioController = new MusicController();
+            init() {
+                if (this.isStarted) return;
+                this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                this.isStarted = true;
+                this.startVoidDrone();
+            }
 
-        const splash = document.getElementById('splash-screen');
-        const dashboard = document.getElementById('main-dashboard');
+            startVoidDrone() {
+                if (!this.ctx) return;
+                // 深層虛空低音振盪器
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                const filter = this.ctx.createBiquadFilter();
 
-        // 點擊開場觸發音效與切換動畫
-        splash.addEventListener('click', () => {
-            audioController.initAndPlay();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(45, this.ctx.currentTime); // 低頻 Low F
 
-            splash.style.opacity = '0';
-            splash.style.filter = 'blur(10px)';
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(140, this.ctx.currentTime);
+
+                gain.gain.setValueAtTime(0.01, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.18, this.ctx.currentTime + 3);
+
+                osc.connect(filter);
+                filter.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+            }
+
+            playTriggerSfx() {
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(300, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(60, this.ctx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.3);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+            }
+        }
+
+        const audioEngine = new NullAudioEngine();
+
+        /* --- 頁面資料資料集 (Templates) --- */
+        const profilePages = [
+            {
+                tag: "// NULL_PROFILE_ARCHIVE",
+                sub: "VOID WALKER // UNKNOWN ENTITY",
+                rows: [
+                    { label: "ENTITY_ID", value: "[ EMPTY FIELD ]" },
+                    { label: "STATUS / EGO", value: "[ EMPTY FIELD ]" },
+                    { label: "ALIGNMENT", value: "[ UNKNOWN ]" }
+                ]
+            },
+            {
+                tag: "// RECORDS_DATABASE",
+                sub: "ARCHIVED TRANSMISSIONS",
+                rows: [
+                    { label: "PROJECT_LOG_01", value: "[ UNASSIGNED DATA ]" },
+                    { label: "PROJECT_LOG_02", value: "[ UNASSIGNED DATA ]" }
+                ]
+            },
+            {
+                tag: "// VOID_COMMUNICATIONS",
+                sub: "CONNECTIVITY LINK",
+                rows: [
+                    { label: "SIGNAL_SOURCE", value: "[ DISCONNECTED ]" },
+                    { label: "EXTERNAL_LINK", value: "[ NONE ]" }
+                ]
+            }
+        ];
+
+        let currentPage = 0;
+        let isSwitching = false;
+
+        /* --- 頁面渲染與切換邏輯 --- */
+        const nullCard = document.getElementById('null-card');
+        const dataList = document.getElementById('data-list');
+        const cardTag = document.getElementById('card-tag');
+        const cardSub = document.getElementById('card-sub');
+        const pageIndicator = document.getElementById('page-indicator');
+
+        function renderPage(index) {
+            const data = profilePages[index];
+            cardTag.textContent = data.tag;
+            cardSub.textContent = data.sub;
             
+            dataList.innerHTML = data.rows.map(row => `
+                <div class="data-row">
+                    <span class="data-label">${row.label}</span>
+                    <span class="data-value">${row.value}</span>
+                </div>
+            `).join('');
+
+            pageIndicator.textContent = `SECTOR 0${index + 1} / 0${profilePages.length}`;
+        }
+
+        function switchPage(dir) {
+            if (isSwitching) return;
+            isSwitching = true;
+            audioEngine.playTriggerSfx();
+
+            const animClass = dir === 'next' ? 'page-next' : 'page-prev';
+            nullCard.classList.add(animClass);
+
             setTimeout(() => {
-                splash.style.display = 'none';
-                dashboard.classList.add('active');
-            }, 800);
+                if (dir === 'next') {
+                    currentPage = (currentPage + 1) % profilePages.length;
+                } else {
+                    currentPage = (currentPage - 1 + profilePages.length) % profilePages.length;
+                }
+                renderPage(currentPage);
+            }, 200);
+
+            setTimeout(() => {
+                nullCard.classList.remove(animClass);
+                isSwitching = false;
+            }, 450);
+        }
+
+        document.getElementById('btn-next').addEventListener('click', () => switchPage('next'));
+        document.getElementById('btn-prev').addEventListener('click', () => switchPage('prev'));
+
+        /* 鍵盤切頁控制 */
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') switchPage('next');
+            if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') switchPage('prev');
         });
 
-        // 全域切頁功能
-        window.switchTab = function(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+        /* --- 3D 卡片傾斜與滑鼠跟蹤 --- */
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
 
-            document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+
+            const rect = nullCard.getBoundingClientRect();
+            nullCard.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+            nullCard.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+
+            const tiltX = ((e.clientX - window.innerWidth / 2) / (window.innerWidth / 2)) * 6;
+            const tiltY = ((e.clientY - window.innerHeight / 2) / (window.innerHeight / 2)) * -6;
+
+            nullCard.style.setProperty('--tilt-x', `${tiltX}deg`);
+            nullCard.style.setProperty('--tilt-y', `${tiltY}deg`);
+        });
+
+        /* --- 開場點擊解鎖 --- */
+        const splash = document.getElementById('splash-screen');
+        const mainContainer = document.getElementById('main-container');
+
+        splash.addEventListener('click', () => {
+            audioEngine.init();
+            audioEngine.playTriggerSfx();
+            splash.classList.add('dissolve');
+            setTimeout(() => {
+                splash.style.display = 'none';
+                mainContainer.classList.add('active');
+            }, 700);
+        });
+
+        /* --- Nullscape Canvas 特效 (扭曲棋盤道路、黑洞吸積、斷裂鎖鏈與追隨虛空之眼) --- */
+        const canvas = document.getElementById('null-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // 虛空眨眼與浮動鎖鏈結構
+        const voidEyes = Array.from({ length: 9 }, () => ({
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            size: Math.random() * 14 + 10,
+            blinkTimer: Math.random() * 200
+        }));
+
+        let angleOffset = 0;
+
+        function drawNullscapeBackground() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+
+            // 1. 中央漩渦黑洞與極光暈
+            const bgGlow = ctx.createRadialGradient(cx, cy, 20, cx, cy, Math.max(cx, cy));
+            bgGlow.addColorStop(0, '#000000');
+            bgGlow.addColorStop(0.3, '#100122');
+            bgGlow.addColorStop(0.7, '#04000a');
+            bgGlow.addColorStop(1, '#020004');
+            ctx.fillStyle = bgGlow;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 2. 扭曲 3D 螺旋棋盤格道路 (Winding Checkered Ribbon Road)
+            angleOffset += 0.008;
+            ctx.save();
+            ctx.translate(cx, cy);
+
+            const numRings = 16;
+            const segments = 24;
+
+            for (let r = numRings; r > 0; r--) {
+                const radius = Math.pow(r / numRings, 2.2) * (Math.max(cx, cy) * 1.1);
+                const prevRadius = Math.pow((r - 1) / numRings, 2.2) * (Math.max(cx, cy) * 1.1);
+
+                for (let s = 0; s < segments; s++) {
+                    const a1 = (s / segments) * Math.PI * 2 + angleOffset + (r * 0.05);
+                    const a2 = ((s + 1) / segments) * Math.PI * 2 + angleOffset + (r * 0.05);
+
+                    ctx.beginPath();
+                    ctx.arc(0, 0, radius, a1, a2);
+                    ctx.arc(0, 0, prevRadius, a2, a1, true);
+                    ctx.closePath();
+
+                    const isEven = (r + s) % 2 === 0;
+                    ctx.fillStyle = isEven ? 'rgba(157, 0, 255, 0.28)' : 'rgba(5, 1, 12, 0.85)';
+                    ctx.fill();
+                    ctx.strokeStyle = 'rgba(157, 0, 255, 0.15)';
+                    ctx.stroke();
+                }
+            }
+            ctx.restore();
+
+            // 3. 散落眨眼的超現實虛空之眼 (Eyes following mouse)
+            voidEyes.forEach(eye => {
+                eye.blinkTimer += 0.05;
+                const isBlinking = Math.sin(eye.blinkTimer) > 0.94;
+
+                ctx.save();
+                ctx.translate(eye.x, eye.y);
+
+                if (!isBlinking) {
+                    // 眼白輪廓
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, eye.size, eye.size * 0.6, 0, 0, Math.PI * 2);
+                    ctx.fillStyle = '#100020';
+                    ctx.strokeStyle = '#bd00ff';
+                    ctx.lineWidth = 1.5;
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // 瞳孔跟隨滑鼠
+                    const dx = mouseX - eye.x;
+                    const dy = mouseY - eye.y;
+                    const dist = Math.hypot(dx, dy) || 1;
+                    const pupilX = (dx / dist) * (eye.size * 0.3);
+                    const pupilY = (dy / dist) * (eye.size * 0.2);
+
+                    ctx.beginPath();
+                    ctx.arc(pupilX, pupilY, eye.size * 0.28, 0, Math.PI * 2);
+                    ctx.fillStyle = '#00f0ff';
+                    ctx.fill();
+                } else {
+                    // 眨眼縫隙
+                    ctx.beginPath();
+                    ctx.moveTo(-eye.size, 0);
+                    ctx.lineTo(eye.size, 0);
+                    ctx.strokeStyle = '#ff0055';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+                ctx.restore();
+            });
+
+            requestAnimationFrame(drawNullscapeBackground);
+        }
+
+        // 初始化
+        renderPage(0);
+        drawNullscapeBackground();
     </script>
 </body>
 </html>
