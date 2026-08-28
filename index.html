@@ -2,21 +2,20 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NULLSCAPE // SYSTEM ARCHIVE CORE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NULLSCAPE</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:ital,wght@1,700;1,900&family=EB+Garamond:ital,wght@1,600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --void-bg: #020106;
-            --null-cyan: #00f0ff;
-            --null-magenta: #ff0055;
-            --null-purple: #9d00ff;
-            --panel-width: 720px;
-            --panel-glass: rgba(8, 6, 18, 0.85);
-            --border-glow: rgba(0, 240, 255, 0.35);
+            --bg-void: #08020f;
+            --null-cyan: #00d2ff;
+            --null-magenta: #e100ff;
+            --null-purple: #4a0080;
+            --panel-bg: rgba(13, 5, 25, 0.82);
+            --border-purple: rgba(160, 32, 240, 0.4);
         }
 
         * {
@@ -24,318 +23,222 @@
             margin: 0;
             padding: 0;
             user-select: none;
-            -webkit-tap-highlight-color: transparent;
         }
 
         body, html {
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: var(--void-bg);
-            color: #ebd9ff;
-            font-family: 'Share Tech Mono', monospace, serif;
+            background-color: var(--bg-void);
+            color: #e5d0ff;
+            font-family: 'Share Tech Mono', monospace;
         }
 
-        /* 全螢幕繪圖與畫質濾鏡層 */
-        #null-canvas {
+        /* 3D 棋盤格虛空 Canvas */
+        #void-canvas {
             position: fixed;
             inset: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             z-index: 1;
         }
 
-        .film-grain {
+        /* 雜訊噪點質感 */
+        .noise-overlay {
             position: fixed;
             inset: 0;
-            width: 100%;
-            height: 100%;
             z-index: 2;
-            opacity: 0.15;
+            opacity: 0.18;
             pointer-events: none;
             mix-blend-mode: overlay;
         }
 
-        .scanline-overlay {
+        .vignette-overlay {
             position: fixed;
             inset: 0;
             z-index: 3;
             pointer-events: none;
-            background: linear-gradient(
-                to bottom,
-                rgba(255,255,255,0),
-                rgba(255,255,255,0) 50%,
-                rgba(0, 0, 0, 0.4) 50%,
-                rgba(0, 0, 0, 0.4)
-            );
-            background-size: 100% 4px;
+            background: radial-gradient(circle at center, transparent 30%, rgba(8, 2, 15, 0.85) 75%, #08020f 100%);
         }
 
-        .vignette {
-            position: fixed;
-            inset: 0;
-            z-index: 4;
-            pointer-events: none;
-            background: radial-gradient(circle at center, transparent 30%, rgba(2, 1, 6, 0.85) 80%, #020106 100%);
-        }
-
-        /* 閃光轉場層 */
-        .flash-overlay {
-            position: fixed;
-            inset: 0;
-            background: #fff;
-            z-index: 50;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s ease-out;
-        }
-
-        .flash-overlay.active {
-            opacity: 0.9;
-        }
-
-        /* --- 開場眼睛層 (Splash Eye Stage) --- */
-        #splash-screen {
-            position: fixed;
-            inset: 0;
-            z-index: 30;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: transform 1.2s cubic-bezier(0.7, 0, 0.2, 1), opacity 0.8s ease;
-        }
-
-        #splash-screen.zooming {
-            transform: scale(35);
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .eye-hint {
-            margin-top: 40px;
-            font-size: 0.85rem;
-            letter-spacing: 6px;
-            color: var(--null-cyan);
-            text-shadow: 0 0 10px var(--null-cyan);
-            animation: pulseText 2s infinite alternate;
-        }
-
-        @keyframes pulseText {
-            0% { opacity: 0.3; transform: scale(0.98); }
-            100% { opacity: 1; transform: scale(1.02); }
-        }
-
-        /* --- 兩側螢幕半透明菱形切頁按鈕 --- */
+        /* 螢幕兩側半透明菱形按鈕 */
         .nav-diamond {
             position: fixed;
             top: 50%;
             transform: translateY(-50%) rotate(45deg);
-            width: 52px;
-            height: 52px;
-            background: rgba(0, 240, 255, 0.06);
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 210, 255, 0.08);
             border: 1.5px solid var(--null-cyan);
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.25);
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
             cursor: pointer;
             z-index: 20;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-            opacity: 0;
-            pointer-events: none;
+            transition: all 0.3s ease;
         }
 
-        .nav-diamond.active {
-            opacity: 0.75;
-            pointer-events: auto;
-        }
-
-        .nav-diamond.left-btn { left: clamp(15px, 3vw, 40px); }
-        .nav-diamond.right-btn { 
-            right: clamp(15px, 3vw, 40px); 
+        .nav-diamond.left { left: clamp(15px, 4vw, 45px); }
+        .nav-diamond.right { 
+            right: clamp(15px, 4vw, 45px); 
             border-color: var(--null-magenta);
-            background: rgba(255, 0, 85, 0.06);
-            box-shadow: 0 0 15px rgba(255, 0, 85, 0.25);
+            background: rgba(225, 0, 255, 0.08);
+            box-shadow: 0 0 15px rgba(225, 0, 255, 0.3);
         }
 
         .nav-diamond:hover {
-            opacity: 1;
-            transform: translateY(-50%) rotate(45deg) scale(1.15);
+            transform: translateY(-50%) rotate(45deg) scale(1.12);
+            background: rgba(0, 210, 255, 0.25);
             box-shadow: 0 0 25px var(--null-cyan);
-            background: rgba(0, 240, 255, 0.2);
         }
 
-        .nav-diamond.right-btn:hover {
+        .nav-diamond.right:hover {
+            background: rgba(225, 0, 255, 0.25);
             box-shadow: 0 0 25px var(--null-magenta);
-            background: rgba(255, 0, 85, 0.2);
         }
 
-        .nav-diamond-icon {
+        .nav-diamond span {
             transform: rotate(-45deg);
             font-size: 1.2rem;
-            font-weight: bold;
             color: #fff;
-            text-shadow: 0 0 8px #fff;
+            font-weight: bold;
         }
 
-        /* --- 主 720px 核心介面面板 --- */
-        .main-stage {
+        /* 720px 核心主面板 */
+        .stage-container {
             position: fixed;
             inset: 0;
             z-index: 10;
             display: flex;
             justify-content: center;
             align-items: center;
-            opacity: 0;
-            transform: scale(0.85);
-            pointer-events: none;
-            transition: opacity 1s ease 0.3s, transform 1s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
         }
 
-        .main-stage.active {
-            opacity: 1;
-            transform: scale(1);
-            pointer-events: auto;
-        }
-
-        .null-panel {
-            width: var(--panel-width);
+        .main-panel {
+            width: 720px;
             max-width: 90vw;
-            background: var(--panel-glass);
-            border: 1px solid var(--border-glow);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: var(--panel-bg);
+            border: 1px solid var(--border-purple);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.95), 0 0 30px rgba(74, 0, 128, 0.3);
+            backdrop-filter: blur(12px);
             padding: 35px 40px;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), inset 0 0 25px rgba(0, 240, 255, 0.08);
             position: relative;
-            clip-path: polygon(
-                0 18px, 18px 0, 
-                calc(100% - 18px) 0, 100% 18px, 
-                100% calc(100% - 18px), calc(100% - 18px) 100%, 
-                18px 100%, 0 calc(100% - 18px)
-            );
         }
 
-        /* 面板四角裝飾 */
-        .corner-tag {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            border: 1px solid var(--null-cyan);
-            transform: rotate(45deg);
-        }
-        .ct-tl { top: 12px; left: 12px; }
-        .ct-tr { top: 12px; right: 12px; }
-        .ct-bl { bottom: 12px; left: 12px; }
-        .ct-br { bottom: 12px; right: 12px; }
-
+        /* HEADER 區域與原生藝術眼睛 */
         .panel-header {
-            text-align: center;
-            border-bottom: 1px solid rgba(0, 240, 255, 0.2);
-            padding-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             margin-bottom: 25px;
+            border-bottom: 1px solid rgba(225, 0, 255, 0.2);
+            padding-bottom: 20px;
         }
 
-        .header-tag {
-            font-size: 0.7rem;
-            color: var(--null-cyan);
-            letter-spacing: 5px;
-            margin-bottom: 8px;
+        .eye-wrapper {
+            width: 150px;
+            height: 90px;
+            margin-bottom: 12px;
+            filter: drop-shadow(0 0 12px rgba(225, 0, 255, 0.4));
+            transition: transform 0.3s ease;
+            cursor: pointer;
         }
 
-        .header-title {
-            font-family: 'Cinzel Decorative', serif;
-            font-size: clamp(2rem, 5vw, 2.8rem);
-            color: #fff;
-            letter-spacing: 8px;
-            text-shadow: 0 0 15px var(--null-cyan), 0 0 30px var(--null-purple);
+        .eye-wrapper:hover {
+            transform: scale(1.05);
         }
 
-        .header-sub {
-            font-size: 0.75rem;
-            color: var(--null-magenta);
-            letter-spacing: 4px;
-            margin-top: 6px;
+        /* 重現圖片同款 Nullscape Italic Gradient 標題 */
+        .nullscape-title {
+            font-family: 'Cinzel', serif;
+            font-style: italic;
+            font-weight: 900;
+            font-size: clamp(2.2rem, 5vw, 3.2rem);
+            letter-spacing: 6px;
+            background: linear-gradient(135deg, #00d2ff 0%, #9000ff 50%, #ff0055 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(0, 210, 255, 0.3);
         }
 
-        /* 樂曲控制列 */
+        .nullscape-sub {
+            font-family: 'EB Garamond', serif;
+            font-style: italic;
+            font-size: 0.9rem;
+            color: rgba(229, 208, 255, 0.7);
+            letter-spacing: 3px;
+            margin-top: 4px;
+        }
+
+        /* 音樂列 */
         .audio-bar {
             background: rgba(0, 0, 0, 0.5);
-            border: 1px dashed rgba(0, 240, 255, 0.3);
-            padding: 12px 20px;
+            border: 1px solid rgba(0, 210, 255, 0.25);
+            padding: 12px 18px;
             margin-bottom: 25px;
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
 
-        .audio-text {
-            font-size: 0.75rem;
+        .audio-info {
+            font-size: 0.8rem;
             color: var(--null-cyan);
-            letter-spacing: 2px;
+            letter-spacing: 1px;
         }
 
         .audio-btn {
             background: transparent;
             border: 1px solid var(--null-cyan);
             color: var(--null-cyan);
-            padding: 6px 16px;
+            padding: 5px 14px;
             font-family: 'Share Tech Mono', monospace;
             font-size: 0.75rem;
             cursor: pointer;
-            transition: all 0.25s ease;
+            transition: all 0.2s ease;
         }
 
         .audio-btn:hover {
             background: var(--null-cyan);
             color: #000;
-            box-shadow: 0 0 12px var(--null-cyan);
+            box-shadow: 0 0 10px var(--null-cyan);
         }
 
-        /* 資料區域 (空欄位) */
+        /* 資料顯示區（純淨無個人資訊） */
         .data-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 25px;
-            min-height: 180px;
+            gap: 16px;
+            margin-bottom: 20px;
         }
 
-        .data-card {
-            background: rgba(3, 2, 8, 0.6);
-            border-left: 3px solid var(--null-cyan);
-            padding: 14px 18px;
-            transition: border-color 0.3s;
-        }
-
-        .data-card:hover {
-            border-left-color: var(--null-magenta);
+        .data-box {
+            background: rgba(5, 2, 12, 0.7);
+            border-left: 2px solid var(--null-magenta);
+            padding: 12px 15px;
         }
 
         .data-label {
-            font-size: 0.65rem;
-            color: rgba(235, 217, 255, 0.5);
-            letter-spacing: 2px;
-            margin-bottom: 6px;
+            font-size: 0.7rem;
+            color: rgba(229, 208, 255, 0.5);
+            letter-spacing: 1.5px;
+            margin-bottom: 4px;
         }
 
-        .data-value {
-            font-size: 0.95rem;
+        .data-val {
+            font-size: 0.9rem;
             color: #ffffff;
             letter-spacing: 1px;
-            text-shadow: 0 0 6px rgba(0, 240, 255, 0.4);
         }
 
         .panel-footer {
             display: flex;
             justify-content: space-between;
-            font-size: 0.65rem;
-            color: rgba(235, 217, 255, 0.4);
-            letter-spacing: 2px;
+            font-size: 0.7rem;
+            color: rgba(229, 208, 255, 0.4);
             border-top: 1px solid rgba(255, 255, 255, 0.08);
-            padding-top: 15px;
+            padding-top: 12px;
         }
 
         #youtube-player {
@@ -349,76 +252,122 @@
 </head>
 <body>
 
-    <!-- SVG 電影級底片噪點 -->
-    <svg class="film-grain">
-        <filter id="noiseFilter">
-            <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch"/>
+    <!-- 畫布與濾鏡 -->
+    <canvas id="void-canvas"></canvas>
+
+    <svg class="noise-overlay">
+        <filter id="noise">
+            <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/>
         </filter>
-        <rect width="100%" height="100%" filter="url(#noiseFilter)"/>
+        <rect width="100%" height="100%" filter="url(#noise)"/>
     </svg>
+    <div class="vignette-overlay"></div>
 
-    <!-- Canvas 畫布引擎 -->
-    <canvas id="null-canvas"></canvas>
-    <div class="scanline-overlay"></div>
-    <div class="vignette"></div>
-    <div class="flash-overlay" id="flash-overlay"></div>
-
-    <!-- 開場眼睛凝視層 -->
-    <div id="splash-screen">
-        <div class="eye-hint">[ CLICK EYE TO ENTER VOID ARCHIVE ]</div>
+    <!-- 左右螢幕半透明菱形按鈕 -->
+    <div class="nav-diamond left" onclick="changePage(-1)">
+        <span>&lt;</span>
+    </div>
+    <div class="nav-diamond right" onclick="changePage(1)">
+        <span>&gt;</span>
     </div>
 
-    <!-- 左右兩側半透明菱形按鈕 -->
-    <div class="nav-diamond left-btn" id="btn-prev">
-        <span class="nav-diamond-icon">&lt;</span>
-    </div>
-    <div class="nav-diamond right-btn" id="btn-next">
-        <span class="nav-diamond-icon">&gt;</span>
-    </div>
-
-    <!-- 核心 720px 資料面板 -->
-    <div class="main-stage" id="main-stage">
-        <div class="null-panel">
-            <div class="corner-tag ct-tl"></div><div class="corner-tag ct-tr"></div>
-            <div class="corner-tag ct-bl"></div><div class="corner-tag ct-br"></div>
-
+    <!-- 720px 主面板 -->
+    <div class="stage-container">
+        <div class="main-panel">
+            
             <div class="panel-header">
-                <div class="header-tag" id="panel-tag">// SECTOR_01 :: NULL_ARCHIVE</div>
-                <div class="header-title">NULLSCAPE</div>
-                <div class="header-sub" id="panel-sub">DIGITAL DESCENDANT // CORE SYSTEM</div>
+                <!-- 精確還原 image_4608fe.png 造型的向量眼睛 SVG -->
+                <div class="eye-wrapper" onclick="toggleAudio()">
+                    <svg viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- 最外層紅邊 -->
+                        <path d="M 15 60 Q 100 -5 185 60 Q 100 125 15 60 Z" stroke="#cc0011" stroke-width="12" stroke-linejoin="round"/>
+                        <!-- 第二層白邊 -->
+                        <path d="M 15 60 Q 100 -5 185 60 Q 100 125 15 60 Z" stroke="#ffffff" stroke-width="6" stroke-linejoin="round"/>
+                        
+                        <!-- 鋸齒刺狀黑色睫毛外框 -->
+                        <path d="M 22 60 
+                            C 35 35, 50 18, 65 22 C 72 10, 85 12, 100 15 C 115 12, 128 10, 135 22 C 150 18, 165 35, 178 60 
+                            C 165 85, 150 102, 135 98 C 128 110, 115 108, 100 105 C 85 108, 72 110, 65 98 C 50 102, 35 85, 22 60 Z" 
+                            fill="#000000" stroke="#0a0314" stroke-width="3"/>
+                        
+                        <!-- 眼睛內膜底色（深藍紫漸層） -->
+                        <path d="M 30 60 Q 100 22 170 60 Q 100 98 30 60 Z" fill="url(#eyeGrad)"/>
+                        
+                        <!-- 電光紋路 -->
+                        <path d="M 45 55 L 70 50 L 85 58 M 155 55 L 130 52 L 115 60" stroke="#8a40ff" stroke-width="1.5" opacity="0.8"/>
+
+                        <!-- 深藍/黑 瞳孔 -->
+                        <path d="M 72 60 C 72 40, 128 40, 128 60 C 128 80, 72 80, 72 60 Z" fill="url(#pupilGrad)"/>
+
+                        <defs>
+                            <linearGradient id="eyeGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#4d2b99"/>
+                                <stop offset="50%" stop-color="#24105c"/>
+                                <stop offset="100%" stop-color="#0e0426"/>
+                            </linearGradient>
+                            <radialGradient id="pupilGrad" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" stop-color="#020008"/>
+                                <stop offset="70%" stop-color="#0a1240"/>
+                                <stop offset="100%" stop-color="#18277a"/>
+                            </radialGradient>
+                        </defs>
+                    </svg>
+                </div>
+
+                <div class="nullscape-title">NULLSCAPE</div>
+                <div class="nullscape-sub">DIGITAL DESCENDANT</div>
             </div>
 
+            <!-- 音樂播放控制區 -->
             <div class="audio-bar">
-                <div class="audio-text">♫ TRACK #1: NULLSCAPE - DIGITAL DESCENDANT</div>
-                <button class="audio-btn" id="audio-toggle-btn">[ PAUSE BGM ]</button>
+                <div class="audio-info" id="track-name">TRACK: #1 NULLSCAPE</div>
+                <button class="audio-btn" id="play-btn" onclick="toggleAudio()">[ PLAY BGM ]</button>
             </div>
 
-            <div class="data-grid" id="data-grid"></div>
+            <!-- 數據資料區 -->
+            <div class="data-grid">
+                <div class="data-box">
+                    <div class="data-label">ARCHIVE_ID</div>
+                    <div class="data-val">[ NULL ]</div>
+                </div>
+                <div class="data-box">
+                    <div class="data-label">SECTOR</div>
+                    <div class="data-val">[ VOID_01 ]</div>
+                </div>
+                <div class="data-box">
+                    <div class="data-label">ENTRY_LOG</div>
+                    <div class="data-val">[ VACANT ]</div>
+                </div>
+                <div class="data-box">
+                    <div class="data-label">STATUS</div>
+                    <div class="data-val">[ UNBOUND ]</div>
+                </div>
+            </div>
 
             <div class="panel-footer">
-                <span id="page-index">PAGE 01 / 03</span>
-                <span>SYSTEM_STATUS: AWAKENED</span>
+                <span id="page-num">PAGE 1 / 3</span>
+                <span>NULLSCAPE ARCHIVE</span>
             </div>
         </div>
     </div>
 
-    <!-- YouTube 背景音樂控制引擎 -->
+    <!-- YouTube 背景音樂控制 -->
     <div id="youtube-player"></div>
 
     <script>
-        /* --- YouTube Iframe API 載入與整合 --- */
-        let ytPlayer = null;
-        let isAudioPlaying = false;
+        /* --- 背景音樂播放器 API --- */
+        let player = null;
+        let isPlaying = false;
 
-        const ytScript = document.createElement('script');
-        ytScript.src = "https://www.youtube.com/iframe_api";
-        document.head.appendChild(ytScript);
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        document.head.appendChild(tag);
 
         function onYouTubeIframeAPIReady() {
-            ytPlayer = new YT.Player('youtube-player', {
+            player = new YT.Player('youtube-player', {
                 height: '0',
                 width: '0',
-                videoId: 'Sts__Z-Qe7s', // DIGITAL DESCENDANT - Nullscape
+                videoId: 'Sts__Z-Qe7s',
                 playerVars: {
                     'autoplay': 0,
                     'controls': 0,
@@ -428,296 +377,108 @@
             });
         }
 
-        /* --- 資料頁面結構 (不帶任何個人資訊，完全開放可空) --- */
-        const archiveSectors = [
-            {
-                tag: "// SECTOR_01 :: NULL_ARCHIVE",
-                sub: "CORE SYSTEM ARCHIVE",
-                data: [
-                    { label: "SUBJECT_ID", value: "[ NULL ]" },
-                    { label: "CLEARANCE_LEVEL", value: "[ UNKNOWN ]" },
-                    { label: "STATUS / EGO", value: "[ VACANT_SLOT ]" },
-                    { label: "ALIGNMENT", value: "[ UNDEFINED ]" }
-                ]
-            },
-            {
-                tag: "// SECTOR_02 :: LOG_TRANSMISSION",
-                sub: "RECORDS DATABASE",
-                data: [
-                    { label: "RECORD_LOG_01", value: "[ UNASSIGNED DATA ]" },
-                    { label: "RECORD_LOG_02", value: "[ UNASSIGNED DATA ]" },
-                    { label: "RECORD_LOG_03", value: "[ UNASSIGNED DATA ]" },
-                    { label: "ENCRYPTION_KEY", value: "[ NONE ]" }
-                ]
-            },
-            {
-                tag: "// SECTOR_03 :: VOID_CONNECTIVITY",
-                sub: "EXTERNAL SIGNAL LINK",
-                data: [
-                    { label: "SIGNAL_SOURCE", value: "[ DISCONNECTED ]" },
-                    { label: "LINK_PROTOCOL", value: "[ NULL_PORT ]" },
-                    { label: "NETWORK_NODE", value: "[ STANDBY ]" },
-                    { label: "DESTINATION", value: "[ VACANT ]" }
-                ]
-            }
-        ];
-
-        let currentSectorIndex = 0;
-
-        function renderSector(index) {
-            const sector = archiveSectors[index];
-            document.getElementById('panel-tag').textContent = sector.tag;
-            document.getElementById('panel-sub').textContent = sector.sub;
-            document.getElementById('page-index').textContent = `PAGE 0${index + 1} / 0${archiveSectors.length}`;
-
-            const grid = document.getElementById('data-grid');
-            grid.innerHTML = sector.data.map(item => `
-                <div class="data-card">
-                    <div class="data-label">${item.label}</div>
-                    <div class="data-value">${item.value}</div>
-                </div>
-            `).join('');
-        }
-
-        function switchSector(dir) {
-            if (dir === 'next') {
-                currentSectorIndex = (currentSectorIndex + 1) % archiveSectors.length;
+        function toggleAudio() {
+            const btn = document.getElementById('play-btn');
+            if (!player) return;
+            
+            if (!isPlaying) {
+                player.playVideo();
+                btn.innerText = '[ PAUSE BGM ]';
+                btn.style.borderColor = 'var(--null-magenta)';
+                btn.style.color = 'var(--null-magenta)';
             } else {
-                currentSectorIndex = (currentSectorIndex - 1 + archiveSectors.length) % archiveSectors.length;
+                player.pauseVideo();
+                btn.innerText = '[ PLAY BGM ]';
+                btn.style.borderColor = 'var(--null-cyan)';
+                btn.style.color = 'var(--null-cyan)';
             }
-            renderSector(currentSectorIndex);
+            isPlaying = !isPlaying;
         }
 
-        document.getElementById('btn-next').addEventListener('click', () => switchSector('next'));
-        document.getElementById('btn-prev').addEventListener('click', () => switchSector('prev'));
+        let currentPage = 1;
+        function changePage(dir) {
+            currentPage += dir;
+            if (currentPage > 3) currentPage = 1;
+            if (currentPage < 1) currentPage = 3;
+            document.getElementById('page-num').innerText = `PAGE ${currentPage} / 3`;
+        }
 
-        /* --- 繪圖引擎：深空虛無粒塵、哥德環印與高質感 Nullscape 凝視眼球 --- */
-        const canvas = document.getElementById('null-canvas');
+        /* --- 3D 棋盤格超現實虛空 Canvas (致敬 image_460bac.jpg 氛圍) --- */
+        const canvas = document.getElementById('void-canvas');
         const ctx = canvas.getContext('2d');
 
-        function resizeCanvas() {
+        function resize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        window.addEventListener('resize', resize);
+        resize();
 
-        let animTime = 0;
-        let mouseX = window.innerWidth / 2;
-        let mouseY = window.innerHeight / 2;
-        let isOpened = false;
+        let time = 0;
 
-        document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-        });
-
-        // 1. 虛空粒塵粒子系統
-        const particles = Array.from({ length: 85 }, () => ({
-            x: Math.random() * window.innerWidth,
-            y: Math.random() * window.innerHeight,
-            size: Math.random() * 2.2 + 0.5,
-            vx: (Math.random() - 0.5) * 0.5,
-            vy: -Math.random() * 0.7 - 0.2,
-            alpha: Math.random()
-        }));
-
-        // 2. 微眼動與眼睛繪製
-        let saccadeOffset = { x: 0, y: 0 };
-        let saccadeTimer = 0;
-        let eyeOpenRatio = 0.25; // 初始半閉眼
-
-        function drawNullscapeEye(x, y, radius, targetX, targetY, openRatio) {
-            ctx.save();
-            ctx.translate(x, y);
-
-            const eyeW = radius * 2.0;
-            const eyeH = radius * 1.3 * openRatio;
-
-            // 眼眶輪廓
-            ctx.beginPath();
-            ctx.moveTo(-eyeW, 0);
-            ctx.bezierCurveTo(-eyeW * 0.5, -eyeH * 1.2, eyeW * 0.5, -eyeH * 1.2, eyeW, 0);
-            ctx.bezierCurveTo(eyeW * 0.5, eyeH * 1.2, -eyeW * 0.5, eyeH * 1.2, -eyeW, 0);
-            ctx.closePath();
-
-            // 外眼眶暗紅光暈
-            ctx.strokeStyle = 'rgba(255, 0, 85, 0.75)';
-            ctx.lineWidth = 2.5;
-            ctx.stroke();
-
-            if (openRatio < 0.05) {
-                ctx.restore();
-                return;
-            }
-
-            ctx.save();
-            ctx.clip();
-
-            // 鞏膜 (Sclera) 漸層
-            const scleraGrad = ctx.createRadialGradient(0, 0, radius * 0.2, 0, 0, radius * 1.5);
-            scleraGrad.addColorStop(0, '#1a0b26');
-            scleraGrad.addColorStop(0.7, '#08020f');
-            scleraGrad.addColorStop(1, '#020005');
-            ctx.fillStyle = scleraGrad;
-            ctx.fill();
-
-            // 視線追蹤與微眼動
-            const dx = (targetX + saccadeOffset.x) - x;
-            const dy = (targetY + saccadeOffset.y) - y;
-            const dist = Math.hypot(dx, dy) || 1;
-            const maxOffset = radius * 0.38;
-            const offX = (dx / dist) * Math.min(dist, maxOffset);
-            const offY = (dy / dist) * Math.min(dist, maxOffset);
-
-            ctx.translate(offX, offY);
-
-            // 虹膜 (Iris) 幾何質感
-            const irisR = radius * 0.58;
-            const irisGrad = ctx.createRadialGradient(0, 0, 2, 0, 0, irisR);
-            irisGrad.addColorStop(0, '#ffffff');
-            irisGrad.addColorStop(0.3, '#00f0ff');
-            irisGrad.addColorStop(0.75, '#ff0055');
-            irisGrad.addColorStop(1, '#030008');
-
-            ctx.beginPath();
-            ctx.arc(0, 0, irisR, 0, Math.PI * 2);
-            ctx.fillStyle = irisGrad;
-            ctx.fill();
-
-            // 菱形/鑽石感幾何細節
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(0, -irisR); ctx.lineTo(irisR, 0); ctx.lineTo(0, irisR); ctx.lineTo(-irisR, 0);
-            ctx.closePath();
-            ctx.stroke();
-
-            // 狹長瞳孔 (Slit Pupil)
-            ctx.beginPath();
-            ctx.ellipse(0, 0, irisR * 0.2, irisR * 0.8, 0, 0, Math.PI * 2);
-            ctx.fillStyle = '#010003';
-            ctx.fill();
-
-            // 瞳孔中央亮點
-            ctx.beginPath();
-            ctx.arc(-irisR * 0.25, -irisR * 0.25, irisR * 0.12, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-            ctx.fill();
-
-            ctx.restore(); // End Clip
-            ctx.restore();
-        }
-
-        /* --- 主繪製迴圈 (Render Loop) --- */
-        function renderCanvas() {
-            animTime += 0.02;
+        function drawCheckerboardVoid() {
+            time += 0.015;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            const cx = canvas.width / 2;
-            const cy = canvas.height / 2;
+            const w = canvas.width;
+            const h = canvas.height;
+            const cx = w / 2;
+            const cy = h / 2;
 
-            // 1. 虛空背景粒子
-            particles.forEach(p => {
-                p.y += p.vy;
-                p.x += p.vx + Math.sin(animTime + p.y * 0.01) * 0.4;
-                if (p.y < 0) { p.y = canvas.height; p.x = Math.random() * canvas.width; }
+            // 背景紫藍深邃漸層
+            const bgGrad = ctx.createRadialGradient(cx, cy, 10, cx, cy, Math.max(w, h) * 0.8);
+            bgGrad.addColorStop(0, '#1c0336');
+            bgGrad.addColorStop(0.5, '#0a0117');
+            bgGrad.addColorStop(1, '#04000a');
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, w, h);
 
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(0, 240, 255, ${0.2 + Math.sin(animTime + p.alpha) * 0.15})`;
-                ctx.fill();
-            });
-
-            // 2. 旋轉哥德幾何印記 (Gothic Void Seal)
+            // 繪製滾動扭曲的 3D 棋盤格路徑 (Checkerboard Ribbon)
             ctx.save();
             ctx.translate(cx, cy);
-            ctx.rotate(animTime * 0.06);
 
-            ctx.strokeStyle = 'rgba(0, 240, 255, 0.12)';
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.arc(0, 0, 190, 0, Math.PI * 2);
-            ctx.stroke();
+            const totalRings = 22;
+            for (let i = totalRings; i > 0; i--) {
+                const z = i - (time % 1);
+                const scale = 400 / (z * 1.8);
+                const rot = time * 0.15 + z * 0.08;
 
-            ctx.strokeStyle = 'rgba(255, 0, 85, 0.12)';
-            for (let i = 0; i < 4; i++) {
-                ctx.rotate(Math.PI / 2);
-                ctx.strokeRect(-130, -130, 260, 260);
+                ctx.save();
+                ctx.rotate(Math.sin(rot) * 0.2);
+
+                const size = 120 * scale;
+                const segments = 12;
+
+                for (let j = 0; j < segments; j++) {
+                    const angle1 = (j / segments) * Math.PI * 2;
+                    const angle2 = ((j + 1) / segments) * Math.PI * 2;
+
+                    ctx.beginPath();
+                    ctx.moveTo(Math.cos(angle1) * size, Math.sin(angle1) * size);
+                    ctx.lineTo(Math.cos(angle2) * size, Math.sin(angle2) * size);
+                    ctx.lineTo(Math.cos(angle2) * (size * 1.15), Math.sin(angle2) * (size * 1.15));
+                    ctx.lineTo(Math.cos(angle1) * (size * 1.15), Math.sin(angle1) * (size * 1.15));
+                    ctx.closePath();
+
+                    // 黑白藍紫交錯棋盤格
+                    if ((i + j) % 2 === 0) {
+                        ctx.fillStyle = `rgba(0, 210, 255, ${0.12 + (1 - z / totalRings) * 0.25})`;
+                    } else {
+                        ctx.fillStyle = `rgba(10, 2, 20, ${0.4 + (1 - z / totalRings) * 0.5})`;
+                    }
+                    ctx.fill();
+                    ctx.strokeStyle = `rgba(180, 0, 255, ${0.1 + (1 - z / totalRings) * 0.2})`;
+                    ctx.lineWidth = 0.8;
+                    ctx.stroke();
+                }
+                ctx.restore();
             }
             ctx.restore();
 
-            // 3. 微眼動隨機震顫計算
-            saccadeTimer++;
-            if (saccadeTimer > 100 && Math.random() < 0.08) {
-                saccadeOffset.x = (Math.random() - 0.5) * 16;
-                saccadeOffset.y = (Math.random() - 0.5) * 16;
-                saccadeTimer = 0;
-            } else {
-                saccadeOffset.x *= 0.9;
-                saccadeOffset.y *= 0.9;
-            }
-
-            // 4. 開場眼睛繪製
-            if (!isOpened) {
-                const eyeRadius = Math.min(canvas.width, canvas.height) * 0.12;
-                // 呼吸睜眼感
-                const breathingOpen = 0.65 + Math.sin(animTime * 1.5) * 0.15;
-                drawNullscapeEye(cx, cy - 20, eyeRadius, mouseX, mouseY, breathingOpen);
-            }
-
-            requestAnimationFrame(renderCanvas);
+            requestAnimationFrame(drawCheckerboardVoid);
         }
 
-        /* --- 互動事件：點擊眼睛進行極速放大轉場 --- */
-        const splashScreen = document.getElementById('splash-screen');
-        const mainStage = document.getElementById('main-stage');
-        const flashOverlay = document.getElementById('flash-overlay');
-        const btnPrev = document.getElementById('btn-prev');
-        const btnNext = document.getElementById('btn-next');
-        const audioBtn = document.getElementById('audio-toggle-btn');
-
-        splashScreen.addEventListener('click', () => {
-            if (isOpened) return;
-            isOpened = true;
-
-            // 啟動音樂
-            if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
-                ytPlayer.playVideo();
-                isAudioPlaying = true;
-            }
-
-            // 眼睛極速推進縮放 (Zoom-in)
-            splashScreen.classList.add('zooming');
-            flashOverlay.classList.add('active');
-
-            setTimeout(() => {
-                flashOverlay.classList.remove('active');
-                splashScreen.style.display = 'none';
-
-                // 顯示兩側菱形按鈕與主面板
-                mainStage.classList.add('active');
-                btnPrev.classList.add('active');
-                btnNext.classList.add('active');
-            }, 600);
-        });
-
-        // 音樂開關 Toggle
-        audioBtn.addEventListener('click', () => {
-            if (!ytPlayer) return;
-            if (isAudioPlaying) {
-                ytPlayer.pauseVideo();
-                audioBtn.textContent = '[ PLAY BGM ]';
-            } else {
-                ytPlayer.playVideo();
-                audioBtn.textContent = '[ PAUSE BGM ]';
-            }
-            isAudioPlaying = !isAudioPlaying;
-        });
-
-        // 初始化
-        renderSector(0);
-        renderCanvas();
+        drawCheckerboardVoid();
     </script>
 </body>
 </html>
