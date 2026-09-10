@@ -3,580 +3,628 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sles // ILLUSIONARY TERMINAL</title>
+    <title>Sles | Memory Core // illusionary</title>
     
-    <!-- 引入賽博/高科技字體 -->
+    <!-- 引入賽博朋克與黑客終端風格字體 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --cyber-cyan: #00f7ff;
-            --cyber-magenta: #ff0055;
-            --cyber-dark: #030710;
-            --cyber-panel: rgba(8, 16, 28, 0.85);
-            --cyber-glow: rgba(0, 247, 255, 0.4);
-            --mouse-x: 50%;
-            --mouse-y: 50%;
+            --cyan: #00f0ff;
+            --cyan-glow: rgba(0, 240, 255, 0.4);
+            --magenta: #ff0055;
+            --magenta-glow: rgba(255, 0, 85, 0.5);
+            --bg-black: #050608;
+            --panel-bg: rgba(10, 14, 22, 0.85);
+            --border-color: rgba(0, 240, 255, 0.3);
+            --font-main: 'Share Tech Mono', monospace;
+            --font-title: 'Orbitron', sans-serif;
             --tilt-x: 0deg;
             --tilt-y: 0deg;
         }
 
-        * { box-sizing: border-box; }
-
-        body, html {
-            margin: 0; padding: 0;
-            height: 100%;
-            background-color: var(--cyber-dark);
-            color: #ffffff;
-            font-family: 'Fira Code', monospace;
-            overflow: hidden;
+        * {
+            box-sizing: border-box;
             user-select: none;
-            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
         }
 
-        /* --- 開場系統崩潰/載入遮罩 --- */
-        #intro-overlay {
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-black);
+            color: #fff;
+            font-family: var(--font-main);
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        /* --- CRT 螢幕掃描線與模糊特效 --- */
+        .crt-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 99;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 3px, 6px 100%;
+            opacity: 0.85;
+        }
+
+        .vignette {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 98;
+            background: radial-gradient(circle at center, transparent 40%, rgba(0, 0, 0, 0.85) 100%);
+        }
+
+        /* --- 開頭動畫：記憶檢索與 CRITICAL FAILURE 系統錯誤 --- */
+        #intro-screen {
             position: fixed;
             inset: 0;
-            background: #000;
-            z-index: 9999;
+            background-color: #030406;
+            z-index: 1000;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            transition: opacity 0.8s ease, visibility 0.8s;
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s;
         }
 
-        #intro-overlay.fade-out {
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .terminal-box {
+        .intro-console {
             width: 85%;
             max-width: 500px;
-            border: 1px solid var(--cyber-magenta);
-            padding: 24px;
-            background: rgba(255, 0, 85, 0.05);
-            box-shadow: 0 0 30px rgba(ff, 0, 85, 0.2);
-            position: relative;
-        }
-
-        .terminal-header {
-            color: var(--cyber-magenta);
-            font-size: 0.8rem;
-            letter-spacing: 2px;
-            margin-bottom: 15px;
-            font-family: 'Orbitron', sans-serif;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .terminal-logs {
             font-size: 0.85rem;
+            color: var(--cyan);
             line-height: 1.6;
-            color: #00f7ff;
-            min-height: 110px;
+            text-shadow: 0 0 8px var(--cyan-glow);
         }
 
-        .blink-btn {
-            margin-top: 25px;
-            color: #fff;
-            font-size: 0.85rem;
-            letter-spacing: 3px;
+        .error-modal {
+            display: none;
+            position: absolute;
+            background: rgba(20, 2, 8, 0.95);
+            border: 2px solid var(--magenta);
+            box-shadow: 0 0 35px var(--magenta-glow);
+            padding: 25px 35px;
             text-align: center;
-            animation: pulse-glow 1.2s infinite alternate;
-            font-family: 'Orbitron', sans-serif;
+            animation: modal-glitch 0.2s infinite alternate;
         }
 
-        @keyframes pulse-glow {
-            from { opacity: 0.3; text-shadow: 0 0 5px #fff; }
-            to { opacity: 1; text-shadow: 0 0 15px var(--cyber-cyan); }
+        .error-modal h2 {
+            font-family: var(--font-title);
+            color: var(--magenta);
+            margin: 0 0 10px 0;
+            font-size: 1.5rem;
+            letter-spacing: 4px;
+            text-shadow: 0 0 12px var(--magenta);
         }
 
-        /* --- 背景 Canvas & CRT 掃描線 --- */
-        #cyber-canvas {
-            position: fixed;
-            inset: 0;
-            z-index: 1;
-            pointer-events: none;
+        .error-modal p {
+            color: #fff;
+            font-size: 0.9rem;
+            margin: 0 0 20px 0;
+            letter-spacing: 2px;
         }
 
-        .scanline-layer {
-            position: fixed;
-            inset: 0;
-            z-index: 2;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%);
-            background-size: 100% 4px;
-            pointer-events: none;
-            opacity: 0.6;
+        .start-btn {
+            background: var(--magenta);
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            font-family: var(--font-title);
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+            cursor: pointer;
+            box-shadow: 0 0 15px var(--magenta-glow);
+            transition: all 0.2s ease;
         }
 
-        /* --- 頂部與底部 HUD 狀態欄 --- */
-        .hud-bar {
+        .start-btn:hover {
+            background: #fff;
+            color: var(--magenta);
+            box-shadow: 0 0 25px #fff;
+        }
+
+        @keyframes modal-glitch {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(-2px, 1px); }
+            100% { transform: translate(2px, -1px); }
+        }
+
+        /* --- 頂部與底部賽博狀態列 --- */
+        .system-bar-top, .system-bar-bottom {
             position: fixed;
             left: 30px; right: 30px;
             z-index: 10;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             letter-spacing: 3px;
-            color: rgba(0, 247, 255, 0.5);
+            color: rgba(0, 240, 255, 0.6);
             pointer-events: none;
         }
-        .hud-bar.top { top: 20px; border-bottom: 1px dashed rgba(0, 247, 255, 0.2); padding-bottom: 6px; }
-        .hud-bar.bottom { bottom: 20px; border-top: 1px dashed rgba(0, 247, 255, 0.2); padding-top: 6px; }
 
-        /* --- 賽博切角 navigation 按鈕 --- */
-        .cyber-nav {
+        .system-bar-top { top: 20px; border-bottom: 1px solid rgba(0, 240, 255, 0.15); padding-bottom: 6px; }
+        .system-bar-bottom { bottom: 20px; border-top: 1px solid rgba(0, 240, 255, 0.15); padding-top: 6px; }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px; height: 8px;
+            background-color: var(--cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--cyan);
+            animation: status-blink 1.5s infinite ease-in-out;
+            margin-right: 6px;
+        }
+
+        @keyframes status-blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+        /* --- Canvas 背景 (棋盤格空間 + 光粒子) --- */
+        #bg-canvas {
             position: fixed;
-            top: 50%;
-            width: 48px; height: 48px;
-            background: rgba(0, 247, 255, 0.08);
-            border: 1px solid var(--cyber-cyan);
-            color: var(--cyber-cyan);
-            font-size: 1.2rem;
-            cursor: pointer;
-            z-index: 100;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-            outline: none;
-        }
-        .nav-left { left: clamp(15px, 3vw, 40px); transform: translateY(-50%); }
-        .nav-right { right: clamp(15px, 3vw, 40px); transform: translateY(-50%); }
-
-        .cyber-nav:hover {
-            background: var(--cyber-cyan);
-            color: #000;
-            box-shadow: 0 0 25px var(--cyber-cyan);
-            transform: translateY(-50%) scale(1.1);
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
         }
 
-        /* --- 主 UI 卡片（賽博切角 + 玻璃擬態） --- */
-        .main-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+        /* --- 主 UI 卡片 (Cyber Terminal) --- */
+        .main-wrapper {
             position: relative;
             z-index: 5;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             perspective: 1000px;
+            pointer-events: none;
         }
 
-        .cyber-card {
-            background: var(--cyber-panel);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            width: 88%;
+        .terminal-card {
+            pointer-events: auto;
+            width: 90%;
             max-width: 580px;
-            padding: clamp(40px, 6vh, 60px) clamp(25px, 4vw, 50px);
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(0, 240, 255, 0.05);
+            padding: 40px 45px;
             position: relative;
-            border: 1px solid rgba(0, 247, 255, 0.3);
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(0, 247, 255, 0.05);
-            clip-path: polygon(0 0, calc(100% - 25px) 0, 100% 25px, 100% 100%, 25px 100%, 0 calc(100% - 25px));
             transform: rotateX(var(--tilt-y)) rotateY(var(--tilt-x));
             transition: transform 0.15s ease-out, opacity 0.3s ease, filter 0.3s ease;
+            clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
         }
 
-        .cyber-card::before {
-            content: "";
+        .terminal-card.switching {
+            opacity: 0;
+            filter: blur(12px);
+            transform: rotateX(var(--tilt-y)) rotateY(var(--tilt-x)) scale(0.95);
+        }
+
+        /* 賽博角邊裝飾 */
+        .corner-bracket {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 3px;
-            background: linear-gradient(90deg, var(--cyber-cyan), var(--cyber-magenta), var(--cyber-cyan));
+            width: 12px; height: 12px;
+            border-color: var(--cyan);
+            border-style: solid;
+            pointer-events: none;
         }
+        .cb-tl { top: 8px; left: 8px; border-width: 2px 0 0 2px; }
+        .cb-tr { top: 8px; right: 8px; border-width: 2px 2px 0 0; }
+        .cb-bl { bottom: 8px; left: 8px; border-width: 0 0 2px 2px; }
+        .cb-br { bottom: 8px; right: 8px; border-width: 0 2px 2px 0; }
 
-        /* Glitch 特效標題 */
         .card-tag {
             font-size: 0.65rem;
-            color: var(--cyber-magenta);
+            color: var(--magenta);
             letter-spacing: 4px;
-            font-family: 'Orbitron', sans-serif;
             margin-bottom: 6px;
+            text-transform: uppercase;
         }
 
-        h1.cyber-title {
-            font-family: 'Orbitron', sans-serif;
+        h1.title-glitch {
+            font-family: var(--font-title);
             font-size: clamp(2rem, 6vw, 3rem);
-            font-weight: 900;
             margin: 0;
             letter-spacing: 6px;
             color: #fff;
-            text-shadow: 2px 0 var(--cyber-magenta), -2px 0 var(--cyber-cyan);
+            text-shadow: 2px 0 var(--cyan), -2px 0 var(--magenta);
             position: relative;
         }
 
         .sub-tag {
-            font-size: 0.7rem;
-            color: var(--cyber-cyan);
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
             letter-spacing: 3px;
-            margin: 8px 0 32px 0;
-            opacity: 0.8;
+            margin: 8px 0 30px 0;
+            border-bottom: 1px dashed rgba(0, 240, 255, 0.2);
+            padding-bottom: 12px;
         }
 
-        /* 數據行樣式 */
-        .data-row {
-            margin-bottom: 22px;
+        /* 數據資料列 */
+        .data-list {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .data-item {
+            display: flex;
+            flex-direction: column;
             position: relative;
-            padding-left: 16px;
-            border-left: 2px solid var(--cyber-cyan);
-            transition: all 0.3s ease;
+            padding-left: 14px;
+            border-left: 2px solid var(--cyan);
         }
 
-        .data-row:hover {
-            border-left-color: var(--cyber-magenta);
-            background: rgba(0, 247, 255, 0.03);
-        }
-
-        .label {
-            font-size: 0.68rem;
-            color: rgba(255, 255, 255, 0.5);
-            letter-spacing: 2px;
-            display: block;
-            margin-bottom: 3px;
-        }
-
-        .value {
-            font-size: 1rem;
-            color: #fff;
-            letter-spacing: 1px;
-            font-weight: 600;
-        }
-
-        .page-indicator {
-            position: absolute;
-            bottom: 16px;
-            right: 25px;
-            font-family: 'Orbitron', sans-serif;
+        .data-label {
             font-size: 0.65rem;
-            letter-spacing: 2px;
-            color: var(--cyber-cyan);
-            opacity: 0.6;
+            color: var(--cyan);
+            letter-spacing: 3px;
+            opacity: 0.8;
+            margin-bottom: 4px;
         }
 
-        /* 頁面切換 Glitch 閃爍 */
-        .cyber-card.switching {
-            opacity: 0.2;
-            filter: blur(6px) hue-rotate(90deg);
-            transform: scale(0.98) rotateX(var(--tilt-y)) rotateY(var(--tilt-x));
+        .data-value {
+            font-size: 1rem;
+            color: #ffffff;
+            letter-spacing: 1px;
+            text-shadow: 0 0 6px var(--cyan-glow);
         }
+
+        .page-counter {
+            position: absolute;
+            bottom: 15px; right: 25px;
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            color: rgba(0, 240, 255, 0.4);
+        }
+
+        /* --- 賽博風格切頁按鈕 --- */
+        .nav-control {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 48px; height: 48px;
+            background: rgba(10, 14, 22, 0.8);
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            cursor: pointer;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: var(--font-title);
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px var(--cyan-glow);
+            clip-path: polygon(30% 0%, 100% 0%, 70% 100%, 0% 100%);
+        }
+
+        .nav-control:hover {
+            background: var(--cyan);
+            color: var(--bg-black);
+            box-shadow: 0 0 30px var(--cyan);
+            transform: translateY(-50%) scale(1.15);
+        }
+
+        .nav-prev { left: clamp(15px, 3vw, 40px); }
+        .nav-next { right: clamp(15px, 3vw, 40px); }
 
         @media (max-width: 480px) {
-            .hud-bar { font-size: 0.5rem; left: 15px; right: 15px; }
-            .cyber-card { width: 85%; padding: 35px 20px; }
-            h1.cyber-title { letter-spacing: 3px; }
+            .terminal-card { width: 85%; padding: 30px 22px; }
+            .system-bar-top, .system-bar-bottom { font-size: 0.55rem; left: 15px; right: 15px; }
+            h1.title-glitch { font-size: 1.8rem; letter-spacing: 3px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- 開場黑屏與錯誤終端機 -->
-    <div id="intro-overlay">
-        <div class="terminal-box">
-            <div class="terminal-header">
-                <span>SYSTEM BREACH</span>
-                <span>ERR_501</span>
-            </div>
-            <div class="terminal-logs" id="type-text"></div>
-            <div class="blink-btn">[ CLICK / PRESS ANYKEY TO INITIALIZE ]</div>
+    <div class="crt-overlay"></div>
+    <div class="vignette"></div>
+
+    <!-- 開頭動畫 Overlay (仿影片 Critical Failure / Memory Core 檢索) -->
+    <div id="intro-screen">
+        <div class="intro-console" id="intro-console"></div>
+        <div class="error-modal" id="error-modal">
+            <h2>CRITICAL FAILURE</h2>
+            <p>ERROR #501: MEMORY CORRUPTED</p>
+            <button class="start-btn" id="btn-start">OVERRIDE & REBOOT</button>
         </div>
     </div>
 
-    <!-- 背景視覺層 -->
-    <canvas id="cyber-canvas"></canvas>
-    <div class="scanline-layer"></div>
-
-    <!-- 頂部與底部 HUD -->
-    <div class="hud-bar top">
-        <span>PROTOCOL // PERFECT PUPPET</span>
-        <span>SECTOR: OBSESSION</span>
+    <!-- 頂部與底部系統資訊列 -->
+    <div class="system-bar-top">
+        <span><span class="status-dot"></span>SYSTEM: ONLINE</span>
+        <span>SECTOR // PERFECT_PUPPET</span>
     </div>
 
-    <div class="hud-bar bottom">
-        <span>SYSTEM: ILLUSIONARY v2.0</span>
-        <span>STATUS: ACTIVE</span>
+    <div class="system-bar-bottom">
+        <span>OBSESSION // IT HURTS TO REMEMBER</span>
+        <span>SOL'S RNG ARCHIVE</span>
     </div>
 
-    <!-- 兩側切頁按鈕 -->
-    <button class="cyber-nav nav-left" id="btn-prev" aria-label="Prev">❮</button>
-    <button class="cyber-nav nav-right" id="btn-next" aria-label="Next">❯</button>
+    <!-- 3D 棋盤格背景 Canvas -->
+    <canvas id="bg-canvas"></canvas>
 
-    <!-- 主介面卡片 -->
-    <main class="main-container">
-        <div class="cyber-card" id="cyber-card">
-            <div class="card-tag" id="card-tag">// USER PROFILE</div>
-            <h1 class="cyber-title" id="card-title">Sles</h1>
-            <div class="sub-tag" id="card-sub">PERFECT PUPPET // ILLUSIONARY ARCHIVE</div>
+    <!-- 切頁按鈕 -->
+    <button class="nav-control nav-prev" id="btn-prev">&lt;</button>
+    <button class="nav-control nav-next" id="btn-next">&gt;</button>
 
-            <div id="data-container">
-                <!-- 動態注入數據 -->
+    <!-- 主 Terminal 卡片 UI -->
+    <div class="main-wrapper">
+        <div class="terminal-card" id="terminal-card">
+            <div class="corner-bracket cb-tl"></div>
+            <div class="corner-bracket cb-tr"></div>
+            <div class="corner-bracket cb-bl"></div>
+            <div class="corner-bracket cb-br"></div>
+
+            <div class="card-tag" id="card-tag">MEM_CORE // 01</div>
+            <h1 class="title-glitch" id="card-title">𝑆𝑙𝑒𝑠</h1>
+            <div class="sub-tag" id="card-sub">DEVELOPER // LUAU & FRONT-END</div>
+
+            <div class="data-list" id="data-list">
+                <!-- 動態注入內容 -->
             </div>
 
-            <div class="page-indicator" id="page-indicator">[ SEC_01 / 03 ]</div>
+            <div class="page-counter" id="page-counter">01 / 03</div>
         </div>
-    </main>
+    </div>
 
     <script>
-        /* --- 1. 終端機開場打字效果 --- */
-        const logs = [
-            "> LOCATING MEMORY CORE...",
-            "> WARNING: CRITICAL CORRUPTION DETECTED.",
-            "> ERROR #501: REALITY DISTORTION IN PROGRESS.",
-            "> OVERRIDING SECURITY PROTOCOL..."
-        ];
-        
-        let logIdx = 0, charIdx = 0;
-        const typeElem = document.getElementById('type-text');
-
-        function typeWriter() {
-            if (logIdx < logs.length) {
-                if (charIdx < logs[logIdx].length) {
-                    typeElem.innerHTML += logs[logIdx].charAt(charIdx);
-                    charIdx++;
-                    setTimeout(typeWriter, 18);
-                } else {
-                    typeElem.innerHTML += "<br/>";
-                    logIdx++;
-                    charIdx = 0;
-                    setTimeout(typeWriter, 180);
-                }
-            }
-        }
-        typeWriter();
-
-        /* --- 2. 賽博 Web Audio 原生音效引擎 --- */
+        /* --- 1. Web Audio API 音效合成器 --- */
         let audioCtx = null;
 
         function initAudio() {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                startCyberAmbient();
             }
         }
 
-        // 啟動深邃背景賽博低頻 Ambient Sound
-        function startCyberAmbient() {
-            try {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                const filter = audioCtx.createBiquadFilter();
-
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(55, audioCtx.currentTime); // A1 低音
-
-                filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(150, audioCtx.currentTime);
-
-                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
-
-                osc.connect(filter);
-                filter.connect(gain);
-                gain.connect(audioCtx.destination);
-
-                osc.start();
-            } catch(e) {}
-        }
-
-        // 高科技點擊與 Glitch 翻頁音效
-        function playCyberSFX(type) {
+        function playSound(type) {
             if (!audioCtx) return;
             try {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
-
-                if (type === 'click') {
-                    osc.type = 'square';
-                    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.05);
-                    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-                    gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
-                } else if (type === 'glitch') {
-                    osc.type = 'sawtooth';
-                    osc.frequency.setValueAtTime(120, audioCtx.currentTime);
-                    osc.frequency.linearRampToValueAtTime(600, audioCtx.currentTime + 0.12);
-                    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
-                    gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
-                }
-
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.12);
-            } catch(e) {}
+
+                const now = audioCtx.currentTime;
+
+                if (type === 'click') {
+                    // 高頻短促賽博點擊聲
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(800, now);
+                    osc.frequency.exponentialRampToValueAtTime(1200, now + 0.05);
+                    gain.gain.setValueAtTime(0.05, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } else if (type === 'switch') {
+                    // 切頁 Sweep 故障聲
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.linearRampToValueAtTime(150, now + 0.15);
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.15);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                } else if (type === 'error') {
+                    // 警報錯誤聲
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.setValueAtTime(100, now + 0.1);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                }
+            } catch(e){}
         }
 
-        // 關閉開場動畫
-        const introOverlay = document.getElementById('intro-overlay');
-        function unlockSystem() {
-            initAudio();
-            playCyberSFX('glitch');
-            introOverlay.classList.add('fade-out');
-        }
+        /* --- 2. 開頭 Console 打字與 Error 彈窗 --- */
+        const consoleElem = document.getElementById('intro-console');
+        const errorModal = document.getElementById('error-modal');
+        const introScreen = document.getElementById('intro-screen');
 
-        introOverlay.addEventListener('click', unlockSystem);
-        document.addEventListener('keydown', (e) => {
-            if (!introOverlay.classList.contains('fade-out')) {
-                unlockSystem();
+        const consoleLogs = [
+            "> INITIALIZING MEMORY CORE...",
+            "> RETRIEVING ARCHIVE DATA [PLUTO]...",
+            "> CHECKING OBSESSION PROTOCOL...",
+            "> WARNING: UNSTABLE MEMORY STREAM DETECTED.",
+            "> CRITICAL FAILURE IN SECTOR-00."
+        ];
+
+        let logIndex = 0;
+        function typeConsoleLogs() {
+            if (logIndex < consoleLogs.length) {
+                const line = document.createElement('div');
+                line.textContent = consoleLogs[logIndex];
+                consoleElem.appendChild(line);
+                logIndex++;
+                setTimeout(typeConsoleLogs, 220);
+            } else {
+                setTimeout(() => {
+                    initAudio();
+                    playSound('error');
+                    errorModal.style.display = 'block';
+                }, 400);
             }
+        }
+
+        document.getElementById('btn-start').addEventListener('click', () => {
+            initAudio();
+            playSound('click');
+            introScreen.style.opacity = '0';
+            introScreen.style.visibility = 'hidden';
         });
 
-        /* --- 3. 頁面資料結構 --- */
+        /* --- 3. 資料頁面結構 --- */
         const pages = [
             {
-                tag: "// IDENTITY MATRIX",
-                title: "Sles",
-                sub: "GAME DEVELOPER // CREATIVE DESIGNER",
+                tag: "SUBJECT_IDENTIFIER // 01",
+                title: "𝑆𝑙𝑒𝑠",
+                sub: "DEVELOPER // GAME & WEB ARCHITECT",
                 rows: [
-                    { label: "PRIMARY_ROLE", value: "Roblox Scripting & Web Front-End" },
-                    { label: "CREATIVE_CORE", value: "Dark & Tragic Worldbuilding" },
-                    { label: "STATUS", value: "System Online // Active" }
+                    { label: "PRIMARY_CLASS", value: "Luau Scripting // Web Front-End" },
+                    { label: "CREATIVE_CORE", value: "Game Design & Narrative Scripting" },
+                    { label: "STATUS", value: "ACTIVE_PROCESS // 15 Y.O." }
                 ]
             },
             {
-                tag: "// ARCHIVE PREFERENCES",
-                title: "Favorites",
-                sub: "NEURAL NETWORK // INTERESTS",
+                tag: "ARCHIVE_PREFERENCES // 02",
+                title: "𝐹𝑎𝑣𝑜𝑟𝑖𝑡𝑒𝑠",
+                sub: "UNIVERSE // MUSIC & GAMING",
                 rows: [
-                    { label: "ENGINES", value: "Roblox Luau / HTML5 Canvas" },
-                    { label: "AESTHETICS", value: "Cyberpunk, Glitch Art, Chess Mechanics" },
-                    { label: "CREATIVE_STYLE", value: "Narrative-driven Interactive Media" }
+                    { label: "GAME_TITLES", value: "Sol's RNG / Roblox Engine Universe" },
+                    { label: "THEMATIC_STYLE", value: "Dark Gothic / Cyberpunk / Glitch Art" },
+                    { label: "AUDIO_RESONANCE", value: "Atmospheric Synth & Cinematic OST" }
                 ]
             },
             {
-                tag: "// PROJECT DATABASE",
-                title: "Works",
-                sub: "ACTIVE EXPERIMENTS & SCRIPTING",
+                tag: "CURRENT_PROJECTS // 03",
+                title: "𝑊𝑜𝑟𝑘𝑠",
+                sub: "REPLICATION & SYSTEM DESIGN",
                 rows: [
-                    { label: "PROJECT_01", value: "Client/Server Replication Systems" },
-                    { label: "PROJECT_02", value: "Cyber & Archive Web Interfaces" },
-                    { label: "CURRENT_TARGET", value: "Unannounced Game Prototypes" }
+                    { label: "SYSTEM_REPLICATION", value: "CFrame & Motor6D Animation Manipulation" },
+                    { label: "WEB_UI_INTERFACES", value: "Custom Interactive Archives" },
+                    { label: "STATUS_LOG", value: "REBOOT COMPLETE // READY FOR QUERY" }
                 ]
             }
         ];
 
         let currentPage = 0;
-        let isTransitioning = false;
-        const cardElem = document.getElementById('cyber-card');
+        let isSwitching = false;
+
+        const terminalCard = document.getElementById('terminal-card');
+        const cardTag = document.getElementById('card-tag');
+        const cardTitle = document.getElementById('card-title');
+        const cardSub = document.getElementById('card-sub');
+        const dataList = document.getElementById('data-list');
+        const pageCounter = document.getElementById('page-counter');
 
         function renderPage(index) {
             const data = pages[index];
-            document.getElementById('card-tag').textContent = data.tag;
-            document.getElementById('card-title').textContent = data.title;
-            document.getElementById('card-sub').textContent = data.sub;
+            cardTag.textContent = data.tag;
+            cardTitle.textContent = data.title;
+            cardSub.textContent = data.sub;
 
-            const container = document.getElementById('data-container');
-            container.innerHTML = data.rows.map(r => `
-                <div class="data-row">
-                    <span class="label">${r.label}</span>
-                    <span class="value">${r.value}</span>
+            dataList.innerHTML = data.rows.map(row => `
+                <div class="data-item">
+                    <span class="data-label">${row.label}</span>
+                    <span class="data-value">${row.value}</span>
                 </div>
             `).join('');
 
-            document.getElementById('page-indicator').textContent = `[ SEC_0${index + 1} / 0${pages.length} ]`;
+            pageCounter.textContent = `0${index + 1} / 0${pages.length}`;
         }
 
-        function switchPage(dir) {
-            if (isTransitioning) return;
-            isTransitioning = true;
-            playCyberSFX('glitch');
+        function switchPage(direction) {
+            if (isSwitching) return;
+            isSwitching = true;
+            playSound('switch');
 
-            cardElem.classList.add('switching');
+            terminalCard.classList.add('switching');
 
             setTimeout(() => {
-                if (dir === 'next') currentPage = (currentPage + 1) % pages.length;
-                else currentPage = (currentPage - 1 + pages.length) % pages.length;
-
+                if (direction === 'next') {
+                    currentPage = (currentPage + 1) % pages.length;
+                } else {
+                    currentPage = (currentPage - 1 + pages.length) % pages.length;
+                }
                 renderPage(currentPage);
-                cardElem.classList.remove('switching');
+                terminalCard.classList.remove('switching');
 
-                setTimeout(() => { isTransitioning = false; }, 200);
-            }, 200);
+                setTimeout(() => { isSwitching = false; }, 300);
+            }, 300);
         }
 
         document.getElementById('btn-next').addEventListener('click', () => switchPage('next'));
         document.getElementById('btn-prev').addEventListener('click', () => switchPage('prev'));
 
         document.addEventListener('keydown', (e) => {
-            if (introOverlay.classList.contains('fade-out')) {
-                if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') switchPage('next');
-                if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') switchPage('prev');
-            }
+            if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') switchPage('next');
+            if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') switchPage('prev');
         });
 
-        /* --- 4. 視差 3D 卡片傾斜與滑鼠位置 --- */
+        /* --- 4. 3D 視差傾斜 --- */
         document.addEventListener('mousemove', (e) => {
             const centerX = window.innerWidth / 2;
             const centerY = window.innerHeight / 2;
             const tiltX = ((e.clientX - centerX) / centerX) * 6;
             const tiltY = ((e.clientY - centerY) / centerY) * -6;
 
-            cardElem.style.setProperty('--tilt-x', `${tiltX}deg`);
-            cardElem.style.setProperty('--tilt-y', `${tiltY}deg`);
+            terminalCard.style.setProperty('--tilt-x', `${tiltX}deg`);
+            terminalCard.style.setProperty('--tilt-y', `${tiltY}deg`);
         });
 
-        /* --- 5. Background Canvas: 賽博西洋棋格子與浮動 Glitch 粒子 --- */
-        const canvas = document.getElementById('cyber-canvas');
+        /* --- 5. 3D 透視棋盤格背景 (Canvas) --- */
+        const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
-        let gridOffset = 0;
 
-        function resize() {
+        function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         }
-        window.addEventListener('resize', resize);
-        resize();
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
-        function drawCyberGrid() {
+        let gridOffset = 0;
+
+        function drawPerspectiveGrid() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            const horizon = canvas.height * 0.55;
-            const step = 40;
+            // 背景星光粒子
+            ctx.fillStyle = 'rgba(0, 240, 255, 0.15)';
+            for (let i = 0; i < 20; i++) {
+                const x = (Math.sin(i * 99 + gridOffset * 0.01) * 0.5 + 0.5) * canvas.width;
+                const y = (Math.cos(i * 33 + gridOffset * 0.01) * 0.5 + 0.5) * (canvas.height * 0.5);
+                ctx.fillRect(x, y, 2, 2);
+            }
 
-            // 繪製透視西洋棋地面線條
-            ctx.strokeStyle = 'rgba(0, 247, 255, 0.12)';
+            // 3D 棋盤格
+            const horizon = canvas.height * 0.55;
+            const fov = 300;
+
+            ctx.strokeStyle = 'rgba(0, 240, 255, 0.18)';
             ctx.lineWidth = 1;
 
-            gridOffset = (gridOffset + 0.5) % step;
+            // 縱向線
+            const centerX = canvas.width / 2;
+            for (let x = -canvas.width * 2; x <= canvas.width * 2; x += 80) {
+                ctx.beginPath();
+                ctx.moveTo(centerX, horizon);
+                ctx.lineTo(centerX + (x * 3), canvas.height);
+                ctx.stroke();
+            }
 
             // 橫向前進線
-            for (let y = horizon; y < canvas.height; y += (y - horizon) * 0.15 + 2) {
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(canvas.width, y);
-                ctx.stroke();
+            gridOffset = (gridOffset + 0.8) % 40;
+            for (let z = 10; z < 400; z += 20) {
+                const currentZ = z + gridOffset;
+                const y = horizon + (fov * 80) / currentZ;
+                if (y <= canvas.height && y >= horizon) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(canvas.width, y);
+                    ctx.stroke();
+                }
             }
 
-            // 縱向放射線（營造 3D 棋盤感）
-            const numLines = 24;
-            for (let i = -numLines; i <= numLines; i++) {
-                const xEnd = (canvas.width / 2) + i * (canvas.width / numLines) * 2;
-                ctx.beginPath();
-                ctx.moveTo(canvas.width / 2, horizon);
-                ctx.lineTo(xEnd, canvas.height);
-                ctx.stroke();
-            }
-
-            // 隨機數碼方塊粒子 (Glitch Code Blocks)
-            ctx.fillStyle = 'rgba(255, 0, 85, 0.25)';
-            for (let i = 0; i < 6; i++) {
-                const rx = (Math.sin(Date.now() * 0.001 + i) * 0.5 + 0.5) * canvas.width;
-                const ry = (Math.cos(Date.now() * 0.0015 + i) * 0.5 + 0.5) * canvas.height;
-                ctx.fillRect(rx, ry, 12, 12);
-            }
-
-            requestAnimationFrame(drawCyberGrid);
+            requestAnimationFrame(drawPerspectiveGrid);
         }
 
         window.onload = () => {
+            typeConsoleLogs();
             renderPage(0);
-            drawCyberGrid();
+            drawPerspectiveGrid();
         };
     </script>
 </body>
