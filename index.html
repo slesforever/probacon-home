@@ -2,630 +2,370 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sles | Memory Core // illusionary</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sol's RNG // 𝚒𝚕𝚕𝚞𝚜𝚒𝚘𝚗𝚊𝚛𝚢 Archive</title>
     
-    <!-- 引入賽博朋克與黑客終端風格字體 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
     <style>
         :root {
             --cyan: #00f0ff;
-            --cyan-glow: rgba(0, 240, 255, 0.4);
             --magenta: #ff0055;
-            --magenta-glow: rgba(255, 0, 85, 0.5);
-            --bg-black: #050608;
-            --panel-bg: rgba(10, 14, 22, 0.85);
-            --border-color: rgba(0, 240, 255, 0.3);
-            --font-main: 'Share Tech Mono', monospace;
-            --font-title: 'Orbitron', sans-serif;
-            --tilt-x: 0deg;
-            --tilt-y: 0deg;
+            --bg-dark: #040508;
+            --panel-bg: rgba(8, 12, 18, 0.88);
+            --font-tech: 'Chakra Petch', sans-serif;
+            --font-code: 'Share Tech Mono', monospace;
         }
 
         * {
             box-sizing: border-box;
+            margin: 0; padding: 0;
             user-select: none;
-            -webkit-user-select: none;
         }
 
         body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--bg-black);
+            width: 100%; height: 100%;
+            background-color: var(--bg-dark);
             color: #fff;
-            font-family: var(--font-main);
+            font-family: var(--font-tech);
             overflow: hidden;
-            touch-action: none;
         }
 
-        /* --- CRT 螢幕掃描線與模糊特效 --- */
-        .crt-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 99;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            background-size: 100% 3px, 6px 100%;
-            opacity: 0.85;
+        /* --- Scanline & Vignette Effect --- */
+        .scanlines {
+            position: fixed; inset: 0;
+            pointer-events: none; z-index: 10;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%);
+            background-size: 100% 4px;
+            opacity: 0.7;
         }
 
         .vignette {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 98;
-            background: radial-gradient(circle at center, transparent 40%, rgba(0, 0, 0, 0.85) 100%);
+            position: fixed; inset: 0;
+            pointer-events: none; z-index: 9;
+            background: radial-gradient(circle, transparent 40%, rgba(2, 3, 5, 0.9) 100%);
         }
 
-        /* --- 開頭動畫：記憶檢索與 CRITICAL FAILURE 系統錯誤 --- */
-        #intro-screen {
-            position: fixed;
-            inset: 0;
-            background-color: #030406;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s;
-        }
-
-        .intro-console {
-            width: 85%;
-            max-width: 500px;
-            font-size: 0.85rem;
-            color: var(--cyan);
-            line-height: 1.6;
-            text-shadow: 0 0 8px var(--cyan-glow);
-        }
-
-        .error-modal {
-            display: none;
-            position: absolute;
-            background: rgba(20, 2, 8, 0.95);
-            border: 2px solid var(--magenta);
-            box-shadow: 0 0 35px var(--magenta-glow);
-            padding: 25px 35px;
-            text-align: center;
-            animation: modal-glitch 0.2s infinite alternate;
-        }
-
-        .error-modal h2 {
-            font-family: var(--font-title);
-            color: var(--magenta);
-            margin: 0 0 10px 0;
-            font-size: 1.5rem;
-            letter-spacing: 4px;
-            text-shadow: 0 0 12px var(--magenta);
-        }
-
-        .error-modal p {
-            color: #fff;
-            font-size: 0.9rem;
-            margin: 0 0 20px 0;
-            letter-spacing: 2px;
-        }
-
-        .start-btn {
-            background: var(--magenta);
-            color: #fff;
-            border: none;
-            padding: 10px 24px;
-            font-family: var(--font-title);
-            font-size: 0.8rem;
-            letter-spacing: 3px;
-            cursor: pointer;
-            box-shadow: 0 0 15px var(--magenta-glow);
-            transition: all 0.2s ease;
-        }
-
-        .start-btn:hover {
-            background: #fff;
-            color: var(--magenta);
-            box-shadow: 0 0 25px #fff;
-        }
-
-        @keyframes modal-glitch {
-            0% { transform: translate(0, 0); }
-            50% { transform: translate(-2px, 1px); }
-            100% { transform: translate(2px, -1px); }
-        }
-
-        /* --- 頂部與底部賽博狀態列 --- */
-        .system-bar-top, .system-bar-bottom {
-            position: fixed;
-            left: 30px; right: 30px;
-            z-index: 10;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.7rem;
-            letter-spacing: 3px;
-            color: rgba(0, 240, 255, 0.6);
-            pointer-events: none;
-        }
-
-        .system-bar-top { top: 20px; border-bottom: 1px solid rgba(0, 240, 255, 0.15); padding-bottom: 6px; }
-        .system-bar-bottom { bottom: 20px; border-top: 1px solid rgba(0, 240, 255, 0.15); padding-top: 6px; }
-
-        .status-dot {
-            display: inline-block;
-            width: 8px; height: 8px;
-            background-color: var(--cyan);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--cyan);
-            animation: status-blink 1.5s infinite ease-in-out;
-            margin-right: 6px;
-        }
-
-        @keyframes status-blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
-
-        /* --- Canvas 背景 (棋盤格空間 + 光粒子) --- */
-        #bg-canvas {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+        /* --- Canvas 背景 (傀儡線 + 粒子) --- */
+        #puppet-canvas {
+            position: fixed; inset: 0;
             z-index: 1;
+            background: radial-gradient(circle at center, #0a0d14 0%, #030406 100%);
         }
 
-        /* --- 主 UI 卡片 (Cyber Terminal) --- */
-        .main-wrapper {
-            position: relative;
-            z-index: 5;
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            perspective: 1000px;
-            pointer-events: none;
+        /* --- 主展示卡片 (Sol's RNG Aura Showcase Style) --- */
+        .container {
+            position: relative; z-index: 5;
+            width: 100%; height: 100vh;
+            display: flex; justify-content: center; align-items: center;
         }
 
-        .terminal-card {
-            pointer-events: auto;
-            width: 90%;
-            max-width: 580px;
+        .aura-card {
+            width: 90%; max-width: 540px;
             background: var(--panel-bg);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--border-color);
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(0, 240, 255, 0.05);
-            padding: 40px 45px;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            box-shadow: 0 0 35px rgba(0, 240, 255, 0.15), inset 0 0 15px rgba(255, 0, 85, 0.1);
+            backdrop-filter: blur(12px);
+            padding: 35px 40px;
             position: relative;
-            transform: rotateX(var(--tilt-y)) rotateY(var(--tilt-x));
-            transition: transform 0.15s ease-out, opacity 0.3s ease, filter 0.3s ease;
-            clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+            clip-path: polygon(0 0, calc(100% - 25px) 0, 100% 25px, 100% 100%, 25px 100%, 0 calc(100% - 25px));
+            transition: transform 0.1s ease-out;
         }
 
-        .terminal-card.switching {
-            opacity: 0;
-            filter: blur(12px);
-            transform: rotateX(var(--tilt-y)) rotateY(var(--tilt-x)) scale(0.95);
+        /* 頂部機率與 Biome 標籤 */
+        .aura-header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 12px; margin-bottom: 20px;
+            font-family: var(--font-code); font-size: 0.75rem;
         }
 
-        /* 賽博角邊裝飾 */
-        .corner-bracket {
-            position: absolute;
-            width: 12px; height: 12px;
-            border-color: var(--cyan);
-            border-style: solid;
-            pointer-events: none;
-        }
-        .cb-tl { top: 8px; left: 8px; border-width: 2px 0 0 2px; }
-        .cb-tr { top: 8px; right: 8px; border-width: 2px 2px 0 0; }
-        .cb-bl { bottom: 8px; left: 8px; border-width: 0 0 2px 2px; }
-        .cb-br { bottom: 8px; right: 8px; border-width: 0 2px 2px 0; }
-
-        .card-tag {
-            font-size: 0.65rem;
+        .rarity-tag {
             color: var(--magenta);
-            letter-spacing: 4px;
-            margin-bottom: 6px;
-            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 8px var(--magenta);
+            font-weight: bold;
         }
 
-        h1.title-glitch {
-            font-family: var(--font-title);
-            font-size: clamp(2rem, 6vw, 3rem);
-            margin: 0;
-            letter-spacing: 6px;
-            color: #fff;
-            text-shadow: 2px 0 var(--cyan), -2px 0 var(--magenta);
-            position: relative;
-        }
-
-        .sub-tag {
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.6);
-            letter-spacing: 3px;
-            margin: 8px 0 30px 0;
-            border-bottom: 1px dashed rgba(0, 240, 255, 0.2);
-            padding-bottom: 12px;
-        }
-
-        /* 數據資料列 */
-        .data-list {
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-        }
-
-        .data-item {
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            padding-left: 14px;
-            border-left: 2px solid var(--cyan);
-        }
-
-        .data-label {
-            font-size: 0.65rem;
+        .biome-tag {
             color: var(--cyan);
-            letter-spacing: 3px;
-            opacity: 0.8;
-            margin-bottom: 4px;
-        }
-
-        .data-value {
-            font-size: 1rem;
-            color: #ffffff;
             letter-spacing: 1px;
-            text-shadow: 0 0 6px var(--cyan-glow);
+            background: rgba(0, 240, 255, 0.1);
+            padding: 2px 8px;
+            border: 1px solid rgba(0, 240, 255, 0.3);
         }
 
-        .page-counter {
-            position: absolute;
-            bottom: 15px; right: 25px;
-            font-size: 0.7rem;
-            letter-spacing: 3px;
-            color: rgba(0, 240, 255, 0.4);
+        /* 標題 RGB Glitch 特效 */
+        .glitch-title {
+            font-size: clamp(2.2rem, 5vw, 3rem);
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 4px;
+            position: relative;
+            display: inline-block;
+            text-shadow: 0 0 15px rgba(0, 240, 255, 0.6);
         }
 
-        /* --- 賽博風格切頁按鈕 --- */
-        .nav-control {
-            position: fixed;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 48px; height: 48px;
-            background: rgba(10, 14, 22, 0.8);
+        .glitch-title::before, .glitch-title::after {
+            content: attr(data-text);
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0.8;
+        }
+
+        .glitch-title::before {
+            left: 2px; color: var(--magenta);
+            clip: rect(24px, 550px, 90px, 0);
+            animation: glitch-anim-1 2s infinite linear alternate-reverse;
+        }
+
+        .glitch-title::after {
+            left: -2px; color: var(--cyan);
+            clip: rect(85px, 550px, 140px, 0);
+            animation: glitch-anim-2 2.5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim-1 {
+            0% { clip: rect(10px, 9999px, 30px, 0); }
+            20% { clip: rect(50px, 9999px, 80px, 0); }
+            40% { clip: rect(20px, 9999px, 60px, 0); }
+            100% { clip: rect(70px, 9999px, 90px, 0); }
+        }
+
+        @keyframes glitch-anim-2 {
+            0% { clip: rect(60px, 9999px, 90px, 0); }
+            30% { clip: rect(10px, 9999px, 40px, 0); }
+            70% { clip: rect(40px, 9999px, 70px, 0); }
+            100% { clip: rect(30px, 9999px, 50px, 0); }
+        }
+
+        .aura-sub {
+            font-family: var(--font-code);
+            font-size: 0.85rem; color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 3px; margin-top: 5px; margin-bottom: 25px;
+        }
+
+        /* 內容數據列 */
+        .info-grid {
+            display: flex; flex-direction: column; gap: 14px;
+            font-family: var(--font-code);
+        }
+
+        .info-item {
+            display: flex; justify-content: space-between;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 10px 14px;
+            border-left: 3px solid var(--cyan);
+        }
+
+        .info-item.accent {
+            border-left-color: var(--magenta);
+        }
+
+        .info-key { color: rgba(255, 255, 255, 0.5); font-size: 0.75rem; letter-spacing: 1px; }
+        .info-val { color: #fff; font-size: 0.85rem; font-weight: bold; letter-spacing: 1px; }
+
+        /* 按鈕區 */
+        .action-bar {
+            margin-top: 30px; display: flex; gap: 12px;
+        }
+
+        .btn-glitch {
+            flex: 1; padding: 12px;
+            background: transparent;
             border: 1px solid var(--cyan);
             color: var(--cyan);
-            cursor: pointer;
-            z-index: 100;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: var(--font-title);
-            font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 15px var(--cyan-glow);
-            clip-path: polygon(30% 0%, 100% 0%, 70% 100%, 0% 100%);
+            font-family: var(--font-tech); font-weight: bold;
+            letter-spacing: 2px; cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.1);
         }
 
-        .nav-control:hover {
-            background: var(--cyan);
-            color: var(--bg-black);
-            box-shadow: 0 0 30px var(--cyan);
-            transform: translateY(-50%) scale(1.15);
+        .btn-glitch:hover {
+            background: var(--cyan); color: #000;
+            box-shadow: 0 0 20px var(--cyan);
         }
 
-        .nav-prev { left: clamp(15px, 3vw, 40px); }
-        .nav-next { right: clamp(15px, 3vw, 40px); }
+        .btn-glitch.danger {
+            border-color: var(--magenta); color: var(--magenta);
+        }
 
-        @media (max-width: 480px) {
-            .terminal-card { width: 85%; padding: 30px 22px; }
-            .system-bar-top, .system-bar-bottom { font-size: 0.55rem; left: 15px; right: 15px; }
-            h1.title-glitch { font-size: 1.8rem; letter-spacing: 3px; }
+        .btn-glitch.danger:hover {
+            background: var(--magenta); color: #fff;
+            box-shadow: 0 0 20px var(--magenta);
+        }
+
+        /* 全螢幕 Flash 特效 */
+        #glitch-overlay {
+            position: fixed; inset: 0; z-index: 100;
+            background: var(--magenta); opacity: 0;
+            pointer-events: none; transition: opacity 0.05s ease;
         }
     </style>
 </head>
 <body>
 
-    <div class="crt-overlay"></div>
+    <div class="scanlines"></div>
     <div class="vignette"></div>
+    <div id="glitch-overlay"></div>
 
-    <!-- 開頭動畫 Overlay (仿影片 Critical Failure / Memory Core 檢索) -->
-    <div id="intro-screen">
-        <div class="intro-console" id="intro-console"></div>
-        <div class="error-modal" id="error-modal">
-            <h2>CRITICAL FAILURE</h2>
-            <p>ERROR #501: MEMORY CORRUPTED</p>
-            <button class="start-btn" id="btn-start">OVERRIDE & REBOOT</button>
-        </div>
-    </div>
+    <!-- 傀儡線 Canvas -->
+    <canvas id="puppet-canvas"></canvas>
 
-    <!-- 頂部與底部系統資訊列 -->
-    <div class="system-bar-top">
-        <span><span class="status-dot"></span>SYSTEM: ONLINE</span>
-        <span>SECTOR // PERFECT_PUPPET</span>
-    </div>
-
-    <div class="system-bar-bottom">
-        <span>OBSESSION // IT HURTS TO REMEMBER</span>
-        <span>SOL'S RNG ARCHIVE</span>
-    </div>
-
-    <!-- 3D 棋盤格背景 Canvas -->
-    <canvas id="bg-canvas"></canvas>
-
-    <!-- 切頁按鈕 -->
-    <button class="nav-control nav-prev" id="btn-prev">&lt;</button>
-    <button class="nav-control nav-next" id="btn-next">&gt;</button>
-
-    <!-- 主 Terminal 卡片 UI -->
-    <div class="main-wrapper">
-        <div class="terminal-card" id="terminal-card">
-            <div class="corner-bracket cb-tl"></div>
-            <div class="corner-bracket cb-tr"></div>
-            <div class="corner-bracket cb-bl"></div>
-            <div class="corner-bracket cb-br"></div>
-
-            <div class="card-tag" id="card-tag">MEM_CORE // 01</div>
-            <h1 class="title-glitch" id="card-title">𝑆𝑙𝑒𝑠</h1>
-            <div class="sub-tag" id="card-sub">DEVELOPER // LUAU & FRONT-END</div>
-
-            <div class="data-list" id="data-list">
-                <!-- 動態注入內容 -->
+    <div class="container">
+        <div class="aura-card" id="card">
+            <div class="aura-header">
+                <span class="rarity-tag">CHALLENGED+ // 1 IN 10,000,000</span>
+                <span class="biome-tag">CYBERSPACE</span>
             </div>
 
-            <div class="page-counter" id="page-counter">01 / 03</div>
+            <div class="glitch-title" data-text="𝚒𝚕𝚕𝚞𝚜𝚒𝚘𝚗𝚊𝚛𝚢">𝚒𝚕𝚕𝚞𝚜𝚒𝚘𝚗𝚊𝚛𝚢</div>
+            <div class="aura-sub">███'█ PERFECT PUPPET 2</div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-key">SYSTEM ARCHITECT</span>
+                    <span class="info-val">Sles</span>
+                </div>
+                <div class="info-item accent">
+                    <span class="info-key">AUDIO TRACK</span>
+                    <span class="info-val">aakairo - PERFECT PUPPET 2</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-key">MECHANICS</span>
+                    <span class="info-val">CFrame & Motor6D Jitter</span>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <button class="btn-glitch" id="btn-trigger">OVERRIDE</button>
+                <button class="btn-glitch danger" id="btn-pulse">PULSE</button>
+            </div>
         </div>
     </div>
 
     <script>
-        /* --- 1. Web Audio API 音效合成器 --- */
-        let audioCtx = null;
-
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-        }
-
-        function playSound(type) {
-            if (!audioCtx) return;
-            try {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-
-                const now = audioCtx.currentTime;
-
-                if (type === 'click') {
-                    // 高頻短促賽博點擊聲
-                    osc.type = 'square';
-                    osc.frequency.setValueAtTime(800, now);
-                    osc.frequency.exponentialRampToValueAtTime(1200, now + 0.05);
-                    gain.gain.setValueAtTime(0.05, now);
-                    gain.gain.linearRampToValueAtTime(0, now + 0.05);
-                    osc.start(now);
-                    osc.stop(now + 0.05);
-                } else if (type === 'switch') {
-                    // 切頁 Sweep 故障聲
-                    osc.type = 'sawtooth';
-                    osc.frequency.setValueAtTime(300, now);
-                    osc.frequency.linearRampToValueAtTime(150, now + 0.15);
-                    gain.gain.setValueAtTime(0.08, now);
-                    gain.gain.linearRampToValueAtTime(0, now + 0.15);
-                    osc.start(now);
-                    osc.stop(now + 0.15);
-                } else if (type === 'error') {
-                    // 警報錯誤聲
-                    osc.type = 'sawtooth';
-                    osc.frequency.setValueAtTime(150, now);
-                    osc.frequency.setValueAtTime(100, now + 0.1);
-                    gain.gain.setValueAtTime(0.12, now);
-                    gain.gain.linearRampToValueAtTime(0, now + 0.3);
-                    osc.start(now);
-                    osc.stop(now + 0.3);
-                }
-            } catch(e){}
-        }
-
-        /* --- 2. 開頭 Console 打字與 Error 彈窗 --- */
-        const consoleElem = document.getElementById('intro-console');
-        const errorModal = document.getElementById('error-modal');
-        const introScreen = document.getElementById('intro-screen');
-
-        const consoleLogs = [
-            "> INITIALIZING MEMORY CORE...",
-            "> RETRIEVING ARCHIVE DATA [PLUTO]...",
-            "> CHECKING OBSESSION PROTOCOL...",
-            "> WARNING: UNSTABLE MEMORY STREAM DETECTED.",
-            "> CRITICAL FAILURE IN SECTOR-00."
-        ];
-
-        let logIndex = 0;
-        function typeConsoleLogs() {
-            if (logIndex < consoleLogs.length) {
-                const line = document.createElement('div');
-                line.textContent = consoleLogs[logIndex];
-                consoleElem.appendChild(line);
-                logIndex++;
-                setTimeout(typeConsoleLogs, 220);
-            } else {
-                setTimeout(() => {
-                    initAudio();
-                    playSound('error');
-                    errorModal.style.display = 'block';
-                }, 400);
-            }
-        }
-
-        document.getElementById('btn-start').addEventListener('click', () => {
-            initAudio();
-            playSound('click');
-            introScreen.style.opacity = '0';
-            introScreen.style.visibility = 'hidden';
-        });
-
-        /* --- 3. 資料頁面結構 --- */
-        const pages = [
-            {
-                tag: "SUBJECT_IDENTIFIER // 01",
-                title: "𝑆𝑙𝑒𝑠",
-                sub: "DEVELOPER // GAME & WEB ARCHITECT",
-                rows: [
-                    { label: "PRIMARY_CLASS", value: "Luau Scripting // Web Front-End" },
-                    { label: "CREATIVE_CORE", value: "Game Design & Narrative Scripting" },
-                    { label: "STATUS", value: "ACTIVE_PROCESS // 15 Y.O." }
-                ]
-            },
-            {
-                tag: "ARCHIVE_PREFERENCES // 02",
-                title: "𝐹𝑎𝑣𝑜𝑟𝑖𝑡𝑒𝑠",
-                sub: "UNIVERSE // MUSIC & GAMING",
-                rows: [
-                    { label: "GAME_TITLES", value: "Sol's RNG / Roblox Engine Universe" },
-                    { label: "THEMATIC_STYLE", value: "Dark Gothic / Cyberpunk / Glitch Art" },
-                    { label: "AUDIO_RESONANCE", value: "Atmospheric Synth & Cinematic OST" }
-                ]
-            },
-            {
-                tag: "CURRENT_PROJECTS // 03",
-                title: "𝑊𝑜𝑟𝑘𝑠",
-                sub: "REPLICATION & SYSTEM DESIGN",
-                rows: [
-                    { label: "SYSTEM_REPLICATION", value: "CFrame & Motor6D Animation Manipulation" },
-                    { label: "WEB_UI_INTERFACES", value: "Custom Interactive Archives" },
-                    { label: "STATUS_LOG", value: "REBOOT COMPLETE // READY FOR QUERY" }
-                ]
-            }
-        ];
-
-        let currentPage = 0;
-        let isSwitching = false;
-
-        const terminalCard = document.getElementById('terminal-card');
-        const cardTag = document.getElementById('card-tag');
-        const cardTitle = document.getElementById('card-title');
-        const cardSub = document.getElementById('card-sub');
-        const dataList = document.getElementById('data-list');
-        const pageCounter = document.getElementById('page-counter');
-
-        function renderPage(index) {
-            const data = pages[index];
-            cardTag.textContent = data.tag;
-            cardTitle.textContent = data.title;
-            cardSub.textContent = data.sub;
-
-            dataList.innerHTML = data.rows.map(row => `
-                <div class="data-item">
-                    <span class="data-label">${row.label}</span>
-                    <span class="data-value">${row.value}</span>
-                </div>
-            `).join('');
-
-            pageCounter.textContent = `0${index + 1} / 0${pages.length}`;
-        }
-
-        function switchPage(direction) {
-            if (isSwitching) return;
-            isSwitching = true;
-            playSound('switch');
-
-            terminalCard.classList.add('switching');
-
-            setTimeout(() => {
-                if (direction === 'next') {
-                    currentPage = (currentPage + 1) % pages.length;
-                } else {
-                    currentPage = (currentPage - 1 + pages.length) % pages.length;
-                }
-                renderPage(currentPage);
-                terminalCard.classList.remove('switching');
-
-                setTimeout(() => { isSwitching = false; }, 300);
-            }, 300);
-        }
-
-        document.getElementById('btn-next').addEventListener('click', () => switchPage('next'));
-        document.getElementById('btn-prev').addEventListener('click', () => switchPage('prev'));
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') switchPage('next');
-            if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') switchPage('prev');
-        });
-
-        /* --- 4. 3D 視差傾斜 --- */
-        document.addEventListener('mousemove', (e) => {
-            const centerX = window.innerWidth / 2;
-            const centerY = window.innerHeight / 2;
-            const tiltX = ((e.clientX - centerX) / centerX) * 6;
-            const tiltY = ((e.clientY - centerY) / centerY) * -6;
-
-            terminalCard.style.setProperty('--tilt-x', `${tiltX}deg`);
-            terminalCard.style.setProperty('--tilt-y', `${tiltY}deg`);
-        });
-
-        /* --- 5. 3D 透視棋盤格背景 (Canvas) --- */
-        const canvas = document.getElementById('bg-canvas');
+        /* --- 1. Canvas 動態傀儡線 (Puppet Threads) 物理模擬 --- */
+        const canvas = document.getElementById('puppet-canvas');
         const ctx = canvas.getContext('2d');
 
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+        let width, height;
+        let mouseX = 0, mouseY = 0;
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
         }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        window.addEventListener('resize', resize);
+        resize();
 
-        let gridOffset = 0;
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
 
-        function drawPerspectiveGrid() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // 建立 14 條縱向「傀儡線」
+        const threads = [];
+        const threadCount = 14;
 
-            // 背景星光粒子
-            ctx.fillStyle = 'rgba(0, 240, 255, 0.15)';
-            for (let i = 0; i < 20; i++) {
-                const x = (Math.sin(i * 99 + gridOffset * 0.01) * 0.5 + 0.5) * canvas.width;
-                const y = (Math.cos(i * 33 + gridOffset * 0.01) * 0.5 + 0.5) * (canvas.height * 0.5);
-                ctx.fillRect(x, y, 2, 2);
-            }
+        for (let i = 0; i < threadCount; i++) {
+            threads.push({
+                xRatio: (i + 1) / (threadCount + 1),
+                nodes: 15,
+                offsets: new Array(15).fill(0),
+                speed: 0.02 + Math.random() * 0.03,
+                color: Math.random() > 0.3 ? 'rgba(0, 240, 255, 0.35)' : 'rgba(255, 0, 85, 0.4)'
+            });
+        }
 
-            // 3D 棋盤格
-            const horizon = canvas.height * 0.55;
-            const fov = 300;
+        let time = 0;
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            time += 0.05;
 
-            ctx.strokeStyle = 'rgba(0, 240, 255, 0.18)';
+            // 繪製微弱網格
+            ctx.strokeStyle = 'rgba(0, 240, 255, 0.04)';
             ctx.lineWidth = 1;
+            for(let x = 0; x < width; x += 40) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
+            }
 
-            // 縱向線
-            const centerX = canvas.width / 2;
-            for (let x = -canvas.width * 2; x <= canvas.width * 2; x += 80) {
+            // 繪製傀儡線
+            threads.forEach((t) => {
+                const baseX = t.xRatio * width;
                 ctx.beginPath();
-                ctx.moveTo(centerX, horizon);
-                ctx.lineTo(centerX + (x * 3), canvas.height);
-                ctx.stroke();
-            }
+                ctx.strokeStyle = t.color;
+                ctx.lineWidth = 1.5;
 
-            // 橫向前進線
-            gridOffset = (gridOffset + 0.8) % 40;
-            for (let z = 10; z < 400; z += 20) {
-                const currentZ = z + gridOffset;
-                const y = horizon + (fov * 80) / currentZ;
-                if (y <= canvas.height && y >= horizon) {
-                    ctx.beginPath();
-                    ctx.moveTo(0, y);
-                    ctx.lineTo(canvas.width, y);
-                    ctx.stroke();
+                for (let j = 0; j <= t.nodes; j++) {
+                    const y = (j / t.nodes) * height;
+                    
+                    // 滑鼠排斥效果 + 鋸齒波故障抖動
+                    const distToMouse = Math.hypot(baseX - mouseX, y - mouseY);
+                    let jitter = Math.sin(time + j) * 3;
+                    
+                    if (distToMouse < 150) {
+                        jitter += (150 - distToMouse) * (baseX < mouseX ? -0.4 : 0.4);
+                    }
+
+                    const currentX = baseX + jitter;
+                    if (j === 0) ctx.moveTo(currentX, y);
+                    else ctx.lineTo(currentX, y);
+
+                    // 傀儡線節點發光
+                    if (j % 4 === 0) {
+                        ctx.fillStyle = t.color;
+                        ctx.fillRect(currentX - 2, y - 2, 4, 4);
+                    }
                 }
-            }
+                ctx.stroke();
+            });
 
-            requestAnimationFrame(drawPerspectiveGrid);
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        /* --- 2. Web Audio API 音效與故障觸發 --- */
+        let audioCtx;
+        function playGlitchSound() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            
+            osc.frequency.setValueAtTime(120, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.08);
+            
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.12);
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.12);
         }
 
-        window.onload = () => {
-            typeConsoleLogs();
-            renderPage(0);
-            drawPerspectiveGrid();
-        };
+        const overlay = document.getElementById('glitch-overlay');
+        const card = document.getElementById('card');
+
+        function triggerEffect() {
+            playGlitchSound();
+            overlay.style.opacity = '0.6';
+            card.style.transform = `translate(${(Math.random()-0.5)*20}px, ${(Math.random()-0.5)*20}px) scale(0.98)`;
+            
+            setTimeout(() => {
+                overlay.style.opacity = '0';
+                card.style.transform = 'translate(0, 0) scale(1)';
+            }, 80);
+        }
+
+        document.getElementById('btn-trigger').addEventListener('click', triggerEffect);
+        document.getElementById('btn-pulse').addEventListener('click', () => {
+            for(let i=0; i<3; i++) setTimeout(triggerEffect, i*100);
+        });
     </script>
 </body>
 </html>
