@@ -44,25 +44,25 @@
         /* CRT 復古掃描線濾鏡 */
         .scanlines {
             position: fixed; inset: 0; pointer-events: none; z-index: 90;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%);
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.45) 50%);
             background-size: 100% 4px;
-            opacity: 0.6;
+            opacity: 0.7;
         }
 
         .vignette {
             position: fixed; inset: 0; pointer-events: none; z-index: 2;
-            background: radial-gradient(circle at center, transparent 20%, rgba(0, 0, 0, 0.95) 90%);
+            background: radial-gradient(circle at center, transparent 15%, rgba(0, 0, 0, 0.96) 90%);
         }
 
         .screen-shake {
-            animation: shake 0.35s cubic-bezier(.36,.07,.19,.97) both;
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
         }
 
         @keyframes shake {
-            10%, 90% { transform: translate3d(-8px, 4px, 0); }
-            20%, 80% { transform: translate3d(10px, -8px, 0); }
-            30%, 50%, 70% { transform: translate3d(-12px, 12px, 0); }
-            40%, 60% { transform: translate3d(12px, -10px, 0); }
+            10%, 90% { transform: translate3d(-10px, 5px, 0); }
+            20%, 80% { transform: translate3d(12px, -10px, 0); }
+            30%, 50%, 70% { transform: translate3d(-15px, 15px, 0); }
+            40%, 60% { transform: translate3d(15px, -12px, 0); }
         }
 
         /* =========================================================================
@@ -76,20 +76,20 @@
         }
 
         .start-btn {
-            padding: 16px 45px;
+            padding: 18px 50px;
             background: transparent;
             border: 2px solid var(--blue-pure);
             color: #fff;
             font-family: var(--font-serif);
-            font-size: 1.2rem; font-weight: 900;
+            font-size: 1.3rem; font-weight: 900;
             letter-spacing: 6px; cursor: pointer;
-            box-shadow: 0 0 30px var(--blue-glow);
+            box-shadow: 0 0 35px var(--blue-glow);
             transition: all 0.25s ease;
         }
 
         .start-btn:hover {
             background: var(--blue-pure);
-            box-shadow: 0 0 60px var(--blue-pure);
+            box-shadow: 0 0 70px var(--blue-pure);
             transform: scale(1.05);
         }
 
@@ -107,8 +107,8 @@
 
         /* SVG 圖案容器 */
         .svg-icon-box {
-            width: 130px; height: 130px;
-            margin-bottom: 25px;
+            width: 140px; height: 140px;
+            margin-bottom: 28px;
             display: flex; justify-content: center; align-items: center;
         }
 
@@ -116,17 +116,17 @@
             width: 100%; height: 100%;
         }
 
-        .spin-anim { animation: spin 6s linear infinite; }
+        .spin-anim { animation: spin 8s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        .jp-text { font-size: 2.2rem; font-weight: bold; letter-spacing: 6px; }
-        .en-text { font-size: 1.6rem; letter-spacing: 3px; font-weight: bold; }
+        .jp-text { font-size: 2.3rem; font-weight: bold; letter-spacing: 8px; }
+        .en-text { font-size: 1.7rem; letter-spacing: 4px; font-weight: bold; }
 
         /* 逐行堆疊文字容器 */
         .stack-container {
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
-            font-size: 1.25rem; line-height: 1.5;
+            font-size: 1.3rem; line-height: 1.5;
             letter-spacing: 3px; text-transform: lowercase;
             font-weight: bold;
         }
@@ -138,21 +138,21 @@
         }
 
         .puppet-title {
-            font-size: 1.8rem; letter-spacing: 4px; color: #fff;
-            margin-bottom: 25px; font-weight: bold;
+            font-size: 2rem; letter-spacing: 5px; color: #fff;
+            margin-bottom: 30px; font-weight: bold;
         }
 
         .puppet-opt {
             background: transparent; border: none;
             color: #fff; font-family: var(--font-mono);
-            font-size: 1.3rem; letter-spacing: 3px;
-            cursor: pointer; padding: 8px 24px;
+            font-size: 1.35rem; letter-spacing: 3px;
+            cursor: pointer; padding: 10px 28px;
             transition: color 0.1s;
         }
 
         .puppet-opt:hover {
             color: var(--blue-bright);
-            text-shadow: 0 0 15px var(--blue-bright);
+            text-shadow: 0 0 18px var(--blue-bright);
         }
 
         .flash-bang {
@@ -304,27 +304,22 @@
             <div class="jp-text">今何時ですか？</div>
         </div>
 
-        <!-- Frame 4: 逐行跳出堆疊 (JS 動態生成) wake up. -> no, not yet. -->
+        <!-- Frame 4: 逐行跳出堆疊 wake up. -> no, not yet. -->
         <div class="cutscene-frame frame-black" id="f4">
             <div class="stack-container" id="stack-f4"></div>
         </div>
 
-        <!-- Frame 5: 重構經典六翼熾天使 (Seraphim Angel) + you belong to here. -->
+        <!-- Frame 5: 經典六翼熾天使 (Seraphim Angel) + you belong to here. -->
         <div class="cutscene-frame frame-white" id="f5">
-            <div class="svg-icon-box" style="width: 220px; height: 130px;">
+            <div class="svg-icon-box" style="width: 240px; height: 140px;">
                 <svg viewBox="0 0 200 120" fill="none" stroke="var(--blue-pure)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- 頂部天使光環 -->
                     <ellipse cx="100" cy="18" rx="36" ry="8" stroke-width="2.5" stroke-dasharray="4 2" />
-                    <!-- 中央神聖巨眼 -->
                     <path d="M 72 50 Q 100 28 128 50 Q 100 72 72 50 Z" stroke-width="4" />
                     <circle cx="100" cy="50" r="9" fill="var(--blue-pure)" />
-                    <!-- 第一對上羽翼 -->
                     <path d="M 75 42 Q 35 12 5 2 Q 30 32 60 50" />
                     <path d="M 125 42 Q 165 12 195 2 Q 170 32 140 50" />
-                    <!-- 第二對中羽翼 -->
                     <path d="M 72 50 Q 25 42 0 52 Q 30 68 65 58" />
                     <path d="M 128 50 Q 175 42 200 52 Q 170 68 135 58" />
-                    <!-- 第三對下羽翼 -->
                     <path d="M 78 58 Q 38 85 18 115 Q 50 92 80 66" />
                     <path d="M 122 58 Q 162 85 182 115 Q 150 92 120 66" />
                 </svg>
@@ -332,12 +327,12 @@
             <div class="en-text" style="color: var(--blue-pure);">you belong to here.</div>
         </div>
 
-        <!-- Frame 6: 逐行跳出堆疊 (JS 動態生成) you are a puppet -->
+        <!-- Frame 6: 逐行跳出堆疊 you are a puppet -->
         <div class="cutscene-frame frame-blue" id="f6">
             <div class="stack-container" id="stack-f6" style="color: #fff;"></div>
         </div>
 
-        <!-- Frame 7: 經典互動問題 will you be my puppet? -->
+        <!-- Frame 7: 互動選項 will you be my puppet? -->
         <div class="cutscene-frame frame-black" id="f7">
             <div class="puppet-box">
                 <div class="puppet-title">will you be my puppet?</div>
@@ -346,16 +341,13 @@
             </div>
         </div>
 
-        <!-- Frame 8: 復刻經典圖片笑臉（藍色線條、無白底、電藍霓虹光芒） -->
+        <!-- Frame 8: 經典圖片笑臉（電藍色線條 + 無白底） -->
         <div class="cutscene-frame frame-black" id="f8">
-            <div class="svg-icon-box" style="width: 150px; height: 150px; filter: drop-shadow(0 0 20px var(--blue-pure));">
+            <div class="svg-icon-box" style="width: 160px; height: 160px; filter: drop-shadow(0 0 25px var(--blue-pure));">
                 <svg viewBox="0 0 100 100">
-                    <!-- 外圈圓環 -->
                     <circle cx="50" cy="50" r="43" fill="none" stroke="var(--blue-pure)" stroke-width="7" />
-                    <!-- 左眼與右眼 (實心圓) -->
                     <circle cx="34" cy="38" r="7.5" fill="var(--blue-pure)" />
                     <circle cx="66" cy="38" r="7.5" fill="var(--blue-pure)" />
-                    <!-- 經典微笑弧線 -->
                     <path d="M 26 58 Q 50 84 74 58" fill="none" stroke="var(--blue-pure)" stroke-width="7" stroke-linecap="round" />
                 </svg>
             </div>
@@ -409,33 +401,136 @@
     </div>
 
     <script>
-        /* 音效合成器 */
+        /* =========================================================================
+           高級 Web Audio API 音效合成引擎 (電影級衝擊音效 & CRT 靜電白雜訊)
+           ========================================================================= */
         let audioCtx;
-        function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
 
-        function playBeep(freq, type = 'sine', duration = 0.12) {
-            if (!audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = type; osc.frequency.value = freq;
-            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + duration);
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
         }
 
-        function playSlamSound() {
+        // 1. 電子電視靜電白雜訊爆音 (Glitch Noise Burst)
+        function playGlitchNoise(duration = 0.08, volume = 0.3) {
+            if (!audioCtx) return;
+            const bufferSize = audioCtx.sampleRate * duration;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'bandpass';
+            filter.frequency.value = 1800;
+
+            const gain = audioCtx.createGain();
+            gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            noise.start();
+        }
+
+        // 2. 深邃低頻嗡鳴與頻率下沉 (Dark Atmospheric Drone)
+        function playDeepDrone(freq = 80, duration = 0.6) {
             if (!audioCtx) return;
             const now = audioCtx.currentTime;
+
+            const osc1 = audioCtx.createOscillator();
+            const osc2 = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc1.type = 'sawtooth';
+            osc2.type = 'sine';
+
+            osc1.frequency.setValueAtTime(freq, now);
+            osc2.frequency.setValueAtTime(freq * 0.5, now);
+
+            // 雙聲道極微解調，創造立態空間恐怖感
+            osc1.detune.setValueAtTime(-12, now);
+            osc2.detune.setValueAtTime(12, now);
+
+            gain.gain.setValueAtTime(0.4, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+            osc1.connect(gain);
+            osc2.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc1.start(now); osc2.start(now);
+            osc1.stop(now + duration); osc2.stop(now + duration);
+        }
+
+        // 3. 逐行堆疊文字時的機械低音重擊 (Stack Line Thump)
+        function playStackThump(pitch = 110) {
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
+
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
+
             osc.type = 'triangle';
-            osc.frequency.setValueAtTime(160, now);
-            osc.frequency.exponentialRampToValueAtTime(20, now + 0.8);
-            gain.gain.setValueAtTime(0.8, now);
-            gain.gain.linearRampToValueAtTime(0, now + 0.8);
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(now); osc.stop(now + 0.8);
+            osc.frequency.setValueAtTime(pitch, now);
+            osc.frequency.exponentialRampToValueAtTime(30, now + 0.12);
+
+            gain.gain.setValueAtTime(0.5, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start(now);
+            osc.stop(now + 0.12);
+
+            // 輕微伴隨高頻靜電喀噠聲
+            playGlitchNoise(0.03, 0.15);
+        }
+
+        // 4. 電影級震撼重低音巨響 SLAM (Cinematic Sub-Bass Impact)
+        function playCinematicSlam() {
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
+
+            // 亞低音下沉 (Sub-Bass Sweep 60Hz -> 10Hz)
+            const subOsc = audioCtx.createOscillator();
+            const subGain = audioCtx.createGain();
+            subOsc.type = 'sine';
+            subOsc.frequency.setValueAtTime(65, now);
+            subOsc.frequency.exponentialRampToValueAtTime(12, now + 1.2);
+
+            subGain.gain.setValueAtTime(0.9, now);
+            subGain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+
+            subOsc.connect(subGain);
+            subGain.connect(audioCtx.destination);
+
+            subOsc.start(now); subOsc.stop(now + 1.2);
+
+            // 鋸齒波中頻衝擊波
+            const bodyOsc = audioCtx.createOscillator();
+            const bodyGain = audioCtx.createGain();
+            bodyOsc.type = 'sawtooth';
+            bodyOsc.frequency.setValueAtTime(180, now);
+            bodyOsc.frequency.exponentialRampToValueAtTime(25, now + 0.6);
+
+            bodyGain.gain.setValueAtTime(0.6, now);
+            bodyGain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+
+            bodyOsc.connect(bodyGain);
+            bodyGain.connect(audioCtx.destination);
+
+            bodyOsc.start(now); bodyOsc.stop(now + 0.6);
+
+            // 衝擊白雜音爆破
+            playGlitchNoise(0.25, 0.5);
         }
 
         /* 隱藏所有 Frame */
@@ -443,63 +538,69 @@
             document.querySelectorAll('.cutscene-frame').forEach(el => el.style.display = 'none');
         }
 
-        /* Sol's RNG Illusionary 完美震撼動態 Sequence */
+        /* Sol's RNG Illusionary 完美節奏與氛圍 Sequence */
         function startIllusionaryCutscene() {
             initAudio();
             document.getElementById('start-btn').style.display = "none";
 
-            // Frame 1: どこにいますか？
+            // Frame 1: どこにいますか？ (停留 950ms)
             hideAllFrames();
             document.getElementById('f1').style.display = 'flex';
-            playBeep(320, 'square', 0.15);
+            playGlitchNoise(0.12, 0.4);
+            playDeepDrone(90, 0.7);
 
-            // Frame 2: Is it time to wake up?
+            // Frame 2: Is it time to wake up? (停留 1050ms)
             setTimeout(() => {
                 hideAllFrames();
                 document.getElementById('f2').style.display = 'flex';
-                playBeep(440, 'square', 0.15);
-            }, 450);
+                playGlitchNoise(0.12, 0.4);
+                playDeepDrone(110, 0.7);
+            }, 950);
 
-            // Frame 3: 今何時ですか？
+            // Frame 3: 今何時ですか？ (停留 1100ms)
             setTimeout(() => {
                 hideAllFrames();
                 document.getElementById('f3').style.display = 'flex';
-                playBeep(560, 'square', 0.15);
-            }, 900);
+                playGlitchNoise(0.12, 0.4);
+                playDeepDrone(130, 0.8);
+            }, 2000);
 
-            // Frame 4: 逐行跳出 wake up. -> no, not yet.
+            // Frame 4: 逐行跳出 wake up. -> pause -> 啪啪啪跳出 "no, not yet."
             setTimeout(() => {
                 hideAllFrames();
                 const container = document.getElementById('stack-f4');
                 container.innerHTML = '';
                 document.getElementById('f4').style.display = 'flex';
 
-                // 先跳出 wake up.
+                // 先跳出 wake up. 並懸停 400ms
                 const wakeLine = document.createElement('div');
                 wakeLine.textContent = 'wake up.';
-                wakeLine.style.marginBottom = '6px';
+                wakeLine.style.marginBottom = '8px';
+                wakeLine.style.color = 'var(--blue-pure)';
                 container.appendChild(wakeLine);
-                playBeep(300, 'sawtooth', 0.1);
+                playStackThump(160);
 
-                // 以極快速度逐行啪啪啪跳出 "no, not yet."
-                let count = 0;
-                const interval = setInterval(() => {
-                    const line = document.createElement('div');
-                    line.textContent = 'no, not yet.';
-                    container.appendChild(line);
-                    playBeep(220 + count * 20, 'square', 0.04);
-                    count++;
-                    if (count >= 7) clearInterval(interval);
-                }, 60);
+                setTimeout(() => {
+                    let count = 0;
+                    const interval = setInterval(() => {
+                        const line = document.createElement('div');
+                        line.textContent = 'no, not yet.';
+                        container.appendChild(line);
+                        playStackThump(120 - count * 5);
+                        count++;
+                        if (count >= 7) clearInterval(interval);
+                    }, 110); // 調整至有節奏感且沉重的速度
+                }, 400);
 
-            }, 1350);
+            }, 3100);
 
-            // Frame 5: 神聖熾天使 + you belong to here.
+            // Frame 5: 神聖熾天使 + you belong to here. (停留 1400ms)
             setTimeout(() => {
                 hideAllFrames();
                 document.getElementById('f5').style.display = 'flex';
-                playBeep(700, 'sine', 0.25);
-            }, 2100);
+                playGlitchNoise(0.15, 0.4);
+                playDeepDrone(150, 1.2);
+            }, 4800);
 
             // Frame 6: 逐行跳出 you are a puppet
             setTimeout(() => {
@@ -513,37 +614,37 @@
                     const line = document.createElement('div');
                     line.textContent = 'you are a puppet';
                     container.appendChild(line);
-                    playBeep(180 + count * 30, 'square', 0.04);
+                    playStackThump(100 + count * 8);
                     count++;
                     if (count >= 9) clearInterval(interval);
-                }, 50);
+                }, 90);
 
-            }, 2650);
+            }, 6200);
 
-            // Frame 7: will you be my puppet? 選項
+            // Frame 7: will you be my puppet? 選項區 (停下來讓玩家互動)
             setTimeout(() => {
                 hideAllFrames();
                 document.getElementById('f7').style.display = 'flex';
-                playBeep(150, 'sawtooth', 0.3);
-            }, 3300);
+                playDeepDrone(70, 1.0);
+            }, 7500);
         }
 
         function forceYes() {
             const btnNo = document.getElementById('opt-no');
             if (btnNo.textContent !== "2. Yes") {
-                playBeep(800, 'square', 0.08);
+                playGlitchNoise(0.08, 0.3);
                 btnNo.textContent = "2. Yes";
             }
         }
 
         function choosePuppet() {
-            playBeep(650, 'sine', 0.2);
+            playDeepDrone(120, 0.4);
             hideAllFrames();
             document.getElementById('f8').style.display = 'flex';
 
-            // 顯示藍色電路笑臉 -> 0.85 秒後重擊 SLAM!
+            // 顯示藍色線條笑臉 -> 1.0 秒醞釀後爆發震撼重擊 SLAM!
             setTimeout(() => {
-                playSlamSound();
+                playCinematicSlam();
                 document.body.classList.add('screen-shake');
                 const flash = document.getElementById('flash');
                 flash.style.opacity = "1";
@@ -551,7 +652,7 @@
                 setTimeout(() => {
                     document.body.classList.remove('screen-shake');
                     flash.style.opacity = "0";
-                }, 160);
+                }, 180);
 
                 setTimeout(() => {
                     document.getElementById('cutscene-overlay').style.opacity = "0";
@@ -561,7 +662,7 @@
                     }, 500);
                 }, 600);
 
-            }, 850);
+            }, 1000);
         }
 
         function replayCutscene() {
@@ -640,7 +741,7 @@
         }
 
         function pulseCore() {
-            initAudio(); playSlamSound();
+            initAudio(); playCinematicSlam();
             const flash = document.getElementById('flash');
             flash.style.opacity = "0.6";
             setTimeout(() => { flash.style.opacity = "0"; }, 100);
