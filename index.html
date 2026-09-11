@@ -50,18 +50,18 @@
             background: radial-gradient(circle at center, transparent 15%, rgba(0, 0, 0, 0.96) 90%);
         }
 
-        /* 畫面重震動特效 */
+        /* 畫面重震動與色散特效 */
         .shake-impact {
-            animation: shakeImpact 0.25s cubic-bezier(.36,.07,.19,.97) both;
+            animation: shakeImpact 0.22s cubic-bezier(.36,.07,.19,.97) both;
         }
 
         @keyframes shakeImpact {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            20% { transform: translate(-12px, 8px) rotate(-1.5deg); }
-            40% { transform: translate(14px, -10px) rotate(1.5deg); }
-            60% { transform: translate(-10px, 12px) rotate(-1deg); }
-            80% { transform: translate(8px, -6px) rotate(0.5deg); }
-            100% { transform: translate(0, 0) rotate(0deg); }
+            0% { transform: translate(0, 0) scale(1); filter: none; }
+            20% { transform: translate(-14px, 10px) scale(1.02); filter: drop-shadow(-4px 0 red) drop-shadow(4px 0 cyan); }
+            40% { transform: translate(16px, -12px) scale(0.99); filter: drop-shadow(5px 0 red) drop-shadow(-5px 0 cyan); }
+            60% { transform: translate(-10px, 14px) scale(1.01); filter: none; }
+            80% { transform: translate(8px, -6px) scale(1); }
+            100% { transform: translate(0, 0) scale(1); filter: none; }
         }
 
         /* Cutscene 畫布 */
@@ -92,7 +92,7 @@
             transform: scale(1.05);
         }
 
-        /* 彈性登場衝擊動畫 */
+        /* 畫面登場衝擊 */
         .cutscene-frame {
             position: absolute; inset: 0;
             display: none; flex-direction: column;
@@ -106,8 +106,8 @@
         }
 
         @keyframes framePunchIn {
-            0% { transform: scale(1.35); opacity: 0; filter: blur(12px); }
-            60% { transform: scale(0.97); opacity: 1; filter: blur(0); }
+            0% { transform: scale(1.4); opacity: 0; filter: blur(14px); }
+            60% { transform: scale(0.96); opacity: 1; filter: blur(0); }
             100% { transform: scale(1); opacity: 1; filter: blur(0); }
         }
 
@@ -115,31 +115,34 @@
         .frame-white { background-color: #ffffff; color: var(--blue-pure); }
         .frame-black { background-color: #000000; color: var(--blue-pure); }
 
-        /* 天使圖騰容器與動態控制 */
+        /* 天使圖騰通用容器與動態控制 */
         .angel-icon-box {
-            width: 240px; height: 240px;
+            width: 260px; height: 260px;
             margin-bottom: 25px;
             display: flex; justify-content: center; align-items: center;
             filter: drop-shadow(0 0 30px var(--blue-bright));
+            position: relative;
         }
 
         .angel-icon-box svg { width: 100%; height: 100%; }
 
-        /* SVG 內部旋轉與脈衝動畫 */
-        .spin-cw { transform-origin: center; animation: spinCW 8s linear infinite; }
-        .spin-ccw { transform-origin: center; animation: spinCCW 6s linear infinite; }
-        .pulse-glow { animation: pulseGlow 1.2s ease-in-out infinite alternate; }
-        .float-icon { animation: floatIcon 2.5s ease-in-out infinite alternate; }
+        /* SVG 內部多層獨立旋轉與脈衝 */
+        .spin-cw { transform-origin: center; animation: spinCW 7s linear infinite; }
+        .spin-cw-fast { transform-origin: center; animation: spinCW 3s linear infinite; }
+        .spin-ccw { transform-origin: center; animation: spinCCW 5s linear infinite; }
+        .spin-ccw-slow { transform-origin: center; animation: spinCCW 12s linear infinite; }
+        .pulse-glow { animation: pulseGlow 1.1s ease-in-out infinite alternate; }
+        .float-icon { animation: floatIcon 2.8s ease-in-out infinite alternate; }
 
         @keyframes spinCW { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes spinCCW { 0% { transform: rotate(0deg); } 100% { transform: rotate(-360deg); } }
         @keyframes pulseGlow {
-            0% { transform: scale(0.95); filter: drop-shadow(0 0 15px var(--blue-bright)); }
-            100% { transform: scale(1.08); filter: drop-shadow(0 0 45px var(--blue-bright)); }
+            0% { transform: scale(0.94); filter: drop-shadow(0 0 15px var(--blue-bright)); }
+            100% { transform: scale(1.08); filter: drop-shadow(0 0 50px var(--blue-bright)); }
         }
         @keyframes floatIcon {
-            0% { transform: translateY(-8px); }
-            100% { transform: translateY(8px); }
+            0% { transform: translateY(-10px); }
+            100% { transform: translateY(10px); }
         }
 
         /* 10s~12s 暴走段落：藍框從最外緣極細平滑向內延伸變粗 */
@@ -149,21 +152,30 @@
             overflow: hidden;
         }
 
-        /* 中央黑色方塊：初始 inset 為 2px，2秒內過渡到 16vw 14vh */
+        /* 中央黑色方塊：初始 inset 為 2px，2秒內過渡到 18vw 15vh (藍框大幅延伸變粗) */
         .glitch-black-box {
             position: absolute;
             inset: 2px;
             background-color: #000000;
             z-index: 2;
-            box-shadow: 0 0 50px rgba(0,0,0,0.95);
+            box-shadow: 0 0 60px rgba(0,0,0,0.98);
             transition: inset 2.0s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .glitch-black-box.expand-inward {
-            inset: 16vw 14vh;
+            inset: 18vw 15vh;
         }
 
-        /* 垂直文字列雨 */
+        /* 暴走背景破碎天使法陣 */
+        .glitch-bg-angel {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70vh; height: 70vh;
+            opacity: 0.18; z-index: 3; pointer-events: none;
+            filter: drop-shadow(0 0 30px var(--blue-bright));
+        }
+
+        /* 垂直文字雨 (字體大幅放大) */
         #glitch-columns-container {
             position: absolute; inset: 0;
             z-index: 10; pointer-events: none;
@@ -171,29 +183,30 @@
 
         .text-column {
             position: absolute;
-            top: -5%;
+            top: -10%;
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 4px;
             font-family: var(--font-serif);
-            font-weight: 700;
+            font-weight: 900;
             color: #ffffff;
             white-space: nowrap;
-            line-height: 1.15;
+            line-height: 1.05;
+            text-transform: lowercase;
         }
 
         .column-pixelated {
-            filter: blur(2.5px) contrast(180%);
-            opacity: 0.8;
+            filter: blur(2px) contrast(200%);
+            opacity: 0.85;
         }
 
         .column-sharp {
             filter: none;
             opacity: 1;
-            text-shadow: 0 0 12px rgba(255,255,255,0.9);
+            text-shadow: 0 0 16px rgba(255,255,255,0.95), 0 0 30px var(--blue-bright);
         }
 
-        /* 笑臉爆發 */
+        /* 笑臉縮放爆發 */
         .smile-zoom-implode {
             animation: smileZoom 0.65s cubic-bezier(0.7, 0, 0.84, 0) forwards;
         }
@@ -204,8 +217,8 @@
             100% { transform: scale(5.5) rotate(15deg); opacity: 0; filter: drop-shadow(0 0 150px #fff); }
         }
 
-        .jp-text { font-size: 2.5rem; font-weight: bold; letter-spacing: 8px; }
-        .en-text { font-size: 1.8rem; letter-spacing: 5px; font-weight: bold; }
+        .jp-text { font-size: 2.8rem; font-weight: bold; letter-spacing: 8px; }
+        .en-text { font-size: 2.2rem; letter-spacing: 6px; font-weight: bold; }
 
         .puppet-box {
             display: flex; flex-direction: column; gap: 20px;
@@ -213,21 +226,22 @@
         }
 
         .puppet-title {
-            font-size: 2.2rem; letter-spacing: 5px; color: #fff;
+            font-size: 2.4rem; letter-spacing: 5px; color: #fff;
             margin-bottom: 30px; font-weight: bold;
+            font-family: var(--font-serif);
         }
 
         .puppet-opt {
             background: transparent; border: none;
             color: #fff; font-family: var(--font-mono);
-            font-size: 1.4rem; letter-spacing: 3px;
-            cursor: pointer; padding: 10px 28px;
+            font-size: 1.5rem; letter-spacing: 4px;
+            cursor: pointer; padding: 10px 30px;
             transition: color 0.1s;
         }
 
         .puppet-opt:hover {
             color: var(--blue-bright);
-            text-shadow: 0 0 18px var(--blue-bright);
+            text-shadow: 0 0 20px var(--blue-bright);
         }
 
         .flash-bang {
@@ -372,68 +386,96 @@
 
         <button class="start-btn" id="start-btn" onclick="startIllusionaryCutscene()">ROLL ILLUSIONARY</button>
 
-        <!-- Frame 1 (0.0s ~ 2.5s): 天使圖騰 1 (Seraphim 六翼熾天使 - 帶旋轉與脈衝) -->
+        <!-- Frame 1 (0.0s ~ 2.5s): Seraphim 六翼熾天使與神聖法陣 -->
         <div class="cutscene-frame frame-white" id="f1">
             <div class="angel-icon-box float-icon">
                 <svg viewBox="0 0 100 100" style="color: var(--blue-pure);">
-                    <!-- 順時針旋轉外環 -->
-                    <circle class="spin-cw" cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="10 6" />
-                    <!-- 逆時針旋轉中環 -->
-                    <circle class="spin-ccw" cx="50" cy="50" r="34" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="16 4" />
-                    <!-- 旋轉八角星芒 -->
-                    <g class="spin-cw" style="animation-duration: 12s;">
-                        <path d="M50 6 L58 38 L90 46 L58 54 L50 86 L42 54 L10 46 L42 38 Z" fill="currentColor" opacity="0.85" />
-                        <path d="M50 16 L55 38 L77 43 L55 48 L50 70 L45 48 L23 43 L45 38 Z" fill="#fff" opacity="0.6" />
+                    <circle class="spin-cw" cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="12 6" />
+                    <circle class="spin-ccw" cx="50" cy="50" r="36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="8 4" />
+                    <g class="spin-cw" style="animation-duration: 10s;">
+                        <path d="M50 4 L58 36 L92 46 L58 56 L50 88 L42 56 L8 46 L42 36 Z" fill="currentColor" opacity="0.85" />
+                        <path d="M50 14 L55 36 L77 41 L55 46 L50 68 L45 46 L23 41 L45 36 Z" fill="#fff" opacity="0.7" />
                     </g>
-                    <!-- 核心瞳孔 -->
+                    <!-- 中央瞳孔與翼羽條紋 -->
                     <circle cx="50" cy="46" r="6" fill="#fff"/>
-                    <path d="M 30 46 Q 50 26 70 46 Q 50 66 30 46 Z" fill="none" stroke="currentColor" stroke-width="2.5"/>
+                    <path d="M 28 46 Q 50 24 72 46 Q 50 68 28 46 Z" fill="none" stroke="currentColor" stroke-width="2.5"/>
                 </svg>
             </div>
             <div class="jp-text pulse-glow">列車が死ぬ</div>
         </div>
 
-        <!-- Frame 2 (2.5s ~ 5.0s) -->
+        <!-- Frame 2 (2.5s ~ 5.0s): Sacred Halo 聖十字幾何光環法陣 -->
         <div class="cutscene-frame frame-blue" id="f2">
+            <div class="angel-icon-box float-icon">
+                <svg viewBox="0 0 100 100" style="color: #ffffff;">
+                    <!-- 外圍微縮齒輪圈 -->
+                    <circle class="spin-cw-fast" cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 4" />
+                    <!-- 反向慢速外框 -->
+                    <circle class="spin-ccw-slow" cx="50" cy="50" r="38" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="20 10" />
+                    <!-- 聖十字芒星 -->
+                    <g class="spin-cw" style="animation-duration: 15s;">
+                        <polygon points="50,8 55,45 92,50 55,55 50,92 45,55 8,50 45,45" fill="none" stroke="currentColor" stroke-width="2.5"/>
+                        <circle cx="50" cy="50" r="14" fill="none" stroke="currentColor" stroke-width="2" />
+                        <circle cx="50" cy="50" r="6" fill="currentColor" />
+                    </g>
+                </svg>
+            </div>
             <div class="en-text pulse-glow">Is it time to wake up?</div>
         </div>
 
-        <!-- Frame 3 (5.0s ~ 7.5s): 天使圖騰 2 (Ophanim 智天使眼環 - 雙向旋轉) -->
+        <!-- Frame 3 (5.0s ~ 7.5s): Ophanim 智天使眼輪法陣 -->
         <div class="cutscene-frame frame-blue" id="f3">
             <div class="angel-icon-box float-icon">
-                <svg viewBox="0 0 100 100">
-                    <!-- 順時針旋轉眼環 1 -->
+                <svg viewBox="0 0 100 100" style="color: #ffffff;">
                     <g class="spin-cw">
-                        <circle cx="50" cy="50" r="42" fill="none" stroke="#fff" stroke-width="2.5" stroke-dasharray="18 8" />
-                        <circle cx="50" cy="8" r="3.5" fill="#fff" />
-                        <circle cx="50" cy="92" r="3.5" fill="#fff" />
-                        <circle cx="8" cy="50" r="3.5" fill="#fff" />
-                        <circle cx="92" cy="50" r="3.5" fill="#fff" />
+                        <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="16 8" />
+                        <circle cx="50" cy="6" r="4" fill="currentColor" />
+                        <circle cx="50" cy="94" r="4" fill="currentColor" />
+                        <circle cx="6" cy="50" r="4" fill="currentColor" />
+                        <circle cx="94" cy="50" r="4" fill="currentColor" />
                     </g>
-                    <!-- 逆時針旋轉眼環 2 -->
-                    <g class="spin-ccw" style="animation-duration: 5s;">
-                        <circle cx="50" cy="50" r="30" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="12 6" />
-                        <circle cx="50" cy="20" r="2.5" fill="var(--blue-bright)" />
-                        <circle cx="50" cy="80" r="2.5" fill="var(--blue-bright)" />
-                        <circle cx="20" cy="50" r="2.5" fill="var(--blue-bright)" />
-                        <circle cx="80" cy="50" r="2.5" fill="var(--blue-bright)" />
+                    <g class="spin-ccw" style="animation-duration: 4s;">
+                        <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="10 5" />
+                        <circle cx="50" cy="20" r="3" fill="var(--blue-bright)" />
+                        <circle cx="50" cy="80" r="3" fill="var(--blue-bright)" />
+                        <circle cx="20" cy="50" r="3" fill="var(--blue-bright)" />
+                        <circle cx="80" cy="50" r="3" fill="var(--blue-bright)" />
                     </g>
-                    <!-- 核心幾何邊框與瞳孔 -->
-                    <polygon points="50,18 62,50 50,82 38,50" fill="none" stroke="#fff" stroke-width="2"/>
-                    <circle cx="50" cy="50" r="5" fill="#fff" class="pulse-glow"/>
+                    <polygon points="50,16 64,50 50,84 36,50" fill="none" stroke="currentColor" stroke-width="2" class="spin-cw-fast"/>
+                    <circle cx="50" cy="50" r="6" fill="#fff" class="pulse-glow"/>
                 </svg>
             </div>
             <div class="jp-text pulse-glow">どこにいますか？</div>
         </div>
 
-        <!-- Frame 4 (7.5s ~ 10.0s) -->
+        <!-- Frame 4 (7.5s ~ 10.0s): Celestial Crown 神聖冠冕法陣 -->
         <div class="cutscene-frame frame-white" id="f5">
+            <div class="angel-icon-box float-icon">
+                <svg viewBox="0 0 100 100" style="color: var(--blue-pure);">
+                    <g class="spin-cw" style="animation-duration: 9s;">
+                        <rect x="20" y="20" width="60" height="60" fill="none" stroke="currentColor" stroke-width="2" rx="4"/>
+                        <rect x="20" y="20" width="60" height="60" fill="none" stroke="currentColor" stroke-width="1.5" transform="rotate(45 50 50)"/>
+                    </g>
+                    <circle class="spin-ccw" cx="50" cy="50" r="28" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="14 6" />
+                    <circle cx="50" cy="50" r="10" fill="currentColor" class="pulse-glow" />
+                </svg>
+            </div>
             <div class="en-text pulse-glow" style="color: var(--blue-pure);">you belong to here.</div>
         </div>
 
-        <!-- Frame 5 (10.0s ~ 12.0s 暴走段落：藍框由最外緣向內延伸，音樂停止並伴隨 Glitch 逐字音效) -->
+        <!-- Frame 5 (10.0s ~ 12.0s 暴走段落：藍框從最外緣極細延伸，背景破碎法陣 + 巨幅 no, not yet.) -->
         <div class="cutscene-frame" id="frame-glitch-scene">
             <div class="glitch-black-box" id="glitch-black-box"></div>
+            
+            <!-- 背景透明破碎天使法陣 -->
+            <div class="glitch-bg-angel">
+                <svg viewBox="0 0 100 100" style="color: #ffffff; width:100%; height:100%;">
+                    <circle class="spin-cw-fast" cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="8 8" />
+                    <polygon points="50,2 62,38 98,50 62,62 50,98 38,62 2,50 38,38" fill="none" stroke="currentColor" stroke-width="2" />
+                    <circle cx="50" cy="50" r="20" fill="none" stroke="currentColor" stroke-width="4" />
+                </svg>
+            </div>
+
             <div id="glitch-columns-container"></div>
         </div>
 
@@ -448,7 +490,7 @@
 
         <!-- Frame 7 (笑臉) -->
         <div class="cutscene-frame frame-black" id="f8">
-            <div class="svg-icon-box" id="smile-box" style="width: 160px; height: 160px; filter: drop-shadow(0 0 25px var(--blue-pure));">
+            <div class="svg-icon-box" id="smile-box" style="width: 170px; height: 170px; filter: drop-shadow(0 0 30px var(--blue-pure));">
                 <svg viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="43" fill="none" stroke="var(--blue-pure)" stroke-width="7" />
                     <circle cx="34" cy="38" r="7.5" fill="var(--blue-pure)" />
@@ -530,27 +572,27 @@
             if (audioCtx.state === 'suspended') audioCtx.resume();
         }
 
-        // 高頻電子 Glitch Pop 音效 (用於 10~12s 彈字)
+        // 巨幅文字彈出之高頻鋸齒波 Glitch 音效
         function playGlitchPop() {
             if (!audioCtx) return;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             
-            const freqs = [1200, 1800, 2400, 3200, 800, 4000, 1500];
+            const freqs = [1500, 2200, 2900, 3600, 900, 4500, 1800];
             const freq = freqs[Math.floor(Math.random() * freqs.length)];
             
-            osc.type = Math.random() > 0.5 ? 'square' : 'sawtooth';
+            osc.type = Math.random() > 0.4 ? 'square' : 'sawtooth';
             osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.05);
+            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.06);
             
-            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+            gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.06);
             
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             
             osc.start();
-            osc.stop(audioCtx.currentTime + 0.05);
+            osc.stop(audioCtx.currentTime + 0.06);
         }
 
         function triggerFlashAndShake() {
@@ -559,7 +601,7 @@
             document.body.classList.add('shake-impact');
 
             const flash = document.getElementById('flash');
-            flash.style.opacity = '0.35';
+            flash.style.opacity = '0.4';
             setTimeout(() => { flash.style.opacity = '0'; }, 50);
         }
 
@@ -579,25 +621,26 @@
             triggerFlashAndShake();
         }
 
-        /* 產生垂直文字直排，並同步播放彈字音效 */
+        /* 產生巨幅垂直文字直排 (no, not yet.) */
         function spawnGlitchColumn(container) {
             const col = document.createElement('div');
             col.className = 'text-column';
 
-            const xPositions = [4, 12, 22, 36, 52, 66, 78, 88];
+            const xPositions = [2, 14, 28, 44, 60, 74, 86];
             const chosenX = xPositions[Math.floor(Math.random() * xPositions.length)];
             col.style.left = chosenX + '%';
 
-            const isBlurry = Math.random() > 0.4;
+            // 大幅提升字級大小 (2.2rem ~ 3.8rem)
+            const isBlurry = Math.random() > 0.35;
             if (isBlurry) {
                 col.classList.add('column-pixelated');
-                col.style.fontSize = (0.85 + Math.random() * 0.3) + 'rem';
+                col.style.fontSize = (2.2 + Math.random() * 0.8) + 'rem';
             } else {
                 col.classList.add('column-sharp');
-                col.style.fontSize = (1.1 + Math.random() * 0.4) + 'rem';
+                col.style.fontSize = (2.6 + Math.random() * 1.2) + 'rem';
             }
 
-            const rowCount = Math.floor(18 + Math.random() * 8);
+            const rowCount = Math.floor(8 + Math.random() * 5);
             for (let i = 0; i < rowCount; i++) {
                 const line = document.createElement('div');
                 line.textContent = 'no, not yet.';
@@ -606,7 +649,6 @@
 
             container.appendChild(col);
             
-            // 彈出文字時觸發特製 Glitch 音效與畫面微震
             playGlitchPop();
             triggerFlashAndShake();
         }
@@ -624,21 +666,20 @@
                 } catch(e) { console.log(e); }
             }
 
-            // 0.0s ~ 2.5s: Frame 1 (列車が死ぬ + 天使 1)
+            // 0.0s ~ 2.5s: Frame 1 (列車が死ぬ + Seraphim 熾天使)
             showFrame('f1');
 
-            // 2.5s ~ 5.0s: Frame 2 (Is it time to wake up?)
+            // 2.5s ~ 5.0s: Frame 2 (Is it time to wake up? + Sacred Halo 聖環)
             setTimeout(() => { showFrame('f2'); }, 2500);
 
-            // 5.0s ~ 7.5s: Frame 3 (どこにいますか？ + 天使眼環 2)
+            // 5.0s ~ 7.5s: Frame 3 (どこにいますか？ + Ophanim 眼輪)
             setTimeout(() => { showFrame('f3'); }, 5000);
 
-            // 7.5s ~ 10.0s: Frame 4 (you belong to here.)
+            // 7.5s ~ 10.0s: Frame 4 (you belong to here. + Crown 冠冕)
             setTimeout(() => { showFrame('f5'); }, 7500);
 
-            // 10.0s ~ 12.0s (暴走段落)：音樂突然【停止】，轉為純寂靜 + Glitch 音效，藍框向內壓迫
+            // 10.0s ~ 12.0s (暴走段落)：音樂停止，藍框向內壓迫延伸，大字暴走
             setTimeout(() => {
-                // 音樂在此精確時間點驟然中斷！
                 if (ytPlayer) {
                     if (ytPlayer.pauseVideo) ytPlayer.pauseVideo();
                     else if (ytPlayer.stopVideo) ytPlayer.stopVideo();
@@ -656,16 +697,19 @@
                 glitchScene.style.display = 'block';
                 triggerFlashAndShake();
 
-                // 觸發「藍邊由最外緣 2px，在 2 秒內向內延伸縮小」的動畫
+                // 3D 方塊加速旋轉與貼近
+                if (coreBox) coreBox.scale.set(1.4, 1.4, 1.4);
+
+                // 觸發「藍邊由最外緣 2px，在 2 秒內向內延伸壓迫變粗」的動畫
                 requestAnimationFrame(() => {
                     blackBox.classList.add('expand-inward');
                 });
 
-                // 生成中央 wake up. 文字
+                // 中央巨幅 wake up. 文字
                 const wakeCol = document.createElement('div');
                 wakeCol.className = 'text-column column-sharp';
-                wakeCol.style.left = '42%';
-                wakeCol.style.fontSize = '1.3rem';
+                wakeCol.style.left = '38%';
+                wakeCol.style.fontSize = '3.2rem';
                 for(let i = 0; i < 3; i++) {
                     const line = document.createElement('div');
                     line.textContent = 'wake up.';
@@ -673,18 +717,19 @@
                 }
                 container.appendChild(wakeCol);
 
-                // 在 10s ~ 12s 這 2 秒內持續刷出 vertical no, not yet.，每次刷出播放專屬 Glitch 音效
+                // 2 秒內持續刷出巨幅 vertical no, not yet.
                 let count = 0;
                 const interval = setInterval(() => {
                     spawnGlitchColumn(container);
                     count++;
-                    if (count >= 13) clearInterval(interval);
-                }, 120);
+                    if (count >= 12) clearInterval(interval);
+                }, 130);
 
             }, 10000);
 
             // 12.0s: 順暢接續 Puppet 選項
             setTimeout(() => {
+                if (coreBox) coreBox.scale.set(1, 1, 1);
                 showFrame('f7');
             }, 12000);
         }
@@ -754,6 +799,7 @@
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
             event.target.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.active;
             document.getElementById(`tab-${tabName}`).classList.add('active');
         }
 
@@ -849,8 +895,8 @@
             requestAnimationFrame(animate);
 
             if (coreBox) {
-                coreBox.rotation.y += 0.01;
-                coreBox.rotation.x += 0.005;
+                coreBox.rotation.y += 0.012;
+                coreBox.rotation.x += 0.006;
                 coreBox.position.y = 4 + Math.sin(Date.now() * 0.002) * 0.5;
             }
 
