@@ -17,7 +17,7 @@
         :root {
             --blue-pure: #0012ff;
             --blue-bright: #0066ff;
-            --blue-glow: rgba(0, 18, 255, 0.8);
+            --blue-glow: rgba(0, 18, 255, 0.85);
             --bg-void: #000000;
             --white: #ffffff;
             --font-serif: 'Cinzel', serif;
@@ -44,29 +44,29 @@
         /* CRT 復古掃描線濾鏡 */
         .scanlines {
             position: fixed; inset: 0; pointer-events: none; z-index: 90;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%);
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%);
             background-size: 100% 4px;
             opacity: 0.6;
         }
 
         .vignette {
             position: fixed; inset: 0; pointer-events: none; z-index: 2;
-            background: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.95) 90%);
+            background: radial-gradient(circle at center, transparent 20%, rgba(0, 0, 0, 0.95) 90%);
         }
 
         .screen-shake {
-            animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both;
+            animation: shake 0.35s cubic-bezier(.36,.07,.19,.97) both;
         }
 
         @keyframes shake {
-            10%, 90% { transform: translate3d(-6px, 3px, 0); }
-            20%, 80% { transform: translate3d(8px, -6px, 0); }
-            30%, 50%, 70% { transform: translate3d(-10px, 10px, 0); }
-            40%, 60% { transform: translate3d(10px, -8px, 0); }
+            10%, 90% { transform: translate3d(-8px, 4px, 0); }
+            20%, 80% { transform: translate3d(10px, -8px, 0); }
+            30%, 50%, 70% { transform: translate3d(-12px, 12px, 0); }
+            40%, 60% { transform: translate3d(12px, -10px, 0); }
         }
 
         /* =========================================================================
-           1. Illusionary Cutscene 滿版動畫層 (無 Emoji，全向量 SVG)
+           1. Illusionary Cutscene 滿版動畫層
            ========================================================================= */
         #cutscene-overlay {
             position: fixed; inset: 0; z-index: 100;
@@ -102,31 +102,31 @@
         }
 
         .frame-blue { background-color: var(--blue-pure); color: #fff; }
-        .frame-white { background-color: #ffffff; color: var(--blue-pure); border: 16px solid var(--blue-pure); }
+        .frame-white { background-color: #ffffff; color: var(--blue-pure); }
         .frame-black { background-color: #000000; color: var(--blue-pure); }
 
-        /* 向量 SVG 容器樣式 */
+        /* SVG 圖案容器 */
         .svg-icon-box {
-            width: 110px; height: 110px;
+            width: 130px; height: 130px;
             margin-bottom: 25px;
             display: flex; justify-content: center; align-items: center;
         }
 
         .svg-icon-box svg {
             width: 100%; height: 100%;
-            fill: currentColor; stroke: currentColor;
-            filter: drop-shadow(0 0 12px currentColor);
         }
 
-        .spin-anim { animation: spin 8s linear infinite; }
+        .spin-anim { animation: spin 6s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
         .jp-text { font-size: 2.2rem; font-weight: bold; letter-spacing: 6px; }
-        .en-text { font-size: 1.5rem; letter-spacing: 3px; font-weight: bold; }
+        .en-text { font-size: 1.6rem; letter-spacing: 3px; font-weight: bold; }
 
-        /* 堆疊文字 */
-        .stack-text {
-            font-size: 1.15rem; line-height: 1.4;
+        /* 逐行堆疊文字容器 */
+        .stack-container {
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            font-size: 1.25rem; line-height: 1.5;
             letter-spacing: 3px; text-transform: lowercase;
             font-weight: bold;
         }
@@ -274,20 +274,19 @@
         <!-- Frame 1: 幾何十字星芒標誌 + どこにいますか？ -->
         <div class="cutscene-frame frame-white" id="f1">
             <div class="svg-icon-box">
-                <svg viewBox="0 0 100 100">
-                    <path d="M50 5 L58 42 L95 50 L58 58 L50 95 L42 58 L5 50 L42 42 Z" />
-                    <circle cx="50" cy="50" r="6" fill="#ffffff" />
+                <svg viewBox="0 0 100 100" fill="var(--blue-pure)">
+                    <path d="M50 0 L59 41 L100 50 L59 59 L50 100 L41 59 L0 50 L41 41 Z" />
                 </svg>
             </div>
             <div class="jp-text">どこにいますか？</div>
         </div>
 
-        <!-- Frame 2: 音效與聲聲波 + Is it time to wake up? -->
+        <!-- Frame 2: 聲波圖騰 + Is it time to wake up? -->
         <div class="cutscene-frame frame-blue" id="f2">
             <div class="svg-icon-box">
-                <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round">
-                    <path d="M20 50 L30 50 L40 20 L50 80 L60 30 L70 60 L80 50" />
-                    <circle cx="50" cy="50" r="42" stroke-width="4" stroke-dasharray="6 6" />
+                <svg viewBox="0 0 100 100" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round">
+                    <path d="M15 50 L28 50 L38 20 L50 80 L62 30 L72 60 L85 50" />
+                    <circle cx="50" cy="50" r="44" stroke-width="3" stroke-dasharray="6 6" />
                 </svg>
             </div>
             <div class="en-text">Is it time to wake up?</div>
@@ -296,53 +295,46 @@
         <!-- Frame 3: 動態旋轉幾何漩渦 + 今何時ですか？ -->
         <div class="cutscene-frame frame-blue" id="f3">
             <div class="svg-icon-box spin-anim">
-                <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="5">
-                    <circle cx="50" cy="50" r="40" stroke-dasharray="20 10" />
-                    <circle cx="50" cy="50" r="26" stroke-dasharray="15 8" />
-                    <circle cx="50" cy="50" r="12" stroke-dasharray="10 5" />
+                <svg viewBox="0 0 100 100" fill="none" stroke="#ffffff" stroke-width="5">
+                    <circle cx="50" cy="50" r="42" stroke-dasharray="18 10" />
+                    <circle cx="50" cy="50" r="28" stroke-dasharray="14 8" />
+                    <circle cx="50" cy="50" r="14" stroke-dasharray="10 6" />
                 </svg>
             </div>
             <div class="jp-text">今何時ですか？</div>
         </div>
 
-        <!-- Frame 4: 堆疊 wake up. no, not yet. -->
+        <!-- Frame 4: 逐行跳出堆疊 (JS 動態生成) wake up. -> no, not yet. -->
         <div class="cutscene-frame frame-black" id="f4">
-            <div class="stack-text">
-                wake up.<br>
-                no, not yet.<br>
-                no, not yet.<br>
-                no, not yet.<br>
-                no, not yet.<br>
-                no, not yet.<br>
-                no, not yet.
-            </div>
+            <div class="stack-container" id="stack-f4"></div>
         </div>
 
-        <!-- Frame 5: 精細天使雙翼與巨眼 + you belong to here. -->
+        <!-- Frame 5: 重構經典六翼熾天使 (Seraphim Angel) + you belong to here. -->
         <div class="cutscene-frame frame-white" id="f5">
-            <div class="svg-icon-box" style="width: 180px; height: 90px;">
-                <svg viewBox="0 0 200 100" fill="currentColor">
-                    <!-- 中央巨眼 -->
-                    <path d="M100 25 C130 25 155 50 155 50 C155 50 C130 75 100 75 100 75 C70 75 45 50 45 50 C45 50 70 25 100 25 Z" fill="none" stroke="currentColor" stroke-width="6"/>
-                    <circle cx="100" cy="50" r="14" fill="currentColor"/>
-                    <!-- 左翼 -->
-                    <path d="M40 50 Q10 20 0 5 Q20 40 35 60 Z" />
-                    <path d="M35 55 Q5 35 0 25 Q15 50 30 65 Z" />
-                    <!-- 右翼 -->
-                    <path d="M160 50 Q190 20 200 5 Q180 40 165 60 Z" />
-                    <path d="M165 55 Q195 35 200 25 Q185 50 170 65 Z" />
+            <div class="svg-icon-box" style="width: 220px; height: 130px;">
+                <svg viewBox="0 0 200 120" fill="none" stroke="var(--blue-pure)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                    <!-- 頂部天使光環 -->
+                    <ellipse cx="100" cy="18" rx="36" ry="8" stroke-width="2.5" stroke-dasharray="4 2" />
+                    <!-- 中央神聖巨眼 -->
+                    <path d="M 72 50 Q 100 28 128 50 Q 100 72 72 50 Z" stroke-width="4" />
+                    <circle cx="100" cy="50" r="9" fill="var(--blue-pure)" />
+                    <!-- 第一對上羽翼 -->
+                    <path d="M 75 42 Q 35 12 5 2 Q 30 32 60 50" />
+                    <path d="M 125 42 Q 165 12 195 2 Q 170 32 140 50" />
+                    <!-- 第二對中羽翼 -->
+                    <path d="M 72 50 Q 25 42 0 52 Q 30 68 65 58" />
+                    <path d="M 128 50 Q 175 42 200 52 Q 170 68 135 58" />
+                    <!-- 第三對下羽翼 -->
+                    <path d="M 78 58 Q 38 85 18 115 Q 50 92 80 66" />
+                    <path d="M 122 58 Q 162 85 182 115 Q 150 92 120 66" />
                 </svg>
             </div>
-            <div class="en-text" style="color: #0012ff;">you belong to here.</div>
+            <div class="en-text" style="color: var(--blue-pure);">you belong to here.</div>
         </div>
 
-        <!-- Frame 6: you are a puppet 滿版堆疊 -->
+        <!-- Frame 6: 逐行跳出堆疊 (JS 動態生成) you are a puppet -->
         <div class="cutscene-frame frame-blue" id="f6">
-            <div class="stack-text" style="color: #fff;">
-                you are a puppet<br>you are a puppet<br>you are a puppet<br>
-                you are a puppet<br>you are a puppet<br>you are a puppet<br>
-                you are a puppet<br>you are a puppet<br>you are a puppet
-            </div>
+            <div class="stack-container" id="stack-f6" style="color: #fff;"></div>
         </div>
 
         <!-- Frame 7: 經典互動問題 will you be my puppet? -->
@@ -354,15 +346,17 @@
             </div>
         </div>
 
-        <!-- Frame 8: 帥氣數位故障笑臉 (Digital Glitch Smile) -->
+        <!-- Frame 8: 復刻經典圖片笑臉（藍色線條、無白底、電藍霓虹光芒） -->
         <div class="cutscene-frame frame-black" id="f8">
-            <div class="svg-icon-box" style="width: 140px; height: 140px; color: var(--blue-pure);">
-                <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="square">
-                    <!-- 矩形電路雙眼 -->
-                    <rect x="22" y="28" width="14" height="18" fill="currentColor" />
-                    <rect x="64" y="28" width="14" height="18" fill="currentColor" />
-                    <!-- 數位弧形微笑 -->
-                    <path d="M 22 65 Q 50 90 78 65" stroke-width="9" />
+            <div class="svg-icon-box" style="width: 150px; height: 150px; filter: drop-shadow(0 0 20px var(--blue-pure));">
+                <svg viewBox="0 0 100 100">
+                    <!-- 外圈圓環 -->
+                    <circle cx="50" cy="50" r="43" fill="none" stroke="var(--blue-pure)" stroke-width="7" />
+                    <!-- 左眼與右眼 (實心圓) -->
+                    <circle cx="34" cy="38" r="7.5" fill="var(--blue-pure)" />
+                    <circle cx="66" cy="38" r="7.5" fill="var(--blue-pure)" />
+                    <!-- 經典微笑弧線 -->
+                    <path d="M 26 58 Q 50 84 74 58" fill="none" stroke="var(--blue-pure)" stroke-width="7" stroke-linecap="round" />
                 </svg>
             </div>
         </div>
@@ -419,7 +413,7 @@
         let audioCtx;
         function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
 
-        function playBeep(freq, type = 'sine', duration = 0.15) {
+        function playBeep(freq, type = 'sine', duration = 0.12) {
             if (!audioCtx) return;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
@@ -436,37 +430,102 @@
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.type = 'triangle';
-            osc.frequency.setValueAtTime(150, now);
-            osc.frequency.exponentialRampToValueAtTime(25, now + 0.8);
-            gain.gain.setValueAtTime(0.7, now);
+            osc.frequency.setValueAtTime(160, now);
+            osc.frequency.exponentialRampToValueAtTime(20, now + 0.8);
+            gain.gain.setValueAtTime(0.8, now);
             gain.gain.linearRampToValueAtTime(0, now + 0.8);
             osc.connect(gain); gain.connect(audioCtx.destination);
             osc.start(now); osc.stop(now + 0.8);
         }
 
-        /* 經典 Illusionary 快速閃屏演繹 Sequence */
+        /* 隱藏所有 Frame */
+        function hideAllFrames() {
+            document.querySelectorAll('.cutscene-frame').forEach(el => el.style.display = 'none');
+        }
+
+        /* Sol's RNG Illusionary 完美震撼動態 Sequence */
         function startIllusionaryCutscene() {
             initAudio();
             document.getElementById('start-btn').style.display = "none";
 
-            const frames = ['f1', 'f2', 'f3', 'f4', 'f5', 'f6'];
-            let delay = 0;
+            // Frame 1: どこにいますか？
+            hideAllFrames();
+            document.getElementById('f1').style.display = 'flex';
+            playBeep(320, 'square', 0.15);
 
-            frames.forEach((fId, index) => {
-                setTimeout(() => {
-                    document.querySelectorAll('.cutscene-frame').forEach(el => el.style.display = 'none');
-                    document.getElementById(fId).style.display = 'flex';
-                    playBeep(300 + index * 120, 'square', 0.12);
-                }, delay);
-                delay += 380;
-            });
-
-            // 停留在互動選項 f7
+            // Frame 2: Is it time to wake up?
             setTimeout(() => {
-                document.querySelectorAll('.cutscene-frame').forEach(el => el.style.display = 'none');
+                hideAllFrames();
+                document.getElementById('f2').style.display = 'flex';
+                playBeep(440, 'square', 0.15);
+            }, 450);
+
+            // Frame 3: 今何時ですか？
+            setTimeout(() => {
+                hideAllFrames();
+                document.getElementById('f3').style.display = 'flex';
+                playBeep(560, 'square', 0.15);
+            }, 900);
+
+            // Frame 4: 逐行跳出 wake up. -> no, not yet.
+            setTimeout(() => {
+                hideAllFrames();
+                const container = document.getElementById('stack-f4');
+                container.innerHTML = '';
+                document.getElementById('f4').style.display = 'flex';
+
+                // 先跳出 wake up.
+                const wakeLine = document.createElement('div');
+                wakeLine.textContent = 'wake up.';
+                wakeLine.style.marginBottom = '6px';
+                container.appendChild(wakeLine);
+                playBeep(300, 'sawtooth', 0.1);
+
+                // 以極快速度逐行啪啪啪跳出 "no, not yet."
+                let count = 0;
+                const interval = setInterval(() => {
+                    const line = document.createElement('div');
+                    line.textContent = 'no, not yet.';
+                    container.appendChild(line);
+                    playBeep(220 + count * 20, 'square', 0.04);
+                    count++;
+                    if (count >= 7) clearInterval(interval);
+                }, 60);
+
+            }, 1350);
+
+            // Frame 5: 神聖熾天使 + you belong to here.
+            setTimeout(() => {
+                hideAllFrames();
+                document.getElementById('f5').style.display = 'flex';
+                playBeep(700, 'sine', 0.25);
+            }, 2100);
+
+            // Frame 6: 逐行跳出 you are a puppet
+            setTimeout(() => {
+                hideAllFrames();
+                const container = document.getElementById('stack-f6');
+                container.innerHTML = '';
+                document.getElementById('f6').style.display = 'flex';
+
+                let count = 0;
+                const interval = setInterval(() => {
+                    const line = document.createElement('div');
+                    line.textContent = 'you are a puppet';
+                    container.appendChild(line);
+                    playBeep(180 + count * 30, 'square', 0.04);
+                    count++;
+                    if (count >= 9) clearInterval(interval);
+                }, 50);
+
+            }, 2650);
+
+            // Frame 7: will you be my puppet? 選項
+            setTimeout(() => {
+                hideAllFrames();
                 document.getElementById('f7').style.display = 'flex';
-                playBeep(200, 'sawtooth', 0.3);
-            }, delay);
+                playBeep(150, 'sawtooth', 0.3);
+            }, 3300);
         }
 
         function forceYes() {
@@ -478,10 +537,11 @@
         }
 
         function choosePuppet() {
-            playBeep(600, 'sine', 0.2);
-            document.querySelectorAll('.cutscene-frame').forEach(el => el.style.display = 'none');
+            playBeep(650, 'sine', 0.2);
+            hideAllFrames();
             document.getElementById('f8').style.display = 'flex';
 
+            // 顯示藍色電路笑臉 -> 0.85 秒後重擊 SLAM!
             setTimeout(() => {
                 playSlamSound();
                 document.body.classList.add('screen-shake');
@@ -491,7 +551,7 @@
                 setTimeout(() => {
                     document.body.classList.remove('screen-shake');
                     flash.style.opacity = "0";
-                }, 150);
+                }, 160);
 
                 setTimeout(() => {
                     document.getElementById('cutscene-overlay').style.opacity = "0";
@@ -501,7 +561,7 @@
                     }, 500);
                 }, 600);
 
-            }, 800);
+            }, 850);
         }
 
         function replayCutscene() {
@@ -510,7 +570,7 @@
             overlay.style.display = "flex";
             overlay.style.opacity = "1";
             document.getElementById('start-btn').style.display = "block";
-            document.querySelectorAll('.cutscene-frame').forEach(el => el.style.display = 'none');
+            hideAllFrames();
             document.getElementById('opt-no').textContent = "2. No";
         }
 
