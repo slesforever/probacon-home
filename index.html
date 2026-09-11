@@ -71,25 +71,6 @@
             transition: opacity 0.4s ease;
         }
 
-        /* 慢慢往內延伸的藍色動態邊框 */
-        .blue-border-inward {
-            position: absolute;
-            inset: 0px;
-            border: 4px solid var(--blue-pure);
-            pointer-events: none;
-            z-index: 80;
-            opacity: 0;
-            box-shadow: inset 0 0 20px var(--blue-glow), 0 0 20px var(--blue-glow);
-            transition: all 1.8s cubic-bezier(0.1, 0.8, 0.2, 1);
-        }
-
-        .blue-border-inward.active {
-            opacity: 1;
-            inset: 45px; /* 慢慢往內延伸收縮 */
-            border-width: 12px;
-            box-shadow: inset 0 0 45px var(--blue-glow), 0 0 45px var(--blue-pure);
-        }
-
         .start-btn {
             padding: 18px 50px;
             background: transparent;
@@ -120,9 +101,9 @@
         .frame-white { background-color: #ffffff; color: var(--blue-pure); }
         .frame-black { background-color: #000000; color: var(--blue-pure); }
 
-        /* 天使與圖騰容器 */
+        /* 天使圖騰容器 */
         .angel-icon-box {
-            width: 220px; height: 220px;
+            width: 200px; height: 200px;
             margin-bottom: 25px;
             display: flex; justify-content: center; align-items: center;
             filter: drop-shadow(0 0 20px var(--blue-bright));
@@ -131,7 +112,7 @@
         .angel-icon-box svg { width: 100%; height: 100%; }
 
         /* =========================================================================
-           截圖還原：電藍背景 + 中央黑色遮罩 + 底部白色球體 + 垂直文字列
+           10s~12s 暴走段落：電藍底 + 藍色由外向內延伸的黑色中央方塊 + 垂直文字列
            ========================================================================= */
         #frame-glitch-scene {
             background-color: var(--blue-pure) !important;
@@ -139,25 +120,18 @@
             overflow: hidden;
         }
 
-        /* 中央黑色方塊遮罩 */
+        /* 中央黑色方塊：初始幾乎滿版，2秒內平滑縮小，實現「藍色框慢慢往內延伸」的效果 */
         .glitch-black-box {
             position: absolute;
-            top: 18%; left: 18%; width: 64%; height: 62%;
+            inset: 8px; /* 初始極細藍邊 */
             background-color: #000000;
             z-index: 2;
             box-shadow: 0 0 35px rgba(0,0,0,0.9);
+            transition: inset 2.0s linear;
         }
 
-        /* 底部關鍵白色半圓球體 (White Sphere / Dome) */
-        .glitch-white-arc {
-            position: absolute;
-            bottom: -90px; left: 50%;
-            transform: translateX(-50%);
-            width: 520px; height: 260px;
-            background-color: #ffffff;
-            border-radius: 260px 260px 0 0;
-            z-index: 3;
-            box-shadow: 0 0 50px #ffffff;
+        .glitch-black-box.inward {
+            inset: 18% 16%; /* 2秒內藍色邊框向內延伸變厚 */
         }
 
         /* 文字列生成容器 */
@@ -368,16 +342,13 @@
 
     <!-- Cutscene 畫布 -->
     <div id="cutscene-overlay">
-        <!-- 慢慢往內收縮延伸的藍色框 -->
-        <div class="blue-border-inward" id="blue-frame"></div>
 
         <button class="start-btn" id="start-btn" onclick="startIllusionaryCutscene()">ROLL ILLUSIONARY</button>
 
-        <!-- Frame 1: 天使圖騰 1 (Seraphim 六翼神聖之眼) -->
+        <!-- Frame 1: 天使圖騰 1 (Seraphim) -->
         <div class="cutscene-frame frame-white" id="f1">
             <div class="angel-icon-box">
                 <svg viewBox="0 0 100 100" fill="var(--blue-pure)">
-                    <!-- 六翼天使幾何與中央眼 -->
                     <path d="M50 5 L60 38 L95 50 L60 62 L50 95 L40 62 L5 50 L40 38 Z" opacity="0.9" />
                     <circle cx="50" cy="50" r="18" fill="none" stroke="#fff" stroke-width="3"/>
                     <circle cx="50" cy="50" r="8" fill="#fff"/>
@@ -392,13 +363,12 @@
             <div class="en-text">Is it time to wake up?</div>
         </div>
 
-        <!-- Frame 3: 天使圖騰 2 (Ophanim 聖經眼環 Halo) -->
+        <!-- Frame 3: 天使圖騰 2 (Ophanim 眼環) -->
         <div class="cutscene-frame frame-blue" id="f3">
             <div class="angel-icon-box">
                 <svg viewBox="0 0 100 100" fill="none" stroke="#ffffff" stroke-width="3">
                     <circle cx="50" cy="50" r="44" stroke-dasharray="14 6" />
                     <circle cx="50" cy="50" r="30" stroke-dasharray="10 6" />
-                    <!-- 環上的眼睛 -->
                     <circle cx="50" cy="6" r="3" fill="#fff" />
                     <circle cx="50" cy="94" r="3" fill="#fff" />
                     <circle cx="6" cy="50" r="3" fill="#fff" />
@@ -414,10 +384,9 @@
             <div class="en-text" style="color: var(--blue-pure);">you belong to here.</div>
         </div>
 
-        <!-- Frame 4 (截圖暴走刷屏層：電藍底 + 黑色遮罩 + 底部白色球體 + 垂直文字列) -->
+        <!-- Frame 4 (10s ~ 12s 暴走段落) -->
         <div class="cutscene-frame" id="frame-glitch-scene">
-            <div class="glitch-black-box"></div>
-            <div class="glitch-white-arc"></div>
+            <div class="glitch-black-box" id="glitch-black-box"></div>
             <div id="glitch-columns-container"></div>
         </div>
 
@@ -484,12 +453,10 @@
         </div>
     </div>
 
-    <!-- YouTube API 加載 -->
+    <!-- YouTube API -->
     <script>
         let ytPlayer;
-        let isYtReady = false;
 
-        // 引入 YouTube API
         const tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
         const firstScriptTag = document.getElementsByTagName('script')[0];
@@ -499,44 +466,38 @@
             ytPlayer = new YT.Player('yt-player', {
                 height: '0',
                 width: '0',
-                videoId: 'JBgq8cG2D6o', // Sol's RNG Cyberspace / Illusionary 主題曲
+                videoId: 'JBgq8cG2D6o', // Cyberspace / Illusionary
                 playerVars: {
                     'autoplay': 0,
                     'controls': 0,
                     'disablekb': 1,
                     'playsinline': 1
-                },
-                events: {
-                    'onReady': () => { isYtReady = true; }
                 }
             });
         }
 
-        /* Web Audio API 音效引擎 */
+        /* Web Audio API 音效 */
         let audioCtx;
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             if (audioCtx.state === 'suspended') audioCtx.resume();
         }
 
-        /* 切畫面專屬音效 (Screen Cut SFX) */
-        function playCutSFX(type = 'glitch') {
+        function playCutSFX(type = 'cut') {
             if (!audioCtx) return;
             const now = audioCtx.currentTime;
 
             if (type === 'cut') {
-                // 銳利切換聲
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(800, now);
-                osc.frequency.exponentialRampToValueAtTime(120, now + 0.08);
+                osc.frequency.setValueAtTime(850, now);
+                osc.frequency.exponentialRampToValueAtTime(100, now + 0.08);
                 gain.gain.setValueAtTime(0.35, now);
                 gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
                 osc.connect(gain); gain.connect(audioCtx.destination);
                 osc.start(now); osc.stop(now + 0.08);
             } else if (type === 'beep') {
-                // 電子嗶聲
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = 'sine';
@@ -588,17 +549,15 @@
             document.querySelectorAll('.cutscene-frame').forEach(el => el.style.display = 'none');
         }
 
-        /* 產生截圖樣式的垂直文字列 */
+        /* 產生垂直文字列 */
         function spawnGlitchColumn(container) {
             const col = document.createElement('div');
             col.className = 'text-column';
 
-            // 亂數 X 座標
             const xPositions = [4, 12, 22, 42, 50, 72, 82, 88];
             const chosenX = xPositions[Math.floor(Math.random() * xPositions.length)];
             col.style.left = chosenX + '%';
 
-            // 亂數：清晰版 or 模糊像素版
             const isBlurry = Math.random() > 0.45;
             if (isBlurry) {
                 col.classList.add('column-pixelated');
@@ -608,7 +567,6 @@
                 col.style.fontSize = (1.1 + Math.random() * 0.4) + 'rem';
             }
 
-            // 垂直堆疊 18 ~ 26 行 no, not yet.
             const rowCount = Math.floor(18 + Math.random() * 8);
             for (let i = 0; i < rowCount; i++) {
                 const line = document.createElement('div');
@@ -622,16 +580,12 @@
             setTimeout(() => document.body.classList.remove('screen-shake-heavy'), 100);
         }
 
-        /* 時間軸控制 */
+        /* 嚴格對時時間軸控制 */
         function startIllusionaryCutscene() {
             initAudio();
             document.getElementById('start-btn').style.display = "none";
 
-            // 啟動藍色邊框慢慢向內延伸動畫
-            const blueFrame = document.getElementById('blue-frame');
-            blueFrame.classList.add('active');
-
-            // 觸發 YouTube 音樂播放指令
+            // 1. 按下按鈕立刻零延遲放音樂 (0.0s)
             if (ytPlayer && ytPlayer.playVideo) {
                 try {
                     ytPlayer.seekTo(0);
@@ -639,42 +593,50 @@
                 } catch(e) { console.log(e); }
             }
 
-            // [0.0s] Frame 1 (列車が死ぬ + 六翼天使)
+            // 0.0s ~ 2.0s: Frame 1 (列車が死ぬ + 天使)
             hideAllFrames();
             document.getElementById('f1').style.display = 'flex';
             playCutSFX('cut');
 
-            // [1.8s] Frame 2 (Is it time to wake up?)
+            // 2.0s ~ 4.5s: Frame 2 (Is it time to wake up?)
             setTimeout(() => {
                 hideAllFrames();
                 document.getElementById('f2').style.display = 'flex';
                 playCutSFX('beep');
-            }, 1800);
+            }, 2000);
 
-            // [4.0s] Frame 3 (どこにいますか？ + 天使眼環)
+            // 4.5s ~ 7.0s: Frame 3 (どこにいますか？ + 天使眼環)
             setTimeout(() => {
                 hideAllFrames();
                 document.getElementById('f3').style.display = 'flex';
                 playCutSFX('cut');
-            }, 4000);
+            }, 4500);
 
-            // [6.5s] Frame 5 (you belong to here.)
+            // 7.0s ~ 10.0s: Frame 5 (you belong to here.)
             setTimeout(() => {
                 hideAllFrames();
                 document.getElementById('f5').style.display = 'flex';
                 playCutSFX('beep');
-            }, 6500);
+            }, 7000);
 
-            // [9.6s ~ 12.0s] 10秒爆發：電藍底 + 黑色遮罩 + 底部白球 + 垂直文字列狂刷
+            // 10.0s 準時進入：暴走段落 (no, not yet. + 藍色框往內延伸)
             setTimeout(() => {
                 hideAllFrames();
                 const glitchScene = document.getElementById('frame-glitch-scene');
                 const container = document.getElementById('glitch-columns-container');
+                const blackBox = document.getElementById('glitch-black-box');
+
                 container.innerHTML = '';
+                blackBox.classList.remove('inward'); // 重置藍框
                 glitchScene.style.display = 'block';
                 playCutSFX('cut');
 
-                // 先產生一列中央 wake up.
+                // 啟動「藍色邊框慢慢向內延伸」動畫（黑色方塊在2秒內向內縮小）
+                requestAnimationFrame(() => {
+                    blackBox.classList.add('inward');
+                });
+
+                // 生成中央 wake up.
                 const wakeCol = document.createElement('div');
                 wakeCol.className = 'text-column column-sharp';
                 wakeCol.style.left = '42%';
@@ -686,19 +648,17 @@
                 }
                 container.appendChild(wakeCol);
 
-                // 開始狂刷垂直直排 no, not yet.
-                setTimeout(() => {
-                    let count = 0;
-                    const interval = setInterval(() => {
-                        spawnGlitchColumn(container);
-                        count++;
-                        if (count >= 13) clearInterval(interval);
-                    }, 100);
-                }, 400);
+                // 在 10s ~ 12s 這 2 秒內狂刷垂直直排 no, not yet.
+                let count = 0;
+                const interval = setInterval(() => {
+                    spawnGlitchColumn(container);
+                    count++;
+                    if (count >= 13) clearInterval(interval);
+                }, 110);
 
-            }, 9600);
+            }, 10000);
 
-            // [12.2s] 瞬間斷音，進入選項頁面
+            // 12.0s 準時音樂結束：瞬間斷音，進入選項頁面
             setTimeout(() => {
                 if (ytPlayer && ytPlayer.pauseVideo) {
                     try { ytPlayer.pauseVideo(); } catch(e){}
@@ -706,7 +666,7 @@
                 hideAllFrames();
                 document.getElementById('f7').style.display = 'flex';
                 playCutSFX('beep');
-            }, 12200);
+            }, 12000);
         }
 
         function forceYes() {
@@ -766,7 +726,6 @@
             overlay.style.display = "flex";
             overlay.style.opacity = "1";
             document.getElementById('start-btn').style.display = "block";
-            document.getElementById('blue-frame').classList.remove('active');
             hideAllFrames();
             document.getElementById('opt-no').textContent = "2. No";
         }
