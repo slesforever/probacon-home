@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>probaon // Illusionary Profile</title>
     
-    <!-- 導入字體：Cinzel & Space Mono -->
+    <!-- 導入頂級襯線與數據字體 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -16,7 +16,8 @@
     <style>
         :root {
             --blue-pure: #0012ff;
-            --blue-bright: #0055ff;
+            --blue-bright: #0066ff;
+            --blue-glow: rgba(0, 18, 255, 0.8);
             --bg-void: #000000;
             --white: #ffffff;
             --font-serif: 'Cinzel', serif;
@@ -38,13 +39,19 @@
         }
 
         /* 3D 背景容器 */
-        #webgl-container {
-            position: fixed; inset: 0; z-index: 1;
+        #webgl-container { position: fixed; inset: 0; z-index: 1; }
+
+        /* CRT 復古掃描線濾鏡 */
+        .scanlines {
+            position: fixed; inset: 0; pointer-events: none; z-index: 90;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%);
+            background-size: 100% 4px;
+            opacity: 0.6;
         }
 
         .vignette {
             position: fixed; inset: 0; pointer-events: none; z-index: 2;
-            background: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.9) 90%);
+            background: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.95) 90%);
         }
 
         .screen-shake {
@@ -59,7 +66,7 @@
         }
 
         /* =========================================================================
-           1. Illusionary Weirdcore / Glitch Cutscene 滿版動畫層
+           1. Illusionary Cutscene 滿版動畫層 (無 Emoji，全向量 SVG)
            ========================================================================= */
         #cutscene-overlay {
             position: fixed; inset: 0; z-index: 100;
@@ -68,22 +75,21 @@
             flex-direction: column; text-align: center;
         }
 
-        /* 開始按鈕 */
         .start-btn {
-            padding: 16px 40px;
+            padding: 16px 45px;
             background: transparent;
             border: 2px solid var(--blue-pure);
             color: #fff;
             font-family: var(--font-serif);
             font-size: 1.2rem; font-weight: 900;
-            letter-spacing: 4px; cursor: pointer;
-            box-shadow: 0 0 25px var(--blue-pure);
-            transition: all 0.2s ease;
+            letter-spacing: 6px; cursor: pointer;
+            box-shadow: 0 0 30px var(--blue-glow);
+            transition: all 0.25s ease;
         }
 
         .start-btn:hover {
             background: var(--blue-pure);
-            box-shadow: 0 0 50px var(--blue-pure);
+            box-shadow: 0 0 60px var(--blue-pure);
             transform: scale(1.05);
         }
 
@@ -96,17 +102,33 @@
         }
 
         .frame-blue { background-color: var(--blue-pure); color: #fff; }
-        .frame-white { background-color: #ffffff; color: var(--blue-pure); border: 20px solid var(--blue-pure); }
+        .frame-white { background-color: #ffffff; color: var(--blue-pure); border: 16px solid var(--blue-pure); }
         .frame-black { background-color: #000000; color: var(--blue-pure); }
 
-        .big-symbol { font-size: 5rem; margin-bottom: 20px; }
-        .jp-text { font-size: 2rem; font-weight: bold; letter-spacing: 4px; }
-        .en-text { font-size: 1.4rem; letter-spacing: 2px; }
+        /* 向量 SVG 容器樣式 */
+        .svg-icon-box {
+            width: 110px; height: 110px;
+            margin-bottom: 25px;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        .svg-icon-box svg {
+            width: 100%; height: 100%;
+            fill: currentColor; stroke: currentColor;
+            filter: drop-shadow(0 0 12px currentColor);
+        }
+
+        .spin-anim { animation: spin 8s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .jp-text { font-size: 2.2rem; font-weight: bold; letter-spacing: 6px; }
+        .en-text { font-size: 1.5rem; letter-spacing: 3px; font-weight: bold; }
 
         /* 堆疊文字 */
         .stack-text {
-            font-size: 1.1rem; line-height: 1.4;
-            letter-spacing: 2px; text-transform: lowercase;
+            font-size: 1.15rem; line-height: 1.4;
+            letter-spacing: 3px; text-transform: lowercase;
+            font-weight: bold;
         }
 
         /* 互動選項區: will you be my puppet? */
@@ -116,21 +138,21 @@
         }
 
         .puppet-title {
-            font-size: 1.8rem; letter-spacing: 3px; color: #fff;
-            margin-bottom: 20px;
+            font-size: 1.8rem; letter-spacing: 4px; color: #fff;
+            margin-bottom: 25px; font-weight: bold;
         }
 
         .puppet-opt {
             background: transparent; border: none;
             color: #fff; font-family: var(--font-mono);
-            font-size: 1.3rem; letter-spacing: 2px;
+            font-size: 1.3rem; letter-spacing: 3px;
             cursor: pointer; padding: 8px 24px;
             transition: color 0.1s;
         }
 
         .puppet-opt:hover {
             color: var(--blue-bright);
-            text-shadow: 0 0 10px var(--blue-bright);
+            text-shadow: 0 0 15px var(--blue-bright);
         }
 
         .flash-bang {
@@ -157,9 +179,9 @@
         .profile-card {
             pointer-events: auto;
             width: 90%; max-width: 520px;
-            background: rgba(2, 4, 12, 0.9);
+            background: rgba(2, 4, 12, 0.92);
             border: 1px solid var(--blue-pure);
-            box-shadow: 0 0 50px rgba(0, 18, 255, 0.4), inset 0 0 20px rgba(0, 18, 255, 0.2);
+            box-shadow: 0 0 60px rgba(0, 18, 255, 0.45), inset 0 0 25px rgba(0, 18, 255, 0.2);
             backdrop-filter: blur(16px);
             padding: 35px 40px;
             clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
@@ -241,6 +263,7 @@
 <body>
 
     <div id="webgl-container"></div>
+    <div class="scanlines"></div>
     <div class="vignette"></div>
     <div class="flash-bang" id="flash"></div>
 
@@ -248,21 +271,37 @@
     <div id="cutscene-overlay">
         <button class="start-btn" id="start-btn" onclick="startIllusionaryCutscene()">ROLL ILLUSIONARY</button>
 
-        <!-- Frame 1: 藍白星號 + どこにいますか？ -->
+        <!-- Frame 1: 幾何十字星芒標誌 + どこにいますか？ -->
         <div class="cutscene-frame frame-white" id="f1">
-            <div class="big-symbol">✦ ✹ ✦</div>
+            <div class="svg-icon-box">
+                <svg viewBox="0 0 100 100">
+                    <path d="M50 5 L58 42 L95 50 L58 58 L50 95 L42 58 L5 50 L42 42 Z" />
+                    <circle cx="50" cy="50" r="6" fill="#ffffff" />
+                </svg>
+            </div>
             <div class="jp-text">どこにいますか？</div>
         </div>
 
-        <!-- Frame 2: 喇叭星號 + Is it time to wake up? -->
+        <!-- Frame 2: 音效與聲聲波 + Is it time to wake up? -->
         <div class="cutscene-frame frame-blue" id="f2">
-            <div class="big-symbol">🔊</div>
+            <div class="svg-icon-box">
+                <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round">
+                    <path d="M20 50 L30 50 L40 20 L50 80 L60 30 L70 60 L80 50" />
+                    <circle cx="50" cy="50" r="42" stroke-width="4" stroke-dasharray="6 6" />
+                </svg>
+            </div>
             <div class="en-text">Is it time to wake up?</div>
         </div>
 
-        <!-- Frame 3: 螺旋 + 今何時ですか？ -->
+        <!-- Frame 3: 動態旋轉幾何漩渦 + 今何時ですか？ -->
         <div class="cutscene-frame frame-blue" id="f3">
-            <div class="big-symbol">🌀</div>
+            <div class="svg-icon-box spin-anim">
+                <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="5">
+                    <circle cx="50" cy="50" r="40" stroke-dasharray="20 10" />
+                    <circle cx="50" cy="50" r="26" stroke-dasharray="15 8" />
+                    <circle cx="50" cy="50" r="12" stroke-dasharray="10 5" />
+                </svg>
+            </div>
             <div class="jp-text">今何時ですか？</div>
         </div>
 
@@ -279,10 +318,22 @@
             </div>
         </div>
 
-        <!-- Frame 5: 天使翅膀與眼睛 you belong to here. -->
+        <!-- Frame 5: 精細天使雙翼與巨眼 + you belong to here. -->
         <div class="cutscene-frame frame-white" id="f5">
-            <div class="big-symbol">🪽 👁️ 🪽</div>
-            <div class="en-text" style="color: #0012ff; font-weight: bold;">you belong to here.</div>
+            <div class="svg-icon-box" style="width: 180px; height: 90px;">
+                <svg viewBox="0 0 200 100" fill="currentColor">
+                    <!-- 中央巨眼 -->
+                    <path d="M100 25 C130 25 155 50 155 50 C155 50 C130 75 100 75 100 75 C70 75 45 50 45 50 C45 50 70 25 100 25 Z" fill="none" stroke="currentColor" stroke-width="6"/>
+                    <circle cx="100" cy="50" r="14" fill="currentColor"/>
+                    <!-- 左翼 -->
+                    <path d="M40 50 Q10 20 0 5 Q20 40 35 60 Z" />
+                    <path d="M35 55 Q5 35 0 25 Q15 50 30 65 Z" />
+                    <!-- 右翼 -->
+                    <path d="M160 50 Q190 20 200 5 Q180 40 165 60 Z" />
+                    <path d="M165 55 Q195 35 200 25 Q185 50 170 65 Z" />
+                </svg>
+            </div>
+            <div class="en-text" style="color: #0012ff;">you belong to here.</div>
         </div>
 
         <!-- Frame 6: you are a puppet 滿版堆疊 -->
@@ -303,9 +354,17 @@
             </div>
         </div>
 
-        <!-- Frame 8: 笑臉 :-) -->
+        <!-- Frame 8: 帥氣數位故障笑臉 (Digital Glitch Smile) -->
         <div class="cutscene-frame frame-black" id="f8">
-            <div class="big-symbol" style="color: var(--blue-pure); font-size: 7rem;">:-)</div>
+            <div class="svg-icon-box" style="width: 140px; height: 140px; color: var(--blue-pure);">
+                <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="square">
+                    <!-- 矩形電路雙眼 -->
+                    <rect x="22" y="28" width="14" height="18" fill="currentColor" />
+                    <rect x="64" y="28" width="14" height="18" fill="currentColor" />
+                    <!-- 數位弧形微笑 -->
+                    <path d="M 22 65 Q 50 90 78 65" stroke-width="9" />
+                </svg>
+            </div>
         </div>
     </div>
 
@@ -399,7 +458,7 @@
                     document.getElementById(fId).style.display = 'flex';
                     playBeep(300 + index * 120, 'square', 0.12);
                 }, delay);
-                delay += 380; // 快速閃動速度
+                delay += 380;
             });
 
             // 停留在互動選項 f7
@@ -410,7 +469,6 @@
             }, delay);
         }
 
-        // 強制把 2. No 改成 2. Yes（重現影片內強行操控的靈魂）
         function forceYes() {
             const btnNo = document.getElementById('opt-no');
             if (btnNo.textContent !== "2. Yes") {
@@ -419,7 +477,6 @@
             }
         }
 
-        // 點選選項後顯示笑臉 :-) 並爆炸震屏轉場
         function choosePuppet() {
             playBeep(600, 'sine', 0.2);
             document.querySelectorAll('.cutscene-frame').forEach(el => el.style.display = 'none');
@@ -480,7 +537,6 @@
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             container.appendChild(renderer.domElement);
 
-            // 棋盤格地板
             const canvasTile = document.createElement('canvas');
             canvasTile.width = 128; canvasTile.height = 128;
             const ctx = canvasTile.getContext('2d');
@@ -498,7 +554,6 @@
             floor.rotation.x = -Math.PI / 2; floor.position.y = -8;
             scene.add(floor);
 
-            // 懸浮核心
             coreBox = new THREE.Mesh(
                 new THREE.BoxGeometry(6, 6, 6),
                 new THREE.MeshStandardMaterial({ color: 0x0012ff, wireframe: true, emissive: 0x0012ff, emissiveIntensity: 0.8 })
