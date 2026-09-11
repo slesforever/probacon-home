@@ -5,12 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>probaon // Illusionary Profile</title>
     
-    <!-- 導入頂級襯線與數據字體 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
-    <!-- Three.js 3D 渲染庫 -->
+    <!-- Three.js 3D 庫 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <style>
@@ -38,15 +37,12 @@
             overflow: hidden;
         }
 
-        /* 3D 背景容器 */
         #webgl-container { position: fixed; inset: 0; z-index: 1; }
 
-        /* CRT 復古掃描線濾鏡 */
         .scanlines {
             position: fixed; inset: 0; pointer-events: none; z-index: 90;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.45) 50%);
-            background-size: 100% 4px;
-            opacity: 0.7;
+            background-size: 100% 4px; opacity: 0.7;
         }
 
         .vignette {
@@ -54,25 +50,24 @@
             background: radial-gradient(circle at center, transparent 15%, rgba(0, 0, 0, 0.96) 90%);
         }
 
-        .screen-shake {
-            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        .screen-shake-heavy {
+            animation: shakeHeavy 0.35s cubic-bezier(.36,.07,.19,.97) both;
         }
 
-        @keyframes shake {
-            10%, 90% { transform: translate3d(-10px, 5px, 0); }
-            20%, 80% { transform: translate3d(12px, -10px, 0); }
-            30%, 50%, 70% { transform: translate3d(-15px, 15px, 0); }
-            40%, 60% { transform: translate3d(15px, -12px, 0); }
+        @keyframes shakeHeavy {
+            10%, 90% { transform: translate3d(-15px, 8px, 0) rotate(-1deg); }
+            20%, 80% { transform: translate3d(18px, -15px, 0) rotate(1deg); }
+            30%, 50%, 70% { transform: translate3d(-20px, 18px, 0) rotate(-1.5deg); }
+            40%, 60% { transform: translate3d(20px, -15px, 0) rotate(1.5deg); }
         }
 
-        /* =========================================================================
-           1. Illusionary Cutscene 滿版動畫層
-           ========================================================================= */
+        /* Cutscene 滿版動畫層 */
         #cutscene-overlay {
             position: fixed; inset: 0; z-index: 100;
             background: #000;
             display: flex; justify-content: center; align-items: center;
             flex-direction: column; text-align: center;
+            transition: opacity 0.4s ease;
         }
 
         .start-btn {
@@ -93,7 +88,6 @@
             transform: scale(1.05);
         }
 
-        /* 閃屏幀容器 */
         .cutscene-frame {
             position: absolute; inset: 0;
             display: none; flex-direction: column;
@@ -105,47 +99,103 @@
         .frame-white { background-color: #ffffff; color: var(--blue-pure); }
         .frame-black { background-color: #000000; color: var(--blue-pure); }
 
-        /* SVG 圖案容器 */
         .svg-icon-box {
             width: 140px; height: 140px;
             margin-bottom: 28px;
             display: flex; justify-content: center; align-items: center;
         }
 
-        .svg-icon-box svg {
-            width: 100%; height: 100%;
+        .svg-icon-box svg { width: 100%; height: 100%; }
+
+        /* =========================================================================
+           10s~12s 重現截圖構圖：電藍背景 + 中央黑色遮罩 + 底部白弧 + 垂直文字列
+           ========================================================================= */
+        #frame-glitch-scene {
+            background-color: var(--blue-pure) !important;
+            position: absolute; inset: 0;
+            overflow: hidden;
         }
 
-        .spin-anim { animation: spin 8s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        /* 中央黑色方塊遮罩 */
+        .glitch-black-box {
+            position: absolute;
+            top: 20%; left: 17%; width: 66%; height: 60%;
+            background-color: #000000;
+            z-index: 2;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+        }
+
+        /* 底部白色半圓弧 */
+        .glitch-white-arc {
+            position: absolute;
+            bottom: -80px; left: 50%;
+            transform: translateX(-50%);
+            width: 480px; height: 240px;
+            background-color: #ffffff;
+            border-radius: 240px 240px 0 0;
+            z-index: 3;
+        }
+
+        /* 文字列生成容器 */
+        #glitch-columns-container {
+            position: absolute; inset: 0;
+            z-index: 10; pointer-events: none;
+        }
+
+        /* 垂直文字列 */
+        .text-column {
+            position: absolute;
+            top: -10%;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            font-family: var(--font-serif);
+            font-weight: 700;
+            color: #ffffff;
+            white-space: nowrap;
+            line-height: 1.1;
+        }
+
+        /* 模糊 / 鋸齒像素特效 */
+        .column-pixelated {
+            filter: blur(1.8px) contrast(150%);
+            opacity: 0.8;
+        }
+
+        .column-sharp {
+            filter: none;
+            opacity: 1;
+            text-shadow: 0 0 8px rgba(255,255,255,0.6);
+        }
+
+        /* 笑臉放大動畫 */
+        .smile-zoom-implode {
+            animation: smileZoom 0.65s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+        }
+
+        @keyframes smileZoom {
+            0% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 20px var(--blue-pure)); }
+            50% { transform: scale(1.4) rotate(-8deg); filter: drop-shadow(0 0 50px var(--blue-bright)); }
+            100% { transform: scale(5) rotate(15deg); opacity: 0; filter: drop-shadow(0 0 120px #fff); }
+        }
 
         .jp-text { font-size: 2.3rem; font-weight: bold; letter-spacing: 8px; }
         .en-text { font-size: 1.7rem; letter-spacing: 4px; font-weight: bold; }
 
-        /* 逐行堆疊文字容器 */
-        .stack-container {
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            font-size: 1.3rem; line-height: 1.5;
-            letter-spacing: 3px; text-transform: lowercase;
-            font-weight: bold;
-        }
-
-        /* 互動選項區: will you be my puppet? */
         .puppet-box {
             display: flex; flex-direction: column; gap: 20px;
             align-items: center;
         }
 
         .puppet-title {
-            font-size: 2rem; letter-spacing: 5px; color: #fff;
+            font-size: 2.2rem; letter-spacing: 5px; color: #fff;
             margin-bottom: 30px; font-weight: bold;
         }
 
         .puppet-opt {
             background: transparent; border: none;
             color: #fff; font-family: var(--font-mono);
-            font-size: 1.35rem; letter-spacing: 3px;
+            font-size: 1.4rem; letter-spacing: 3px;
             cursor: pointer; padding: 10px 28px;
             transition: color 0.1s;
         }
@@ -158,22 +208,41 @@
         .flash-bang {
             position: fixed; inset: 0; z-index: 200;
             background: #ffffff; opacity: 0; pointer-events: none;
-            transition: opacity 0.15s ease-out;
         }
 
-        /* =========================================================================
-           2. probaon 個人資料歸檔 UI
-           ========================================================================= */
+        .shockwave-ring {
+            position: fixed; top: 50%; left: 50%;
+            width: 100px; height: 100px;
+            margin-left: -50px; margin-top: -50px;
+            border-radius: 50%;
+            border: 8px solid var(--blue-bright);
+            box-shadow: 0 0 50px var(--blue-bright), inset 0 0 30px var(--blue-pure);
+            pointer-events: none; z-index: 190;
+            opacity: 0; transform: scale(0.1);
+        }
+
+        .shockwave-active {
+            animation: shockwaveExpand 0.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+
+        @keyframes shockwaveExpand {
+            0% { opacity: 1; transform: scale(0.1); border-width: 20px; }
+            100% { opacity: 0; transform: scale(25); border-width: 1px; }
+        }
+
+        /* Profile 卡片 UI */
         #profile-ui {
             position: fixed; inset: 0; z-index: 10;
             pointer-events: none;
             display: flex; justify-content: center; align-items: center;
-            opacity: 0; transform: scale(0.9);
-            transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0; transform: scale(1.6) rotateX(25deg) translateY(-80px);
+            perspective: 1000px;
+            transition: opacity 0.3s ease, transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.25);
         }
 
         #profile-ui.active {
-            opacity: 1; transform: scale(1);
+            opacity: 1;
+            transform: scale(1) rotateX(0deg) translateY(0);
         }
 
         .profile-card {
@@ -181,7 +250,7 @@
             width: 90%; max-width: 520px;
             background: rgba(2, 4, 12, 0.92);
             border: 1px solid var(--blue-pure);
-            box-shadow: 0 0 60px rgba(0, 18, 255, 0.45), inset 0 0 25px rgba(0, 18, 255, 0.2);
+            box-shadow: 0 0 70px rgba(0, 18, 255, 0.5), inset 0 0 30px rgba(0, 18, 255, 0.25);
             backdrop-filter: blur(16px);
             padding: 35px 40px;
             clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
@@ -262,77 +331,58 @@
 </head>
 <body>
 
+    <!-- 隱藏式 YouTube 背景音訊播放器 -->
+    <div id="yt-player" style="position:fixed; width:1px; height:1px; opacity:0; pointer-events:none;"></div>
+
     <div id="webgl-container"></div>
     <div class="scanlines"></div>
     <div class="vignette"></div>
     <div class="flash-bang" id="flash"></div>
+    <div class="shockwave-ring" id="shockwave"></div>
 
-    <!-- 1. Sol's RNG Illusionary 滿版劇情報告 Cutscene -->
+    <!-- Cutscene 畫布 -->
     <div id="cutscene-overlay">
         <button class="start-btn" id="start-btn" onclick="startIllusionaryCutscene()">ROLL ILLUSIONARY</button>
 
-        <!-- Frame 1: 幾何十字星芒標誌 + どこにいますか？ -->
+        <!-- Frame 1 -->
         <div class="cutscene-frame frame-white" id="f1">
             <div class="svg-icon-box">
                 <svg viewBox="0 0 100 100" fill="var(--blue-pure)">
                     <path d="M50 0 L59 41 L100 50 L59 59 L50 100 L41 59 L0 50 L41 41 Z" />
                 </svg>
             </div>
-            <div class="jp-text">どこにいますか？</div>
+            <div class="jp-text">列車が死ぬ</div>
         </div>
 
-        <!-- Frame 2: 聲波圖騰 + Is it time to wake up? -->
+        <!-- Frame 2 -->
         <div class="cutscene-frame frame-blue" id="f2">
-            <div class="svg-icon-box">
-                <svg viewBox="0 0 100 100" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round">
-                    <path d="M15 50 L28 50 L38 20 L50 80 L62 30 L72 60 L85 50" />
-                    <circle cx="50" cy="50" r="44" stroke-width="3" stroke-dasharray="6 6" />
-                </svg>
-            </div>
             <div class="en-text">Is it time to wake up?</div>
         </div>
 
-        <!-- Frame 3: 動態旋轉幾何漩渦 + 今何時ですか？ -->
+        <!-- Frame 3 -->
         <div class="cutscene-frame frame-blue" id="f3">
-            <div class="svg-icon-box spin-anim">
+            <div class="svg-icon-box">
                 <svg viewBox="0 0 100 100" fill="none" stroke="#ffffff" stroke-width="5">
                     <circle cx="50" cy="50" r="42" stroke-dasharray="18 10" />
                     <circle cx="50" cy="50" r="28" stroke-dasharray="14 8" />
-                    <circle cx="50" cy="50" r="14" stroke-dasharray="10 6" />
                 </svg>
             </div>
-            <div class="jp-text">今何時ですか？</div>
+            <div class="jp-text">どこにいますか？</div>
         </div>
 
-        <!-- Frame 4: 逐行跳出堆疊 wake up. -> no, not yet. -->
-        <div class="cutscene-frame frame-black" id="f4">
-            <div class="stack-container" id="stack-f4"></div>
-        </div>
-
-        <!-- Frame 5: 經典六翼熾天使 (Seraphim Angel) + you belong to here. -->
+        <!-- Frame 5 -->
         <div class="cutscene-frame frame-white" id="f5">
-            <div class="svg-icon-box" style="width: 240px; height: 140px;">
-                <svg viewBox="0 0 200 120" fill="none" stroke="var(--blue-pure)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
-                    <ellipse cx="100" cy="18" rx="36" ry="8" stroke-width="2.5" stroke-dasharray="4 2" />
-                    <path d="M 72 50 Q 100 28 128 50 Q 100 72 72 50 Z" stroke-width="4" />
-                    <circle cx="100" cy="50" r="9" fill="var(--blue-pure)" />
-                    <path d="M 75 42 Q 35 12 5 2 Q 30 32 60 50" />
-                    <path d="M 125 42 Q 165 12 195 2 Q 170 32 140 50" />
-                    <path d="M 72 50 Q 25 42 0 52 Q 30 68 65 58" />
-                    <path d="M 128 50 Q 175 42 200 52 Q 170 68 135 58" />
-                    <path d="M 78 58 Q 38 85 18 115 Q 50 92 80 66" />
-                    <path d="M 122 58 Q 162 85 182 115 Q 150 92 120 66" />
-                </svg>
-            </div>
             <div class="en-text" style="color: var(--blue-pure);">you belong to here.</div>
         </div>
 
-        <!-- Frame 6: 逐行跳出堆疊 you are a puppet -->
-        <div class="cutscene-frame frame-blue" id="f6">
-            <div class="stack-container" id="stack-f6" style="color: #fff;"></div>
+        <!-- Frame 4 (10s ~ 12s 還原截圖的暴走刷屏層) -->
+        <div class="cutscene-frame" id="frame-glitch-scene">
+            <div class="glitch-black-box"></div>
+            <div class="glitch-white-arc"></div>
+            <div id="glitch-columns-container"></div>
         </div>
 
-        <!-- Frame 7: 互動選項 will you be my puppet? -->
+        <!-- Frame 7 (12s 靜音選項) -->
         <div class="cutscene-frame frame-black" id="f7">
             <div class="puppet-box">
                 <div class="puppet-title">will you be my puppet?</div>
@@ -341,9 +391,9 @@
             </div>
         </div>
 
-        <!-- Frame 8: 經典圖片笑臉（電藍色線條 + 無白底） -->
+        <!-- Frame 8 (笑臉) -->
         <div class="cutscene-frame frame-black" id="f8">
-            <div class="svg-icon-box" style="width: 160px; height: 160px; filter: drop-shadow(0 0 25px var(--blue-pure));">
+            <div class="svg-icon-box" id="smile-box" style="width: 160px; height: 160px; filter: drop-shadow(0 0 25px var(--blue-pure));">
                 <svg viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="43" fill="none" stroke="var(--blue-pure)" stroke-width="7" />
                     <circle cx="34" cy="38" r="7.5" fill="var(--blue-pure)" />
@@ -354,7 +404,7 @@
         </div>
     </div>
 
-    <!-- 2. probaon 個人檔案卡 -->
+    <!-- probaon UI -->
     <div id="profile-ui">
         <div class="profile-card">
             <div class="card-header">
@@ -371,7 +421,6 @@
                 <button class="tab-btn" onclick="switchTab('projects')">PROJECTS</button>
             </div>
 
-            <!-- 頁籤 1: PROFILE -->
             <div class="tab-content active" id="tab-profile">
                 <div class="data-row"><span class="data-key">ALIAS</span><span class="data-val">-</span></div>
                 <div class="data-row"><span class="data-key">ROLE</span><span class="data-val">-</span></div>
@@ -379,18 +428,14 @@
                 <div class="data-row"><span class="data-key">STATUS</span><span class="data-val">-</span></div>
             </div>
 
-            <!-- 頁籤 2: SKILLS -->
             <div class="tab-content" id="tab-skills">
                 <div class="data-row"><span class="data-key">SKILL I</span><span class="data-val">-</span></div>
                 <div class="data-row"><span class="data-key">SKILL II</span><span class="data-val">-</span></div>
-                <div class="data-row"><span class="data-key">SKILL III</span><span class="data-val">-</span></div>
             </div>
 
-            <!-- 頁籤 3: PROJECTS -->
             <div class="tab-content" id="tab-projects">
                 <div class="data-row"><span class="data-key">PROJECT I</span><span class="data-val">-</span></div>
                 <div class="data-row"><span class="data-key">PROJECT II</span><span class="data-val">-</span></div>
-                <div class="data-row"><span class="data-key">PROJECT III</span><span class="data-val">-</span></div>
             </div>
 
             <div class="card-actions">
@@ -400,233 +445,172 @@
         </div>
     </div>
 
-    <script>
-        /* =========================================================================
-           高級 Web Audio API 音效合成引擎 (電影級衝擊音效 & CRT 靜電白雜訊)
-           ========================================================================= */
-        let audioCtx;
+    <!-- YouTube API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
 
+    <script>
+        let ytPlayer;
+        function onYouTubeIframeAPIReady() {
+            ytPlayer = new YT.Player('yt-player', {
+                height: '1', width: '1',
+                videoId: '-p1s3-p69HA',
+                playerVars: { 'autoplay': 0, 'controls': 0, 'disablekb': 1 }
+            });
+        }
+
+        let audioCtx;
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             if (audioCtx.state === 'suspended') audioCtx.resume();
         }
 
-        // 1. 電子電視靜電白雜訊爆音 (Glitch Noise Burst)
         function playGlitchNoise(duration = 0.08, volume = 0.3) {
             if (!audioCtx) return;
             const bufferSize = audioCtx.sampleRate * duration;
             const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
             const data = buffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) {
-                data[i] = Math.random() * 2 - 1;
-            }
+            for (let i = 0; i < bufferSize; i++) { data[i] = Math.random() * 2 - 1; }
 
             const noise = audioCtx.createBufferSource();
             noise.buffer = buffer;
-
             const filter = audioCtx.createBiquadFilter();
-            filter.type = 'bandpass';
-            filter.frequency.value = 1800;
-
+            filter.type = 'bandpass'; filter.frequency.value = 2000;
             const gain = audioCtx.createGain();
             gain.gain.setValueAtTime(volume, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
 
-            noise.connect(filter);
-            filter.connect(gain);
-            gain.connect(audioCtx.destination);
-
+            noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
             noise.start();
         }
 
-        // 2. 深邃低頻嗡鳴與頻率下沉 (Dark Atmospheric Drone)
-        function playDeepDrone(freq = 80, duration = 0.6) {
-            if (!audioCtx) return;
-            const now = audioCtx.currentTime;
-
-            const osc1 = audioCtx.createOscillator();
-            const osc2 = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-
-            osc1.type = 'sawtooth';
-            osc2.type = 'sine';
-
-            osc1.frequency.setValueAtTime(freq, now);
-            osc2.frequency.setValueAtTime(freq * 0.5, now);
-
-            // 雙聲道極微解調，創造立態空間恐怖感
-            osc1.detune.setValueAtTime(-12, now);
-            osc2.detune.setValueAtTime(12, now);
-
-            gain.gain.setValueAtTime(0.4, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-
-            osc1.connect(gain);
-            osc2.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            osc1.start(now); osc2.start(now);
-            osc1.stop(now + duration); osc2.stop(now + duration);
-        }
-
-        // 3. 逐行堆疊文字時的機械低音重擊 (Stack Line Thump)
-        function playStackThump(pitch = 110) {
-            if (!audioCtx) return;
-            const now = audioCtx.currentTime;
-
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(pitch, now);
-            osc.frequency.exponentialRampToValueAtTime(30, now + 0.12);
-
-            gain.gain.setValueAtTime(0.5, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            osc.start(now);
-            osc.stop(now + 0.12);
-
-            // 輕微伴隨高頻靜電喀噠聲
-            playGlitchNoise(0.03, 0.15);
-        }
-
-        // 4. 電影級震撼重低音巨響 SLAM (Cinematic Sub-Bass Impact)
         function playCinematicSlam() {
             if (!audioCtx) return;
             const now = audioCtx.currentTime;
 
-            // 亞低音下沉 (Sub-Bass Sweep 60Hz -> 10Hz)
             const subOsc = audioCtx.createOscillator();
             const subGain = audioCtx.createGain();
             subOsc.type = 'sine';
-            subOsc.frequency.setValueAtTime(65, now);
-            subOsc.frequency.exponentialRampToValueAtTime(12, now + 1.2);
+            subOsc.frequency.setValueAtTime(75, now);
+            subOsc.frequency.exponentialRampToValueAtTime(10, now + 1.4);
+            subGain.gain.setValueAtTime(1.0, now);
+            subGain.gain.exponentialRampToValueAtTime(0.001, now + 1.4);
 
-            subGain.gain.setValueAtTime(0.9, now);
-            subGain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
-
-            subOsc.connect(subGain);
-            subGain.connect(audioCtx.destination);
-
-            subOsc.start(now); subOsc.stop(now + 1.2);
-
-            // 鋸齒波中頻衝擊波
-            const bodyOsc = audioCtx.createOscillator();
-            const bodyGain = audioCtx.createGain();
-            bodyOsc.type = 'sawtooth';
-            bodyOsc.frequency.setValueAtTime(180, now);
-            bodyOsc.frequency.exponentialRampToValueAtTime(25, now + 0.6);
-
-            bodyGain.gain.setValueAtTime(0.6, now);
-            bodyGain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
-
-            bodyOsc.connect(bodyGain);
-            bodyGain.connect(audioCtx.destination);
-
-            bodyOsc.start(now); bodyOsc.stop(now + 0.6);
-
-            // 衝擊白雜音爆破
-            playGlitchNoise(0.25, 0.5);
+            subOsc.connect(subGain); subGain.connect(audioCtx.destination);
+            subOsc.start(now); subOsc.stop(now + 1.4);
+            playGlitchNoise(0.3, 0.5);
         }
 
-        /* 隱藏所有 Frame */
         function hideAllFrames() {
             document.querySelectorAll('.cutscene-frame').forEach(el => el.style.display = 'none');
         }
 
-        /* Sol's RNG Illusionary 完美節奏與氛圍 Sequence */
+        /* 產生截圖樣式的垂直文字列 */
+        function spawnGlitchColumn(container) {
+            const col = document.createElement('div');
+            col.className = 'text-column';
+
+            // 亂數 X 座標 (讓它落在畫面左右各處)
+            const xPositions = [5, 12, 22, 42, 50, 72, 82, 88];
+            const chosenX = xPositions[Math.floor(Math.random() * xPositions.length)];
+            col.style.left = chosenX + '%';
+
+            // 亂數選擇：清晰版 or 像素模糊版 (模擬截圖右上角的低解析度 blur)
+            const isBlurry = Math.random() > 0.45;
+            if (isBlurry) {
+                col.classList.add('column-pixelated');
+                col.style.fontSize = (0.85 + Math.random() * 0.3) + 'rem';
+            } else {
+                col.classList.add('column-sharp');
+                col.style.fontSize = (1.1 + Math.random() * 0.4) + 'rem';
+            }
+
+            // 在此列垂直堆疊 18 ~ 26 個 no, not yet.
+            const rowCount = Math.floor(18 + Math.random() * 8);
+            for (let i = 0; i < rowCount; i++) {
+                const line = document.createElement('div');
+                line.textContent = 'no, not yet.';
+                col.appendChild(line);
+            }
+
+            container.appendChild(col);
+            playGlitchNoise(0.04, 0.2);
+            document.body.classList.add('screen-shake-heavy');
+            setTimeout(() => document.body.classList.remove('screen-shake-heavy'), 100);
+        }
+
+        /* 時間軸控制 */
         function startIllusionaryCutscene() {
             initAudio();
             document.getElementById('start-btn').style.display = "none";
 
-            // Frame 1: どこにいますか？ (停留 950ms)
+            if (ytPlayer && ytPlayer.seekTo) {
+                ytPlayer.seekTo(0);
+                ytPlayer.playVideo();
+            }
+
+            // [0.0s - 1.8s] Frame 1
             hideAllFrames();
             document.getElementById('f1').style.display = 'flex';
-            playGlitchNoise(0.12, 0.4);
-            playDeepDrone(90, 0.7);
 
-            // Frame 2: Is it time to wake up? (停留 1050ms)
+            // [1.8s - 4.0s] Frame 2
             setTimeout(() => {
                 hideAllFrames();
                 document.getElementById('f2').style.display = 'flex';
-                playGlitchNoise(0.12, 0.4);
-                playDeepDrone(110, 0.7);
-            }, 950);
+            }, 1800);
 
-            // Frame 3: 今何時ですか？ (停留 1100ms)
+            // [4.0s - 6.5s] Frame 3
             setTimeout(() => {
                 hideAllFrames();
                 document.getElementById('f3').style.display = 'flex';
-                playGlitchNoise(0.12, 0.4);
-                playDeepDrone(130, 0.8);
-            }, 2000);
+            }, 4000);
 
-            // Frame 4: 逐行跳出 wake up. -> pause -> 啪啪啪跳出 "no, not yet."
-            setTimeout(() => {
-                hideAllFrames();
-                const container = document.getElementById('stack-f4');
-                container.innerHTML = '';
-                document.getElementById('f4').style.display = 'flex';
-
-                // 先跳出 wake up. 並懸停 400ms
-                const wakeLine = document.createElement('div');
-                wakeLine.textContent = 'wake up.';
-                wakeLine.style.marginBottom = '8px';
-                wakeLine.style.color = 'var(--blue-pure)';
-                container.appendChild(wakeLine);
-                playStackThump(160);
-
-                setTimeout(() => {
-                    let count = 0;
-                    const interval = setInterval(() => {
-                        const line = document.createElement('div');
-                        line.textContent = 'no, not yet.';
-                        container.appendChild(line);
-                        playStackThump(120 - count * 5);
-                        count++;
-                        if (count >= 7) clearInterval(interval);
-                    }, 110); // 調整至有節奏感且沉重的速度
-                }, 400);
-
-            }, 3100);
-
-            // Frame 5: 神聖熾天使 + you belong to here. (停留 1400ms)
+            // [6.5s - 9.6s] Frame 5
             setTimeout(() => {
                 hideAllFrames();
                 document.getElementById('f5').style.display = 'flex';
-                playGlitchNoise(0.15, 0.4);
-                playDeepDrone(150, 1.2);
-            }, 4800);
+            }, 6500);
 
-            // Frame 6: 逐行跳出 you are a puppet
+            // [9.6s ~ 12.0s] 10秒跳出 wake up -> 刷爆 no, not yet. 垂直列！
             setTimeout(() => {
                 hideAllFrames();
-                const container = document.getElementById('stack-f6');
+                const glitchScene = document.getElementById('frame-glitch-scene');
+                const container = document.getElementById('glitch-columns-container');
                 container.innerHTML = '';
-                document.getElementById('f6').style.display = 'flex';
+                glitchScene.style.display = 'block';
 
-                let count = 0;
-                const interval = setInterval(() => {
+                // 先產生一列經典中央的 wake up 堆疊
+                const wakeCol = document.createElement('div');
+                wakeCol.className = 'text-column column-sharp';
+                wakeCol.style.left = '42%';
+                wakeCol.style.fontSize = '1.3rem';
+                for(let i=0; i<3; i++) {
                     const line = document.createElement('div');
-                    line.textContent = 'you are a puppet';
-                    container.appendChild(line);
-                    playStackThump(100 + count * 8);
-                    count++;
-                    if (count >= 9) clearInterval(interval);
-                }, 90);
+                    line.textContent = 'wake up.';
+                    line.style.color = '#ffffff';
+                    wakeCol.appendChild(line);
+                }
+                container.appendChild(wakeCol);
 
-            }, 6200);
+                // 10.2秒開始狂刷 no, not yet. 垂直直排！
+                setTimeout(() => {
+                    let count = 0;
+                    const interval = setInterval(() => {
+                        spawnGlitchColumn(container);
+                        count++;
+                        if (count >= 12) clearInterval(interval);
+                    }, 110);
+                }, 500);
 
-            // Frame 7: will you be my puppet? 選項區 (停下來讓玩家互動)
+            }, 9600);
+
+            // [12.2s] 瞬間斷音，進入絕對寂靜選項頁面
             setTimeout(() => {
+                if (ytPlayer && ytPlayer.pauseVideo) {
+                    ytPlayer.pauseVideo();
+                }
                 hideAllFrames();
                 document.getElementById('f7').style.display = 'flex';
-                playDeepDrone(70, 1.0);
-            }, 7500);
+            }, 12200);
         }
 
         function forceYes() {
@@ -638,31 +622,46 @@
         }
 
         function choosePuppet() {
-            playDeepDrone(120, 0.4);
             hideAllFrames();
-            document.getElementById('f8').style.display = 'flex';
+            
+            const f8 = document.getElementById('f8');
+            const smileBox = document.getElementById('smile-box');
+            f8.style.display = 'flex';
+            smileBox.classList.remove('smile-zoom-implode');
 
-            // 顯示藍色線條笑臉 -> 1.0 秒醞釀後爆發震撼重擊 SLAM!
+            setTimeout(() => {
+                smileBox.classList.add('smile-zoom-implode');
+            }, 250);
+
             setTimeout(() => {
                 playCinematicSlam();
-                document.body.classList.add('screen-shake');
+                trigger3DExplosion();
+
+                document.body.classList.add('screen-shake-heavy');
+
+                const shockwave = document.getElementById('shockwave');
                 const flash = document.getElementById('flash');
+
+                shockwave.classList.remove('shockwave-active');
+                void shockwave.offsetWidth;
+                shockwave.classList.add('shockwave-active');
+
+                flash.style.backgroundColor = "#0012ff";
                 flash.style.opacity = "1";
-
                 setTimeout(() => {
-                    document.body.classList.remove('screen-shake');
-                    flash.style.opacity = "0";
-                }, 180);
+                    flash.style.backgroundColor = "#ffffff";
+                    setTimeout(() => { flash.style.opacity = "0"; }, 120);
+                }, 80);
 
+                document.getElementById('cutscene-overlay').style.opacity = "0";
+                
                 setTimeout(() => {
-                    document.getElementById('cutscene-overlay').style.opacity = "0";
-                    setTimeout(() => {
-                        document.getElementById('cutscene-overlay').style.display = "none";
-                        document.getElementById('profile-ui').classList.add('active');
-                    }, 500);
-                }, 600);
+                    document.getElementById('cutscene-overlay').style.display = "none";
+                    document.body.classList.remove('screen-shake-heavy');
+                    document.getElementById('profile-ui').classList.add('active');
+                }, 250);
 
-            }, 1000);
+            }, 850);
         }
 
         function replayCutscene() {
@@ -683,8 +682,10 @@
             document.getElementById(`tab-${tabName}`).classList.add('active');
         }
 
-        /* Three.js 3D 背景渲染 */
+        /* Three.js 3D 背景 */
         let scene, camera, renderer, coreBox;
+        let particleSystem, particleVelocities = [];
+
         function init3D() {
             const container = document.getElementById('webgl-container');
             scene = new THREE.Scene();
@@ -730,18 +731,77 @@
             animate();
         }
 
+        function trigger3DExplosion() {
+            if (particleSystem) scene.remove(particleSystem);
+
+            const count = 350;
+            const geo = new THREE.BufferGeometry();
+            const positions = new Float32Array(count * 3);
+            particleVelocities = [];
+
+            for (let i = 0; i < count; i++) {
+                positions[i * 3] = 0;
+                positions[i * 3 + 1] = 4;
+                positions[i * 3 + 2] = 0;
+
+                const speed = 0.6 + Math.random() * 1.8;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = (Math.random() - 0.5) * Math.PI;
+
+                particleVelocities.push({
+                    x: Math.cos(theta) * Math.cos(phi) * speed,
+                    y: Math.sin(phi) * speed,
+                    z: Math.sin(theta) * Math.cos(phi) * speed
+                });
+            }
+
+            geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+            const mat = new THREE.PointsMaterial({
+                color: 0x00aaff,
+                size: 0.9,
+                transparent: true,
+                opacity: 1,
+                blending: THREE.AdditiveBlending
+            });
+
+            particleSystem = new THREE.Points(geo, mat);
+            scene.add(particleSystem);
+            camera.position.z = 24;
+        }
+
         function animate() {
             requestAnimationFrame(animate);
+
             if (coreBox) {
                 coreBox.rotation.y += 0.01;
                 coreBox.rotation.x += 0.005;
                 coreBox.position.y = 4 + Math.sin(Date.now() * 0.002) * 0.5;
             }
+
+            camera.position.z += (30 - camera.position.z) * 0.05;
+
+            if (particleSystem) {
+                const pos = particleSystem.geometry.attributes.position.array;
+                for (let i = 0; i < particleVelocities.length; i++) {
+                    pos[i * 3] += particleVelocities[i].x;
+                    pos[i * 3 + 1] += particleVelocities[i].y;
+                    pos[i * 3 + 2] += particleVelocities[i].z;
+                }
+                particleSystem.geometry.attributes.position.needsUpdate = true;
+                particleSystem.material.opacity -= 0.015;
+
+                if (particleSystem.material.opacity <= 0) {
+                    scene.remove(particleSystem);
+                    particleSystem = null;
+                }
+            }
+
             renderer.render(scene, camera);
         }
 
         function pulseCore() {
-            initAudio(); playCinematicSlam();
+            initAudio(); playCinematicSlam(); trigger3DExplosion();
             const flash = document.getElementById('flash');
             flash.style.opacity = "0.6";
             setTimeout(() => { flash.style.opacity = "0"; }, 100);
