@@ -50,6 +50,7 @@
             background: radial-gradient(circle at center, transparent 15%, rgba(0, 0, 0, 0.96) 90%);
         }
 
+        /* 震動效果 */
         .screen-shake-heavy {
             animation: shakeHeavy 0.35s cubic-bezier(.36,.07,.19,.97) both;
         }
@@ -70,6 +71,25 @@
             transition: opacity 0.4s ease;
         }
 
+        /* 慢慢往內延伸的藍色動態邊框 */
+        .blue-border-inward {
+            position: absolute;
+            inset: 0px;
+            border: 4px solid var(--blue-pure);
+            pointer-events: none;
+            z-index: 80;
+            opacity: 0;
+            box-shadow: inset 0 0 20px var(--blue-glow), 0 0 20px var(--blue-glow);
+            transition: all 1.8s cubic-bezier(0.1, 0.8, 0.2, 1);
+        }
+
+        .blue-border-inward.active {
+            opacity: 1;
+            inset: 45px; /* 慢慢往內延伸收縮 */
+            border-width: 12px;
+            box-shadow: inset 0 0 45px var(--blue-glow), 0 0 45px var(--blue-pure);
+        }
+
         .start-btn {
             padding: 18px 50px;
             background: transparent;
@@ -80,6 +100,7 @@
             letter-spacing: 6px; cursor: pointer;
             box-shadow: 0 0 35px var(--blue-glow);
             transition: all 0.25s ease;
+            z-index: 110;
         }
 
         .start-btn:hover {
@@ -99,16 +120,18 @@
         .frame-white { background-color: #ffffff; color: var(--blue-pure); }
         .frame-black { background-color: #000000; color: var(--blue-pure); }
 
-        .svg-icon-box {
-            width: 140px; height: 140px;
-            margin-bottom: 28px;
+        /* 天使與圖騰容器 */
+        .angel-icon-box {
+            width: 220px; height: 220px;
+            margin-bottom: 25px;
             display: flex; justify-content: center; align-items: center;
+            filter: drop-shadow(0 0 20px var(--blue-bright));
         }
 
-        .svg-icon-box svg { width: 100%; height: 100%; }
+        .angel-icon-box svg { width: 100%; height: 100%; }
 
         /* =========================================================================
-           10s~12s 重現截圖構圖：電藍背景 + 中央黑色遮罩 + 底部白弧 + 垂直文字列
+           截圖還原：電藍背景 + 中央黑色遮罩 + 底部白色球體 + 垂直文字列
            ========================================================================= */
         #frame-glitch-scene {
             background-color: var(--blue-pure) !important;
@@ -119,21 +142,22 @@
         /* 中央黑色方塊遮罩 */
         .glitch-black-box {
             position: absolute;
-            top: 20%; left: 17%; width: 66%; height: 60%;
+            top: 18%; left: 18%; width: 64%; height: 62%;
             background-color: #000000;
             z-index: 2;
-            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            box-shadow: 0 0 35px rgba(0,0,0,0.9);
         }
 
-        /* 底部白色半圓弧 */
+        /* 底部關鍵白色半圓球體 (White Sphere / Dome) */
         .glitch-white-arc {
             position: absolute;
-            bottom: -80px; left: 50%;
+            bottom: -90px; left: 50%;
             transform: translateX(-50%);
-            width: 480px; height: 240px;
+            width: 520px; height: 260px;
             background-color: #ffffff;
-            border-radius: 240px 240px 0 0;
+            border-radius: 260px 260px 0 0;
             z-index: 3;
+            box-shadow: 0 0 50px #ffffff;
         }
 
         /* 文字列生成容器 */
@@ -156,19 +180,19 @@
             line-height: 1.1;
         }
 
-        /* 模糊 / 鋸齒像素特效 */
+        /* 模糊像素特效 */
         .column-pixelated {
-            filter: blur(1.8px) contrast(150%);
-            opacity: 0.8;
+            filter: blur(2px) contrast(160%);
+            opacity: 0.85;
         }
 
         .column-sharp {
             filter: none;
             opacity: 1;
-            text-shadow: 0 0 8px rgba(255,255,255,0.6);
+            text-shadow: 0 0 10px rgba(255,255,255,0.8);
         }
 
-        /* 笑臉放大動畫 */
+        /* 笑臉縮放動畫 */
         .smile-zoom-implode {
             animation: smileZoom 0.65s cubic-bezier(0.7, 0, 0.84, 0) forwards;
         }
@@ -331,8 +355,10 @@
 </head>
 <body>
 
-    <!-- 隱藏式 YouTube 背景音訊播放器 -->
-    <div id="yt-player" style="position:fixed; width:1px; height:1px; opacity:0; pointer-events:none;"></div>
+    <!-- 隱藏式 YouTube 背景音訊容器 -->
+    <div id="yt-player-container" style="position:fixed; width:1px; height:1px; opacity:0; pointer-events:none; top:-9999px;">
+        <div id="yt-player"></div>
+    </div>
 
     <div id="webgl-container"></div>
     <div class="scanlines"></div>
@@ -342,13 +368,20 @@
 
     <!-- Cutscene 畫布 -->
     <div id="cutscene-overlay">
+        <!-- 慢慢往內收縮延伸的藍色框 -->
+        <div class="blue-border-inward" id="blue-frame"></div>
+
         <button class="start-btn" id="start-btn" onclick="startIllusionaryCutscene()">ROLL ILLUSIONARY</button>
 
-        <!-- Frame 1 -->
+        <!-- Frame 1: 天使圖騰 1 (Seraphim 六翼神聖之眼) -->
         <div class="cutscene-frame frame-white" id="f1">
-            <div class="svg-icon-box">
+            <div class="angel-icon-box">
                 <svg viewBox="0 0 100 100" fill="var(--blue-pure)">
-                    <path d="M50 0 L59 41 L100 50 L59 59 L50 100 L41 59 L0 50 L41 41 Z" />
+                    <!-- 六翼天使幾何與中央眼 -->
+                    <path d="M50 5 L60 38 L95 50 L60 62 L50 95 L40 62 L5 50 L40 38 Z" opacity="0.9" />
+                    <circle cx="50" cy="50" r="18" fill="none" stroke="#fff" stroke-width="3"/>
+                    <circle cx="50" cy="50" r="8" fill="#fff"/>
+                    <path d="M 20 50 Q 50 15 80 50 Q 50 85 20 50 Z" fill="none" stroke="var(--blue-pure)" stroke-width="2"/>
                 </svg>
             </div>
             <div class="jp-text">列車が死ぬ</div>
@@ -359,12 +392,18 @@
             <div class="en-text">Is it time to wake up?</div>
         </div>
 
-        <!-- Frame 3 -->
+        <!-- Frame 3: 天使圖騰 2 (Ophanim 聖經眼環 Halo) -->
         <div class="cutscene-frame frame-blue" id="f3">
-            <div class="svg-icon-box">
-                <svg viewBox="0 0 100 100" fill="none" stroke="#ffffff" stroke-width="5">
-                    <circle cx="50" cy="50" r="42" stroke-dasharray="18 10" />
-                    <circle cx="50" cy="50" r="28" stroke-dasharray="14 8" />
+            <div class="angel-icon-box">
+                <svg viewBox="0 0 100 100" fill="none" stroke="#ffffff" stroke-width="3">
+                    <circle cx="50" cy="50" r="44" stroke-dasharray="14 6" />
+                    <circle cx="50" cy="50" r="30" stroke-dasharray="10 6" />
+                    <!-- 環上的眼睛 -->
+                    <circle cx="50" cy="6" r="3" fill="#fff" />
+                    <circle cx="50" cy="94" r="3" fill="#fff" />
+                    <circle cx="6" cy="50" r="3" fill="#fff" />
+                    <circle cx="94" cy="50" r="3" fill="#fff" />
+                    <polygon points="50,20 60,50 50,80 40,50" fill="none" stroke="#fff" stroke-width="2"/>
                 </svg>
             </div>
             <div class="jp-text">どこにいますか？</div>
@@ -375,7 +414,7 @@
             <div class="en-text" style="color: var(--blue-pure);">you belong to here.</div>
         </div>
 
-        <!-- Frame 4 (10s ~ 12s 還原截圖的暴走刷屏層) -->
+        <!-- Frame 4 (截圖暴走刷屏層：電藍底 + 黑色遮罩 + 底部白色球體 + 垂直文字列) -->
         <div class="cutscene-frame" id="frame-glitch-scene">
             <div class="glitch-black-box"></div>
             <div class="glitch-white-arc"></div>
@@ -445,23 +484,68 @@
         </div>
     </div>
 
-    <!-- YouTube API -->
-    <script src="https://www.youtube.com/iframe_api"></script>
-
+    <!-- YouTube API 加載 -->
     <script>
         let ytPlayer;
+        let isYtReady = false;
+
+        // 引入 YouTube API
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
         function onYouTubeIframeAPIReady() {
             ytPlayer = new YT.Player('yt-player', {
-                height: '1', width: '1',
-                videoId: '-p1s3-p69HA',
-                playerVars: { 'autoplay': 0, 'controls': 0, 'disablekb': 1 }
+                height: '0',
+                width: '0',
+                videoId: 'JBgq8cG2D6o', // Sol's RNG Cyberspace / Illusionary 主題曲
+                playerVars: {
+                    'autoplay': 0,
+                    'controls': 0,
+                    'disablekb': 1,
+                    'playsinline': 1
+                },
+                events: {
+                    'onReady': () => { isYtReady = true; }
+                }
             });
         }
 
+        /* Web Audio API 音效引擎 */
         let audioCtx;
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        /* 切畫面專屬音效 (Screen Cut SFX) */
+        function playCutSFX(type = 'glitch') {
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
+
+            if (type === 'cut') {
+                // 銳利切換聲
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(800, now);
+                osc.frequency.exponentialRampToValueAtTime(120, now + 0.08);
+                gain.gain.setValueAtTime(0.35, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(now); osc.stop(now + 0.08);
+            } else if (type === 'beep') {
+                // 電子嗶聲
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1200, now);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(now); osc.stop(now + 0.06);
+            }
         }
 
         function playGlitchNoise(duration = 0.08, volume = 0.3) {
@@ -474,7 +558,7 @@
             const noise = audioCtx.createBufferSource();
             noise.buffer = buffer;
             const filter = audioCtx.createBiquadFilter();
-            filter.type = 'bandpass'; filter.frequency.value = 2000;
+            filter.type = 'bandpass'; filter.frequency.value = 2200;
             const gain = audioCtx.createGain();
             gain.gain.setValueAtTime(volume, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
@@ -490,7 +574,7 @@
             const subOsc = audioCtx.createOscillator();
             const subGain = audioCtx.createGain();
             subOsc.type = 'sine';
-            subOsc.frequency.setValueAtTime(75, now);
+            subOsc.frequency.setValueAtTime(85, now);
             subOsc.frequency.exponentialRampToValueAtTime(10, now + 1.4);
             subGain.gain.setValueAtTime(1.0, now);
             subGain.gain.exponentialRampToValueAtTime(0.001, now + 1.4);
@@ -509,12 +593,12 @@
             const col = document.createElement('div');
             col.className = 'text-column';
 
-            // 亂數 X 座標 (讓它落在畫面左右各處)
-            const xPositions = [5, 12, 22, 42, 50, 72, 82, 88];
+            // 亂數 X 座標
+            const xPositions = [4, 12, 22, 42, 50, 72, 82, 88];
             const chosenX = xPositions[Math.floor(Math.random() * xPositions.length)];
             col.style.left = chosenX + '%';
 
-            // 亂數選擇：清晰版 or 像素模糊版 (模擬截圖右上角的低解析度 blur)
+            // 亂數：清晰版 or 模糊像素版
             const isBlurry = Math.random() > 0.45;
             if (isBlurry) {
                 col.classList.add('column-pixelated');
@@ -524,7 +608,7 @@
                 col.style.fontSize = (1.1 + Math.random() * 0.4) + 'rem';
             }
 
-            // 在此列垂直堆疊 18 ~ 26 個 no, not yet.
+            // 垂直堆疊 18 ~ 26 行 no, not yet.
             const rowCount = Math.floor(18 + Math.random() * 8);
             for (let i = 0; i < rowCount; i++) {
                 const line = document.createElement('div');
@@ -543,42 +627,54 @@
             initAudio();
             document.getElementById('start-btn').style.display = "none";
 
-            if (ytPlayer && ytPlayer.seekTo) {
-                ytPlayer.seekTo(0);
-                ytPlayer.playVideo();
+            // 啟動藍色邊框慢慢向內延伸動畫
+            const blueFrame = document.getElementById('blue-frame');
+            blueFrame.classList.add('active');
+
+            // 觸發 YouTube 音樂播放指令
+            if (ytPlayer && ytPlayer.playVideo) {
+                try {
+                    ytPlayer.seekTo(0);
+                    ytPlayer.playVideo();
+                } catch(e) { console.log(e); }
             }
 
-            // [0.0s - 1.8s] Frame 1
+            // [0.0s] Frame 1 (列車が死ぬ + 六翼天使)
             hideAllFrames();
             document.getElementById('f1').style.display = 'flex';
+            playCutSFX('cut');
 
-            // [1.8s - 4.0s] Frame 2
+            // [1.8s] Frame 2 (Is it time to wake up?)
             setTimeout(() => {
                 hideAllFrames();
                 document.getElementById('f2').style.display = 'flex';
+                playCutSFX('beep');
             }, 1800);
 
-            // [4.0s - 6.5s] Frame 3
+            // [4.0s] Frame 3 (どこにいますか？ + 天使眼環)
             setTimeout(() => {
                 hideAllFrames();
                 document.getElementById('f3').style.display = 'flex';
+                playCutSFX('cut');
             }, 4000);
 
-            // [6.5s - 9.6s] Frame 5
+            // [6.5s] Frame 5 (you belong to here.)
             setTimeout(() => {
                 hideAllFrames();
                 document.getElementById('f5').style.display = 'flex';
+                playCutSFX('beep');
             }, 6500);
 
-            // [9.6s ~ 12.0s] 10秒跳出 wake up -> 刷爆 no, not yet. 垂直列！
+            // [9.6s ~ 12.0s] 10秒爆發：電藍底 + 黑色遮罩 + 底部白球 + 垂直文字列狂刷
             setTimeout(() => {
                 hideAllFrames();
                 const glitchScene = document.getElementById('frame-glitch-scene');
                 const container = document.getElementById('glitch-columns-container');
                 container.innerHTML = '';
                 glitchScene.style.display = 'block';
+                playCutSFX('cut');
 
-                // 先產生一列經典中央的 wake up 堆疊
+                // 先產生一列中央 wake up.
                 const wakeCol = document.createElement('div');
                 wakeCol.className = 'text-column column-sharp';
                 wakeCol.style.left = '42%';
@@ -586,30 +682,30 @@
                 for(let i=0; i<3; i++) {
                     const line = document.createElement('div');
                     line.textContent = 'wake up.';
-                    line.style.color = '#ffffff';
                     wakeCol.appendChild(line);
                 }
                 container.appendChild(wakeCol);
 
-                // 10.2秒開始狂刷 no, not yet. 垂直直排！
+                // 開始狂刷垂直直排 no, not yet.
                 setTimeout(() => {
                     let count = 0;
                     const interval = setInterval(() => {
                         spawnGlitchColumn(container);
                         count++;
-                        if (count >= 12) clearInterval(interval);
-                    }, 110);
-                }, 500);
+                        if (count >= 13) clearInterval(interval);
+                    }, 100);
+                }, 400);
 
             }, 9600);
 
-            // [12.2s] 瞬間斷音，進入絕對寂靜選項頁面
+            // [12.2s] 瞬間斷音，進入選項頁面
             setTimeout(() => {
                 if (ytPlayer && ytPlayer.pauseVideo) {
-                    ytPlayer.pauseVideo();
+                    try { ytPlayer.pauseVideo(); } catch(e){}
                 }
                 hideAllFrames();
                 document.getElementById('f7').style.display = 'flex';
+                playCutSFX('beep');
             }, 12200);
         }
 
@@ -670,6 +766,7 @@
             overlay.style.display = "flex";
             overlay.style.opacity = "1";
             document.getElementById('start-btn').style.display = "block";
+            document.getElementById('blue-frame').classList.remove('active');
             hideAllFrames();
             document.getElementById('opt-no').textContent = "2. No";
         }
