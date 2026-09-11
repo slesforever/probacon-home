@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>i l l u s i o n a r y // PERFECT PUPPET</title>
+    <title>probaon // Personal Profile & Archive</title>
     
-    <!-- 影片同款頂級字體：Cinzel (典雅襯線) & Space Mono (極簡數據字體) -->
+    <!-- 導入影片同款頂級字體：Cinzel (典雅襯線) & Space Mono (極簡數據字體) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:ital,wght@0,400;0,700;0,900;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -17,7 +17,7 @@
         :root {
             --blue-royal: #0012ff;
             --blue-bright: #0055ff;
-            --blue-glow: rgba(0, 18, 255, 0.6);
+            --blue-glow: rgba(0, 18, 255, 0.7);
             --bg-void: #02040a;
             --white: #ffffff;
             --font-serif: 'Cinzel', serif;
@@ -39,236 +39,205 @@
             overflow: hidden;
         }
 
-        /* --- 3D WebGL Canvas 容器 --- */
+        /* --- 3D WebGL Canvas --- */
         #webgl-container {
             position: fixed; inset: 0;
             z-index: 1;
         }
 
-        /* --- 復古暗角與細微掃描線 --- */
+        /* --- 特效層：暗角與震屏 --- */
         .vignette {
             position: fixed; inset: 0; pointer-events: none; z-index: 2;
-            background: radial-gradient(circle at center, transparent 30%, rgba(2, 4, 10, 0.95) 90%);
+            background: radial-gradient(circle at center, transparent 20%, rgba(2, 4, 10, 0.95) 90%);
         }
 
-        .scanline {
-            position: fixed; inset: 0; pointer-events: none; z-index: 3;
-            background: linear-gradient(rgba(0, 0, 0, 0) 50%, rgba(0, 18, 255, 0.08) 50%);
-            background-size: 100% 4px;
-            opacity: 0.6;
+        .screen-shake {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
         }
 
-        /* --- 1. 動態平面視覺 cutscene (Kinetic Typography Intro) --- */
-        #intro-overlay {
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-4px, 2px, 0); }
+            20%, 80% { transform: translate3d(6px, -4px, 0); }
+            30%, 50%, 70% { transform: translate3d(-8px, 8px, 0); }
+            40%, 60% { transform: translate3d(8px, -6px, 0); }
+        }
+
+        /* --- 1. Sol's RNG 抽卡入場動畫 (Roll Cutscene Overlay) --- */
+        #roll-overlay {
             position: fixed; inset: 0; z-index: 100;
             background-color: var(--bg-void);
             display: flex; flex-direction: column;
             justify-content: center; align-items: center;
             text-align: center;
             padding: 20px;
-            transition: opacity 0.8s ease, visibility 0.8s;
         }
 
-        .typewriter-text {
-            font-family: var(--font-mono);
-            font-size: clamp(0.8rem, 2vw, 1.2rem);
-            color: var(--blue-bright);
-            letter-spacing: 3px;
-            margin-bottom: 20px;
-            height: 24px;
-            text-shadow: 0 0 10px var(--blue-glow);
+        .roll-start-btn {
+            padding: 18px 45px;
+            background: transparent;
+            border: 2px solid var(--blue-bright);
+            color: #fff;
+            font-family: var(--font-serif);
+            font-size: 1.2rem;
+            font-weight: 900;
+            letter-spacing: 6px;
+            cursor: pointer;
+            box-shadow: 0 0 30px var(--blue-glow);
+            transition: all 0.3s ease;
         }
 
-        .kinetic-title-group {
+        .roll-start-btn:hover {
+            background: var(--blue-royal);
+            box-shadow: 0 0 60px var(--blue-royal);
+            transform: scale(1.05);
+        }
+
+        /* 抽卡前奏數據流 */
+        .roll-status-group {
             display: none;
             flex-direction: column;
             align-items: center;
         }
 
-        .kinetic-sub {
+        .roll-text-sub {
             font-family: var(--font-mono);
-            font-size: 0.9rem;
-            color: #fff;
-            letter-spacing: 8px;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-            opacity: 0.8;
-        }
-
-        .kinetic-main {
-            font-size: clamp(2.5rem, 7vw, 5.5rem);
-            font-weight: 900;
-            letter-spacing: 14px;
-            color: #fff;
-            text-transform: uppercase;
-            text-shadow: 0 0 20px var(--blue-royal), 0 0 40px #fff;
-            margin-bottom: 15px;
-            line-height: 1.1;
-        }
-
-        .year-counter {
-            font-family: var(--font-mono);
-            font-size: 1.5rem;
+            font-size: 1rem;
             color: var(--blue-bright);
-            letter-spacing: 4px;
-            font-weight: bold;
-            margin-top: 15px;
+            letter-spacing: 6px;
+            margin-bottom: 12px;
+            text-shadow: 0 0 10px var(--blue-glow);
         }
 
-        /* Windows #501 復古錯誤彈窗 */
-        .win-dialog {
-            display: none;
-            position: absolute;
-            width: 320px;
-            background: #c0c0c0;
-            border: 2px solid #fff;
-            border-right-color: #404040;
-            border-bottom-color: #404040;
-            box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.9);
-            font-family: 'Tahoma', sans-serif;
-            color: #000;
-            text-align: left;
-            z-index: 101;
-            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .roll-text-main {
+            font-size: clamp(2rem, 6vw, 4.5rem);
+            font-weight: 900;
+            letter-spacing: 12px;
+            color: #fff;
+            text-transform: uppercase;
+            text-shadow: 0 0 30px var(--blue-royal), 0 0 60px #fff;
+            opacity: 0;
+            transform: scale(3);
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
         }
 
-        @keyframes popIn {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
+        .roll-text-main.slam {
+            opacity: 1;
+            transform: scale(1);
         }
 
-        .win-titlebar {
-            background: var(--blue-royal);
-            padding: 4px 8px;
-            display: flex; justify-content: space-between; align-items: center;
-            color: #fff; font-weight: bold; font-size: 11px;
-            letter-spacing: 1px;
+        .flash-bang {
+            position: fixed; inset: 0; z-index: 200;
+            background: #ffffff;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.12s ease-out;
         }
 
-        .win-close {
-            width: 16px; height: 14px; background: #c0c0c0;
-            border: 1px solid #fff; border-right-color: #000; border-bottom-color: #000;
-            color: #000; font-size: 10px; line-height: 12px; text-align: center; cursor: pointer;
-        }
-
-        .win-body {
-            padding: 16px; display: flex; align-items: center; gap: 15px; font-size: 12px;
-        }
-
-        .win-icon {
-            width: 32px; height: 32px; background: #ff0000; border-radius: 50%;
-            color: #fff; font-weight: bold; font-size: 22px;
-            display: flex; justify-content: center; align-items: center; flex-shrink: 0;
-            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
-        }
-
-        .win-buttons {
-            padding: 8px 16px 12px; display: flex; justify-content: flex-end; gap: 8px;
-        }
-
-        .win-btn {
-            padding: 4px 20px; background: #c0c0c0;
-            border: 2px solid #fff; border-right-color: #404040; border-bottom-color: #404040;
-            font-size: 11px; font-weight: bold; cursor: pointer;
-        }
-
-        .win-btn:active {
-            border: 2px solid #404040; border-right-color: #fff; border-bottom-color: #fff;
-        }
-
-        /* --- 2. Sol's RNG 遊戲 UI 展示卡片 --- */
-        #sols-ui {
+        /* --- 2. Sol's RNG 風格個人資料卡 (Profile UI) --- */
+        #profile-ui {
             position: fixed; inset: 0; z-index: 10;
             pointer-events: none;
             display: flex; justify-content: center; align-items: center;
-            opacity: 0; transform: translateY(20px);
-            transition: opacity 1s ease, transform 1s ease;
+            opacity: 0; transform: translateY(30px) scale(0.95);
+            transition: opacity 0.8s ease, transform 0.8s ease;
         }
 
-        #sols-ui.active {
-            opacity: 1; transform: translateY(0);
+        #profile-ui.active {
+            opacity: 1; transform: translateY(0) scale(1);
         }
 
-        .rng-card {
+        .profile-card {
             pointer-events: auto;
-            width: 90%; max-width: 520px;
-            background: rgba(4, 8, 20, 0.85);
-            border: 1px solid rgba(0, 85, 255, 0.4);
-            box-shadow: 0 0 50px rgba(0, 18, 255, 0.3), inset 0 0 25px rgba(0, 85, 255, 0.15);
-            backdrop-filter: blur(16px);
+            width: 92%; max-width: 580px;
+            background: rgba(3, 7, 18, 0.88);
+            border: 1px solid rgba(0, 85, 255, 0.45);
+            box-shadow: 0 0 60px rgba(0, 18, 255, 0.35), inset 0 0 30px rgba(0, 85, 255, 0.15);
+            backdrop-filter: blur(18px);
             padding: 35px 40px;
             position: relative;
-            clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+            clip-path: polygon(0 0, calc(100% - 25px) 0, 100% 25px, 100% 100%, 25px 100%, 0 calc(100% - 25px));
         }
 
-        .card-top-bar {
+        .card-header {
             display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-            padding-bottom: 10px; margin-bottom: 20px;
+            padding-bottom: 12px; margin-bottom: 20px;
             font-family: var(--font-mono); font-size: 0.75rem;
         }
 
         .rarity-badge {
             color: #fff; font-weight: bold; letter-spacing: 2px;
-            background: var(--blue-royal); padding: 3px 10px;
-            box-shadow: 0 0 12px var(--blue-royal);
+            background: var(--blue-royal); padding: 4px 12px;
+            box-shadow: 0 0 15px var(--blue-royal);
         }
 
         .biome-badge {
             color: var(--blue-bright); letter-spacing: 1px;
-            border: 1px solid rgba(0, 85, 255, 0.5); padding: 2px 8px;
+            border: 1px solid rgba(0, 85, 255, 0.5); padding: 3px 10px;
+            background: rgba(0, 85, 255, 0.1);
         }
 
-        .aura-title {
-            font-size: clamp(2.2rem, 5vw, 3.2rem);
+        .user-title {
+            font-size: clamp(2.4rem, 5vw, 3.5rem);
             font-style: italic; font-weight: 900;
             letter-spacing: 4px; color: #fff;
             text-shadow: 0 0 20px var(--blue-royal), 0 0 40px #fff;
-            margin-bottom: 2px;
+            line-height: 1.1;
         }
 
-        .aura-sub {
+        .user-sub {
             font-family: var(--font-mono); font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.7); letter-spacing: 4px;
-            margin-bottom: 25px;
+            color: rgba(255, 255, 255, 0.75); letter-spacing: 4px;
+            margin-bottom: 22px; margin-top: 4px;
         }
 
-        .info-list {
-            display: flex; flex-direction: column; gap: 12px;
-            font-family: var(--font-mono); font-size: 0.8rem;
+        /* 頁籤選單 */
+        .tab-menu {
+            display: flex; gap: 8px; margin-bottom: 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
         }
 
-        .info-row {
-            display: flex; justify-content: space-between;
+        .tab-btn {
+            background: transparent; border: none; color: rgba(255, 255, 255, 0.5);
+            font-family: var(--font-mono); font-size: 0.75rem; font-weight: bold;
+            letter-spacing: 2px; cursor: pointer; padding: 4px 10px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active, .tab-btn:hover {
+            color: #fff; background: rgba(0, 85, 255, 0.2);
+            border-bottom: 2px solid var(--blue-bright);
+        }
+
+        /* 內容數據區 */
+        .tab-content { display: none; flex-direction: column; gap: 12px; font-family: var(--font-mono); font-size: 0.8rem; }
+        .tab-content.active { display: flex; }
+
+        .data-row {
+            display: flex; justify-content: space-between; align-items: center;
             background: rgba(255, 255, 255, 0.03); padding: 10px 14px;
             border-left: 3px solid var(--blue-bright);
         }
 
-        .info-key { color: rgba(255, 255, 255, 0.5); }
-        .info-val { color: #fff; font-weight: bold; }
+        .data-key { color: rgba(255, 255, 255, 0.5); letter-spacing: 1px; }
+        .data-val { color: #fff; font-weight: bold; letter-spacing: 1px; }
 
-        .ui-controls {
-            margin-top: 25px; display: flex; gap: 10px;
+        /* 底部操作鈕 */
+        .card-actions {
+            margin-top: 25px; display: flex; gap: 12px;
         }
 
-        .btn-action {
+        .btn-ui {
             flex: 1; padding: 12px;
             background: transparent; border: 1px solid var(--blue-bright);
             color: #fff; font-family: var(--font-serif); font-weight: bold;
             letter-spacing: 2px; cursor: pointer; transition: all 0.2s ease;
-            box-shadow: 0 0 10px rgba(0, 85, 255, 0.2);
+            box-shadow: 0 0 12px rgba(0, 85, 255, 0.2);
         }
 
-        .btn-action:hover {
+        .btn-ui:hover {
             background: var(--blue-royal); border-color: #fff;
             box-shadow: 0 0 25px var(--blue-royal);
-        }
-
-        /* 畫面極速閃光 */
-        #flash-screen {
-            position: fixed; inset: 0; z-index: 200;
-            background: #fff; opacity: 0; pointer-events: none;
-            transition: opacity 0.08s ease-out;
         }
     </style>
 </head>
@@ -276,373 +245,323 @@
 
     <div id="webgl-container"></div>
     <div class="vignette"></div>
-    <div class="scanline"></div>
-    <div id="flash-screen"></div>
+    <div class="flash-bang" id="flash"></div>
 
-    <!-- 1. 平面動態視覺 (Kinetic Typography & Windows Error Intro) -->
-    <div id="intro-overlay">
-        <div class="typewriter-text" id="typewriter"></div>
+    <!-- 1. Sol's RNG 抽卡入場動畫 Cutscene Overlay -->
+    <div id="roll-overlay">
+        <button class="roll-start-btn" id="start-btn" onclick="triggerAuraRoll()">ROLL AURA</button>
 
-        <div class="kinetic-title-group" id="kinetic-group">
-            <div class="kinetic-sub">DO YOU REMEMBER YOUR MISTAKE?</div>
-            <div class="kinetic-main">PLUTO...</div>
-            <div class="year-counter" id="year-counter">0 YEARS</div>
-        </div>
-
-        <div class="win-dialog" id="win-modal">
-            <div class="win-titlebar">
-                <span>SYSTEM ERROR</span>
-                <div class="win-close" onclick="enter3DWorld()">X</div>
-            </div>
-            <div class="win-body">
-                <div class="win-icon">!</div>
-                <div>
-                    <strong>Error # 501</strong><br>
-                    Escape Not Found.
-                </div>
-            </div>
-            <div class="win-buttons">
-                <button class="win-btn" onclick="enter3DWorld()">ENTER VOID</button>
-            </div>
+        <div class="roll-status-group" id="roll-status">
+            <div class="roll-text-sub" id="roll-sub">BIOME: CYBERSPACE DETECTED...</div>
+            <div class="roll-text-main" id="roll-title">𝚒𝚕𝚕𝚞𝚜𝚒𝚘𝚗𝚊𝚛𝚢</div>
         </div>
     </div>
 
-    <!-- 2. Sol's RNG 遊戲 UI 歸檔展示卡片 -->
-    <div id="sols-ui">
-        <div class="rng-card">
-            <div class="card-top-bar">
+    <!-- 2. Sol's RNG 風格個人資料歸檔卡 (probaon Profile UI) -->
+    <div id="profile-ui">
+        <div class="profile-card">
+            <div class="card-header">
                 <span class="rarity-badge">1 IN 100,000,000</span>
-                <span class="biome-badge">CYBERSPACE</span>
+                <span class="biome-badge">CYBERSPACE // PERFECT PUPPET</span>
             </div>
 
-            <div class="aura-title">i l l u s i o n a r y</div>
-            <div class="aura-sub">PERFECT PUPPET 2</div>
+            <!-- 個人名字與稱號 -->
+            <div class="user-title">probaon</div>
+            <div class="user-sub">-</div>
 
-            <div class="info-list">
-                <div class="info-row">
-                    <span class="info-key">SYSTEM ARCHITECT</span>
-                    <span class="info-val">Sles</span>
+            <!-- 頁籤切換 -->
+            <div class="tab-menu">
+                <button class="tab-btn active" onclick="switchTab('profile')">PROFILE</button>
+                <button class="tab-btn" onclick="switchTab('skills')">SKILLS</button>
+                <button class="tab-btn" onclick="switchTab('projects')">PROJECTS</button>
+            </div>
+
+            <!-- 頁籤 1: 個人檔案 -->
+            <div class="tab-content active" id="tab-profile">
+                <div class="data-row">
+                    <span class="data-key">ALIAS</span>
+                    <span class="data-val">-</span>
                 </div>
-                <div class="info-row">
-                    <span class="info-key">AUDIO TRACK</span>
-                    <span class="info-val">aakairo - PERFECT PUPPET 2</span>
+                <div class="data-row">
+                    <span class="data-key">ROLE</span>
+                    <span class="data-val">-</span>
                 </div>
-                <div class="info-row">
-                    <span class="info-key">LORE OBSESSION</span>
-                    <span class="info-val">IT HURTS TO REMEMBER</span>
+                <div class="data-row">
+                    <span class="data-key">SPECIALTY</span>
+                    <span class="data-val">-</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-key">STATUS</span>
+                    <span class="data-val">-</span>
                 </div>
             </div>
 
-            <div class="ui-controls">
-                <button class="btn-action" onclick="replayCutscene()">REPLAY CUTSCENE</button>
-                <button class="btn-action" onclick="triggerPulse()">PULSE CORE</button>
+            <!-- 頁籤 2: 核心能力 -->
+            <div class="tab-content" id="tab-skills">
+                <div class="data-row">
+                    <span class="data-key">SKILL I</span>
+                    <span class="data-val">-</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-key">SKILL II</span>
+                    <span class="data-val">-</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-key">SKILL III</span>
+                    <span class="data-val">-</span>
+                </div>
+            </div>
+
+            <!-- 頁籤 3: 專案作品 -->
+            <div class="tab-content" id="tab-projects">
+                <div class="data-row">
+                    <span class="data-key">PROJECT I</span>
+                    <span class="data-val">-</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-key">PROJECT II</span>
+                    <span class="data-val">-</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-key">PROJECT III</span>
+                    <span class="data-val">-</span>
+                </div>
+            </div>
+
+            <div class="card-actions">
+                <button class="btn-ui" onclick="replayRollCutscene()">ROLL AGAIN</button>
+                <button class="btn-ui" onclick="triggerCorePulse()">PULSE CORE</button>
             </div>
         </div>
     </div>
 
     <script>
         /* =========================================================================
-           1. Web Audio API (音效合成器：打字聲 / 警報聲 / 切換聲)
+           1. Web Audio API 音效合成器 (重現 Sol's RNG 抽卡蓄力與爆炸衝擊波)
            ========================================================================= */
         let audioCtx;
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         }
 
-        function playSound(type) {
+        function playSoundSequence(type) {
             if (!audioCtx) return;
-            try {
-                const now = audioCtx.currentTime;
+            const now = audioCtx.currentTime;
+
+            if (type === 'charge') {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(100, now);
+                osc.frequency.exponentialRampToValueAtTime(1200, now + 2.2);
+                gain.gain.setValueAtTime(0.01, now);
+                gain.gain.linearRampToValueAtTime(0.25, now + 2.2);
                 osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(now); osc.stop(now + 2.2);
 
-                if (type === 'type') {
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(600 + Math.random()*200, now);
-                    gain.gain.setValueAtTime(0.03, now);
-                    gain.gain.linearRampToValueAtTime(0, now + 0.03);
-                    osc.start(now); osc.stop(now + 0.03);
-                } else if (type === 'error') {
-                    osc.type = 'sawtooth';
-                    osc.frequency.setValueAtTime(150, now);
-                    osc.frequency.setValueAtTime(100, now + 0.08);
-                    gain.gain.setValueAtTime(0.15, now);
-                    gain.gain.linearRampToValueAtTime(0, now + 0.25);
-                    osc.start(now); osc.stop(now + 0.25);
-                } else if (type === 'enter') {
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(200, now);
-                    osc.frequency.exponentialRampToValueAtTime(800, now + 0.3);
-                    gain.gain.setValueAtTime(0.2, now);
-                    gain.gain.linearRampToValueAtTime(0, now + 0.3);
-                    osc.start(now); osc.stop(now + 0.3);
-                }
-            } catch(e){}
-        }
-
-        /* =========================================================================
-           2. 2D 動態視覺 Cutscene 腳本 (Kinetic Typography + Years Counter + Win Dialog)
-           ========================================================================= */
-        const typewriterElem = document.getElementById('typewriter');
-        const kineticGroup = document.getElementById('kinetic-group');
-        const yearCounterElem = document.getElementById('year-counter');
-        const winModal = document.getElementById('win-modal');
-        const introOverlay = document.getElementById('intro-overlay');
-        const solsUI = document.getElementById('sols-ui');
-        const flashScreen = document.getElementById('flash-screen');
-
-        const textIntro = "I don't remember when I was born, or if I ever was.";
-        let typeIndex = 0;
-
-        function startIntroSequence() {
-            typewriterElem.textContent = "";
-            kineticGroup.style.display = "none";
-            winModal.style.display = "none";
-            introOverlay.style.opacity = "1";
-            introOverlay.style.visibility = "visible";
-            solsUI.classList.remove("active");
-
-            typeWriter();
-        }
-
-        function typeWriter() {
-            if (typeIndex < textIntro.length) {
-                typewriterElem.textContent += textIntro.charAt(typeIndex);
-                typeIndex++;
-                playSound('type');
-                setTimeout(typeWriter, 40);
-            } else {
-                setTimeout(showKineticTitle, 500);
+            } else if (type === 'slam') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(180, now);
+                osc.frequency.exponentialRampToValueAtTime(30, now + 0.8);
+                gain.gain.setValueAtTime(0.6, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.8);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(now); osc.stop(now + 0.8);
             }
         }
 
-        function showKineticTitle() {
-            kineticGroup.style.display = "flex";
-            let years = 0;
-            const timer = setInterval(() => {
-                years += 5;
-                yearCounterElem.textContent = `${years} YEARS (RESEARCH)`;
-                playSound('type');
-                if (years >= 110) {
-                    clearInterval(timer);
-                    setTimeout(triggerWindowsError, 600);
-                }
-            }, 30);
-        }
+        /* =========================================================================
+           2. Sol's RNG 抽卡入場 Cutscene 流程控制
+           ========================================================================= */
+        const startBtn = document.getElementById('start-btn');
+        const rollStatus = document.getElementById('roll-status');
+        const rollSub = document.getElementById('roll-sub');
+        const rollTitle = document.getElementById('roll-title');
+        const rollOverlay = document.getElementById('roll-overlay');
+        const flash = document.getElementById('flash');
+        const profileUI = document.getElementById('profile-ui');
 
-        function triggerWindowsError() {
-            playSound('error');
-            winModal.style.display = "block";
-            flashScreen.style.opacity = "0.8";
-            setTimeout(() => { flashScreen.style.opacity = "0"; }, 80);
-        }
-
-        function enter3DWorld() {
+        function triggerAuraRoll() {
             initAudio();
-            playSound('enter');
+            startBtn.style.display = "none";
+            rollStatus.style.display = "flex";
+            rollTitle.classList.remove('slam');
 
-            flashScreen.style.opacity = "1";
+            playSoundSequence('charge');
+
+            const subTexts = [
+                "BIOME: CYBERSPACE DETECTED...",
+                "ROLLING CHANCE: 1 IN 100,000,000...",
+                "EQUIPMENT ARCHIVE LOADING...",
+                "AURA FOUND: 𝚒𝚕𝚕𝚞𝚜𝚒𝚘𝚗𝚊𝚛𝚢"
+            ];
+            let subIdx = 0;
+            const subTimer = setInterval(() => {
+                rollSub.textContent = subTexts[subIdx % subTexts.length];
+                subIdx++;
+            }, 500);
+
             setTimeout(() => {
-                introOverlay.style.opacity = "0";
-                introOverlay.style.visibility = "hidden";
-                flashScreen.style.opacity = "0";
-                solsUI.classList.add("active");
-            }, 150);
+                clearInterval(subTimer);
+                playSoundSequence('slam');
+
+                document.body.classList.add('screen-shake');
+                flash.style.opacity = "1";
+                rollTitle.classList.add('slam');
+
+                setTimeout(() => {
+                    document.body.classList.remove('screen-shake');
+                    flash.style.opacity = "0";
+                }, 150);
+
+                setTimeout(() => {
+                    rollOverlay.style.opacity = "0";
+                    setTimeout(() => {
+                        rollOverlay.style.display = "none";
+                        profileUI.classList.add('active');
+                    }, 500);
+                }, 1800);
+
+            }, 2200);
         }
 
-        function replayCutscene() {
-            typeIndex = 0;
-            startIntroSequence();
+        function replayRollCutscene() {
+            profileUI.classList.remove('active');
+            rollOverlay.style.display = "flex";
+            rollOverlay.style.opacity = "1";
+            startBtn.style.display = "block";
+            rollStatus.style.display = "none";
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
         }
 
         /* =========================================================================
-           3. Three.js 3D 空間 (藍白棋盤格 + 懸浮微縮核心盒 + 漂浮西洋棋 + 多眼環)
+           3. Three.js 3D 互動背景 (棋盤格 + 懸浮核心 + 多眼光環)
            ========================================================================= */
-        let scene, camera, renderer;
-        let coreBox, ringOfEyesGroup;
-        const chessPieces = [];
+        let scene, camera, renderer, coreBox, ringGroup;
+        let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
 
-        let targetMouseX = 0, targetMouseY = 0;
-        let mouseX = 0, mouseY = 0;
-
-        function initThreeJS() {
+        function init3D() {
             const container = document.getElementById('webgl-container');
-            
-            // 創建場景與攝影機
             scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x02040a, 0.015);
+            scene.fog = new THREE.FogExp2(0x02040a, 0.012);
 
             camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 12, 35);
+            camera.position.set(0, 10, 32);
 
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             container.appendChild(renderer.domElement);
 
-            // 1. 動態生成「藍白高對比棋盤格」紋理
             const canvasTile = document.createElement('canvas');
             canvasTile.width = 256; canvasTile.height = 256;
             const ctx = canvasTile.getContext('2d');
             ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, 256, 256);
-            ctx.fillStyle = '#0012ff'; 
-            ctx.fillRect(0, 0, 128, 128);
-            ctx.fillRect(128, 128, 128, 128);
+            ctx.fillStyle = '#0012ff'; ctx.fillRect(0, 0, 128, 128); ctx.fillRect(128, 128, 128, 128);
 
             const floorTexture = new THREE.CanvasTexture(canvasTile);
-            floorTexture.wrapS = THREE.RepeatWrapping;
-            floorTexture.wrapT = THREE.RepeatWrapping;
-            floorTexture.repeat.set(30, 30);
+            floorTexture.wrapS = THREE.RepeatWrapping; floorTexture.wrapT = THREE.RepeatWrapping;
+            floorTexture.repeat.set(25, 25);
 
-            const floorGeo = new THREE.PlaneGeometry(300, 300);
-            const floorMat = new THREE.MeshStandardMaterial({ 
-                map: floorTexture, 
-                roughness: 0.2, 
-                metalness: 0.1 
-            });
-            const floor = new THREE.Mesh(floorGeo, floorMat);
+            const floor = new THREE.Mesh(
+                new THREE.PlaneGeometry(300, 300),
+                new THREE.MeshStandardMaterial({ map: floorTexture, roughness: 0.2 })
+            );
             floor.rotation.x = -Math.PI / 2;
             floor.position.y = -8;
             scene.add(floor);
 
-            // 2. 懸浮核心：微縮辦公室房間盒 (Core Box)
-            const boxGeo = new THREE.BoxGeometry(6, 6, 6);
-            const boxMat = new THREE.MeshStandardMaterial({ 
-                color: 0x0012ff, 
-                wireframe: true, 
-                emissive: 0x0033ff, 
-                emissiveIntensity: 0.6 
-            });
-            coreBox = new THREE.Mesh(boxGeo, boxMat);
-            coreBox.position.set(0, 5, 0);
+            coreBox = new THREE.Mesh(
+                new THREE.BoxGeometry(6, 6, 6),
+                new THREE.MeshStandardMaterial({ color: 0x0012ff, wireframe: true, emissive: 0x0033ff, emissiveIntensity: 0.8 })
+            );
+            coreBox.position.set(0, 4, 0);
             scene.add(coreBox);
 
-            // 核心內部微縮亮塊
-            const innerGeo = new THREE.BoxGeometry(3, 3, 3);
-            const innerMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-            const innerCube = new THREE.Mesh(innerGeo, innerMat);
+            const innerCube = new THREE.Mesh(
+                new THREE.BoxGeometry(2.8, 2.8, 2.8),
+                new THREE.MeshBasicMaterial({ color: 0xffffff })
+            );
             coreBox.add(innerCube);
 
-            // 3. 多眼光環陣列 (Ring of Eyes)
-            ringOfEyesGroup = new THREE.Group();
-            ringOfEyesGroup.position.set(0, 5, 0);
-            scene.add(ringOfEyesGroup);
+            ringGroup = new THREE.Group();
+            ringGroup.position.set(0, 4, 0);
+            scene.add(ringGroup);
 
-            for (let r = 0; r < 3; r++) {
-                const ringRadius = 8 + r * 3;
-                const torusGeo = new THREE.TorusGeometry(ringRadius, 0.08, 16, 100);
-                const torusMat = new THREE.MeshBasicMaterial({ color: r % 2 === 0 ? 0x0055ff : 0xffffff });
-                const ring = new THREE.Mesh(torusGeo, torusMat);
-                ring.rotation.x = Math.PI / 2 + (r * 0.4);
-                ringOfEyesGroup.add(ring);
-
-                // 在光環上附加微型「眼睛節點」
-                for (let e = 0; e < 8; e++) {
-                    const angle = (e / 8) * Math.PI * 2;
-                    const eyeGeo = new THREE.SphereGeometry(0.4, 16, 16);
-                    const eyeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-                    const eye = new THREE.Mesh(eyeGeo, eyeMat);
-                    eye.position.set(Math.cos(angle) * ringRadius, Math.sin(angle) * ringRadius, 0);
-                    ring.add(eye);
-                }
-            }
-
-            // 4. 漂浮西洋棋子 (Chess Pieces)
-            const chessGroup = new THREE.Group();
-            scene.add(chessGroup);
-
-            for (let i = 0; i < 12; i++) {
-                const pMat = new THREE.MeshStandardMaterial({ 
-                    color: i % 2 === 0 ? 0xffffff : 0x0012ff, 
-                    roughness: 0.1 
-                });
-                // 使用幾何體組合模擬西洋棋子造型
-                const pGeo = new THREE.CylinderGeometry(0.5, 0.8, 2.5, 16);
-                const piece = new THREE.Mesh(pGeo, pMat);
-                
-                piece.position.set(
-                    (Math.random() - 0.5) * 40,
-                    Math.random() * 15 - 2,
-                    (Math.random() - 0.5) * 40
+            for (let i = 0; i < 3; i++) {
+                const radius = 8 + i * 3.2;
+                const ring = new THREE.Mesh(
+                    new THREE.TorusGeometry(radius, 0.08, 16, 100),
+                    new THREE.MeshBasicMaterial({ color: i % 2 === 0 ? 0x0055ff : 0xffffff })
                 );
-                piece.rotation.set(Math.random(), Math.random(), Math.random());
-                chessGroup.add(piece);
-                chessPieces.push({ mesh: piece, rotSpeed: Math.random() * 0.02 });
+                ring.rotation.x = Math.PI / 2 + (i * 0.4);
+                ringGroup.add(ring);
             }
 
-            // 5. 光源設置
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
-            scene.add(ambientLight);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+            const pLight = new THREE.PointLight(0x0055ff, 2, 80);
+            pLight.position.set(0, 15, 0);
+            scene.add(pLight);
 
-            const pointLight = new THREE.PointLight(0x0055ff, 2, 80);
-            pointLight.position.set(0, 15, 0);
-            scene.add(pointLight);
+            document.addEventListener('mousemove', (e) => {
+                targetX = (e.clientX - window.innerWidth / 2) * 0.008;
+                targetY = (e.clientY - window.innerHeight / 2) * 0.008;
+            });
 
-            window.addEventListener('resize', onWindowResize);
-            document.addEventListener('mousemove', onMouseMove);
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
 
-            animate3D();
+            animate();
         }
 
-        function onMouseMove(e) {
-            targetMouseX = (e.clientX - window.innerWidth / 2) * 0.01;
-            targetMouseY = (e.clientY - window.innerHeight / 2) * 0.01;
-        }
+        function animate() {
+            requestAnimationFrame(animate);
 
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-
-        function animate3D() {
-            requestAnimationFrame(animate3D);
-
-            // 滑鼠緩動靈敏運鏡
-            mouseX += (targetMouseX - mouseX) * 0.05;
-            mouseY += (targetMouseY - mouseY) * 0.05;
+            mouseX += (targetX - mouseX) * 0.05;
+            mouseY += (targetY - mouseY) * 0.05;
 
             camera.position.x = mouseX * 8;
-            camera.position.y = 12 - mouseY * 6;
-            camera.lookAt(0, 4, 0);
+            camera.position.y = 10 - mouseY * 6;
+            camera.lookAt(0, 3, 0);
 
-            // 物體自轉動畫
             if (coreBox) {
                 coreBox.rotation.y += 0.01;
                 coreBox.rotation.x += 0.005;
-                coreBox.position.y = 5 + Math.sin(Date.now() * 0.002) * 0.8;
+                coreBox.position.y = 4 + Math.sin(Date.now() * 0.002) * 0.6;
             }
 
-            if (ringOfEyesGroup) {
-                ringOfEyesGroup.rotation.z += 0.005;
-                ringOfEyesGroup.rotation.y -= 0.008;
+            if (ringGroup) {
+                ringGroup.rotation.z += 0.004;
+                ringGroup.rotation.y -= 0.006;
             }
-
-            chessPieces.forEach(p => {
-                p.mesh.rotation.x += p.rotSpeed;
-                p.mesh.rotation.y += p.rotSpeed;
-            });
 
             renderer.render(scene, camera);
         }
 
-        function triggerPulse() {
-            initAudio(); playSound('enter');
-            flashScreen.style.opacity = "0.7";
-            setTimeout(() => { flashScreen.style.opacity = "0"; }, 100);
+        function triggerCorePulse() {
+            initAudio(); playSoundSequence('slam');
+            flash.style.opacity = "0.7";
+            setTimeout(() => { flash.style.opacity = "0"; }, 100);
 
             if (coreBox) {
-                coreBox.scale.set(1.5, 1.5, 1.5);
+                coreBox.scale.set(1.6, 1.6, 1.6);
                 setTimeout(() => { coreBox.scale.set(1, 1, 1); }, 200);
             }
         }
 
-        /* 頁面載入自動初始化 */
-        window.onload = () => {
-            initThreeJS();
-            startIntroSequence();
-        };
+        window.onload = init3D;
     </script>
 </body>
 </html>
