@@ -92,7 +92,7 @@
             transform: scale(1.05);
         }
 
-        /* 消除投影片感：強烈的彈性登場衝擊動畫 */
+        /* 彈性登場衝擊動畫 */
         .cutscene-frame {
             position: absolute; inset: 0;
             display: none; flex-direction: column;
@@ -106,7 +106,7 @@
         }
 
         @keyframes framePunchIn {
-            0% { transform: scale(1.4); opacity: 0; filter: blur(12px); }
+            0% { transform: scale(1.35); opacity: 0; filter: blur(12px); }
             60% { transform: scale(0.97); opacity: 1; filter: blur(0); }
             100% { transform: scale(1); opacity: 1; filter: blur(0); }
         }
@@ -115,47 +115,52 @@
         .frame-white { background-color: #ffffff; color: var(--blue-pure); }
         .frame-black { background-color: #000000; color: var(--blue-pure); }
 
-        /* 心跳/重音脈衝效果 */
-        .beat-pulse {
-            animation: beatPulseAnim 0.6s infinite ease-in-out alternate;
-        }
-
-        @keyframes beatPulseAnim {
-            0% { transform: scale(0.96); }
-            100% { transform: scale(1.06); filter: drop-shadow(0 0 25px var(--blue-bright)); }
-        }
-
-        /* 天使圖騰容器 */
+        /* 天使圖騰容器與動態控制 */
         .angel-icon-box {
-            width: 220px; height: 220px;
+            width: 240px; height: 240px;
             margin-bottom: 25px;
             display: flex; justify-content: center; align-items: center;
-            filter: drop-shadow(0 0 25px var(--blue-bright));
+            filter: drop-shadow(0 0 30px var(--blue-bright));
         }
 
         .angel-icon-box svg { width: 100%; height: 100%; }
 
-        /* =========================================================================
-           10s~12s (2秒) 暴走段落：藍框從最外緣(極細)平滑向內延伸變粗
-           ========================================================================= */
+        /* SVG 內部旋轉與脈衝動畫 */
+        .spin-cw { transform-origin: center; animation: spinCW 8s linear infinite; }
+        .spin-ccw { transform-origin: center; animation: spinCCW 6s linear infinite; }
+        .pulse-glow { animation: pulseGlow 1.2s ease-in-out infinite alternate; }
+        .float-icon { animation: floatIcon 2.5s ease-in-out infinite alternate; }
+
+        @keyframes spinCW { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes spinCCW { 0% { transform: rotate(0deg); } 100% { transform: rotate(-360deg); } }
+        @keyframes pulseGlow {
+            0% { transform: scale(0.95); filter: drop-shadow(0 0 15px var(--blue-bright)); }
+            100% { transform: scale(1.08); filter: drop-shadow(0 0 45px var(--blue-bright)); }
+        }
+        @keyframes floatIcon {
+            0% { transform: translateY(-8px); }
+            100% { transform: translateY(8px); }
+        }
+
+        /* 10s~12s 暴走段落：藍框從最外緣極細平滑向內延伸變粗 */
         #frame-glitch-scene {
             background-color: var(--blue-pure) !important;
             position: absolute; inset: 0;
             overflow: hidden;
         }
 
-        /* 中央黑色方塊：初始 inset 為 2px (邊框最薄)，2秒內過渡到 16vw 14vh (藍框大幅向內延伸) */
+        /* 中央黑色方塊：初始 inset 為 2px，2秒內過渡到 16vw 14vh */
         .glitch-black-box {
             position: absolute;
-            inset: 2px; /* 初始極細外框 */
+            inset: 2px;
             background-color: #000000;
             z-index: 2;
-            box-shadow: 0 0 40px rgba(0,0,0,0.95);
+            box-shadow: 0 0 50px rgba(0,0,0,0.95);
             transition: inset 2.0s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .glitch-black-box.expand-inward {
-            inset: 16vw 14vh; /* 2秒內藍色向內擴張，黑色區縮小 */
+            inset: 16vw 14vh;
         }
 
         /* 垂直文字列雨 */
@@ -188,7 +193,7 @@
             text-shadow: 0 0 12px rgba(255,255,255,0.9);
         }
 
-        /* 笑臉縮放爆發 */
+        /* 笑臉爆發 */
         .smile-zoom-implode {
             animation: smileZoom 0.65s cubic-bezier(0.7, 0, 0.84, 0) forwards;
         }
@@ -367,46 +372,66 @@
 
         <button class="start-btn" id="start-btn" onclick="startIllusionaryCutscene()">ROLL ILLUSIONARY</button>
 
-        <!-- Frame 1 (0.0s ~ 2.5s): 天使圖騰 1 (Seraphim) -->
+        <!-- Frame 1 (0.0s ~ 2.5s): 天使圖騰 1 (Seraphim 六翼熾天使 - 帶旋轉與脈衝) -->
         <div class="cutscene-frame frame-white" id="f1">
-            <div class="angel-icon-box beat-pulse">
-                <svg viewBox="0 0 100 100" fill="var(--blue-pure)">
-                    <path d="M50 5 L60 38 L95 50 L60 62 L50 95 L40 62 L5 50 L40 38 Z" opacity="0.9" />
-                    <circle cx="50" cy="50" r="18" fill="none" stroke="#fff" stroke-width="3"/>
-                    <circle cx="50" cy="50" r="8" fill="#fff"/>
-                    <path d="M 20 50 Q 50 15 80 50 Q 50 85 20 50 Z" fill="none" stroke="var(--blue-pure)" stroke-width="2"/>
+            <div class="angel-icon-box float-icon">
+                <svg viewBox="0 0 100 100" style="color: var(--blue-pure);">
+                    <!-- 順時針旋轉外環 -->
+                    <circle class="spin-cw" cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="10 6" />
+                    <!-- 逆時針旋轉中環 -->
+                    <circle class="spin-ccw" cx="50" cy="50" r="34" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="16 4" />
+                    <!-- 旋轉八角星芒 -->
+                    <g class="spin-cw" style="animation-duration: 12s;">
+                        <path d="M50 6 L58 38 L90 46 L58 54 L50 86 L42 54 L10 46 L42 38 Z" fill="currentColor" opacity="0.85" />
+                        <path d="M50 16 L55 38 L77 43 L55 48 L50 70 L45 48 L23 43 L45 38 Z" fill="#fff" opacity="0.6" />
+                    </g>
+                    <!-- 核心瞳孔 -->
+                    <circle cx="50" cy="46" r="6" fill="#fff"/>
+                    <path d="M 30 46 Q 50 26 70 46 Q 50 66 30 46 Z" fill="none" stroke="currentColor" stroke-width="2.5"/>
                 </svg>
             </div>
-            <div class="jp-text beat-pulse">列車が死ぬ</div>
+            <div class="jp-text pulse-glow">列車が死ぬ</div>
         </div>
 
         <!-- Frame 2 (2.5s ~ 5.0s) -->
         <div class="cutscene-frame frame-blue" id="f2">
-            <div class="en-text beat-pulse">Is it time to wake up?</div>
+            <div class="en-text pulse-glow">Is it time to wake up?</div>
         </div>
 
-        <!-- Frame 3 (5.0s ~ 7.5s): 天使圖騰 2 (Ophanim 眼環) -->
+        <!-- Frame 3 (5.0s ~ 7.5s): 天使圖騰 2 (Ophanim 智天使眼環 - 雙向旋轉) -->
         <div class="cutscene-frame frame-blue" id="f3">
-            <div class="angel-icon-box beat-pulse">
-                <svg viewBox="0 0 100 100" fill="none" stroke="#ffffff" stroke-width="3">
-                    <circle cx="50" cy="50" r="44" stroke-dasharray="14 6" />
-                    <circle cx="50" cy="50" r="30" stroke-dasharray="10 6" />
-                    <circle cx="50" cy="6" r="3" fill="#fff" />
-                    <circle cx="50" cy="94" r="3" fill="#fff" />
-                    <circle cx="6" cy="50" r="3" fill="#fff" />
-                    <circle cx="94" cy="50" r="3" fill="#fff" />
-                    <polygon points="50,20 60,50 50,80 40,50" fill="none" stroke="#fff" stroke-width="2"/>
+            <div class="angel-icon-box float-icon">
+                <svg viewBox="0 0 100 100">
+                    <!-- 順時針旋轉眼環 1 -->
+                    <g class="spin-cw">
+                        <circle cx="50" cy="50" r="42" fill="none" stroke="#fff" stroke-width="2.5" stroke-dasharray="18 8" />
+                        <circle cx="50" cy="8" r="3.5" fill="#fff" />
+                        <circle cx="50" cy="92" r="3.5" fill="#fff" />
+                        <circle cx="8" cy="50" r="3.5" fill="#fff" />
+                        <circle cx="92" cy="50" r="3.5" fill="#fff" />
+                    </g>
+                    <!-- 逆時針旋轉眼環 2 -->
+                    <g class="spin-ccw" style="animation-duration: 5s;">
+                        <circle cx="50" cy="50" r="30" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="12 6" />
+                        <circle cx="50" cy="20" r="2.5" fill="var(--blue-bright)" />
+                        <circle cx="50" cy="80" r="2.5" fill="var(--blue-bright)" />
+                        <circle cx="20" cy="50" r="2.5" fill="var(--blue-bright)" />
+                        <circle cx="80" cy="50" r="2.5" fill="var(--blue-bright)" />
+                    </g>
+                    <!-- 核心幾何邊框與瞳孔 -->
+                    <polygon points="50,18 62,50 50,82 38,50" fill="none" stroke="#fff" stroke-width="2"/>
+                    <circle cx="50" cy="50" r="5" fill="#fff" class="pulse-glow"/>
                 </svg>
             </div>
-            <div class="jp-text beat-pulse">どこにいますか？</div>
+            <div class="jp-text pulse-glow">どこにいますか？</div>
         </div>
 
         <!-- Frame 4 (7.5s ~ 10.0s) -->
         <div class="cutscene-frame frame-white" id="f5">
-            <div class="en-text beat-pulse" style="color: var(--blue-pure);">you belong to here.</div>
+            <div class="en-text pulse-glow" style="color: var(--blue-pure);">you belong to here.</div>
         </div>
 
-        <!-- Frame 5 (10.0s ~ 12.0s 暴走段落：藍框從最外緣慢慢向內延伸變粗) -->
+        <!-- Frame 5 (10.0s ~ 12.0s 暴走段落：藍框由最外緣向內延伸，音樂停止並伴隨 Glitch 逐字音效) -->
         <div class="cutscene-frame" id="frame-glitch-scene">
             <div class="glitch-black-box" id="glitch-black-box"></div>
             <div id="glitch-columns-container"></div>
@@ -498,41 +523,44 @@
             });
         }
 
-        /* Web Audio API 爆發音效 */
+        /* Web Audio API 音效系統 */
         let audioCtx;
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             if (audioCtx.state === 'suspended') audioCtx.resume();
         }
 
-        function playGlitchNoise(duration = 0.06, volume = 0.25) {
+        // 高頻電子 Glitch Pop 音效 (用於 10~12s 彈字)
+        function playGlitchPop() {
             if (!audioCtx) return;
-            const bufferSize = audioCtx.sampleRate * duration;
-            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-            const data = buffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) { data[i] = Math.random() * 2 - 1; }
-
-            const noise = audioCtx.createBufferSource();
-            noise.buffer = buffer;
-            const filter = audioCtx.createBiquadFilter();
-            filter.type = 'bandpass'; filter.frequency.value = 2500;
+            const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            gain.gain.setValueAtTime(volume, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-
-            noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
-            noise.start();
+            
+            const freqs = [1200, 1800, 2400, 3200, 800, 4000, 1500];
+            const freq = freqs[Math.floor(Math.random() * freqs.length)];
+            
+            osc.type = Math.random() > 0.5 ? 'square' : 'sawtooth';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.05);
+            
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.05);
         }
 
         function triggerFlashAndShake() {
             document.body.classList.remove('shake-impact');
-            void document.body.offsetWidth; // 強制重繪
+            void document.body.offsetWidth;
             document.body.classList.add('shake-impact');
 
             const flash = document.getElementById('flash');
             flash.style.opacity = '0.35';
             setTimeout(() => { flash.style.opacity = '0'; }, 50);
-            playGlitchNoise(0.05, 0.3);
         }
 
         function hideAllFrames() {
@@ -551,12 +579,12 @@
             triggerFlashAndShake();
         }
 
-        /* 產生垂直文字直排 */
+        /* 產生垂直文字直排，並同步播放彈字音效 */
         function spawnGlitchColumn(container) {
             const col = document.createElement('div');
             col.className = 'text-column';
 
-            const xPositions = [3, 10, 20, 38, 52, 68, 80, 88];
+            const xPositions = [4, 12, 22, 36, 52, 66, 78, 88];
             const chosenX = xPositions[Math.floor(Math.random() * xPositions.length)];
             col.style.left = chosenX + '%';
 
@@ -577,16 +605,18 @@
             }
 
             container.appendChild(col);
-            playGlitchNoise(0.04, 0.2);
+            
+            // 彈出文字時觸發特製 Glitch 音效與畫面微震
+            playGlitchPop();
             triggerFlashAndShake();
         }
 
-        /* 順暢音樂與嚴格時間軸 */
+        /* 順暢動畫與時間軸 */
         function startIllusionaryCutscene() {
             initAudio();
             document.getElementById('start-btn').style.display = "none";
 
-            // 1. 音樂零延遲啟動，並全程持續播放 12 秒
+            // 1. 音樂開始播放 (0.0s)
             if (ytPlayer && ytPlayer.playVideo) {
                 try {
                     ytPlayer.seekTo(0);
@@ -594,20 +624,26 @@
                 } catch(e) { console.log(e); }
             }
 
-            // 0.0s ~ 2.5s: Frame 1 (列車が死ぬ + 天使)
+            // 0.0s ~ 2.5s: Frame 1 (列車が死ぬ + 天使 1)
             showFrame('f1');
 
             // 2.5s ~ 5.0s: Frame 2 (Is it time to wake up?)
             setTimeout(() => { showFrame('f2'); }, 2500);
 
-            // 5.0s ~ 7.5s: Frame 3 (どこにいますか？ + 天使眼環)
+            // 5.0s ~ 7.5s: Frame 3 (どこにいますか？ + 天使眼環 2)
             setTimeout(() => { showFrame('f3'); }, 5000);
 
             // 7.5s ~ 10.0s: Frame 4 (you belong to here.)
             setTimeout(() => { showFrame('f5'); }, 7500);
 
-            // 10.0s ~ 12.0s (2秒整): 進入暴走段落 (音樂高潮持續播放，藍框由最外邊緣向內延伸變粗)
+            // 10.0s ~ 12.0s (暴走段落)：音樂突然【停止】，轉為純寂靜 + Glitch 音效，藍框向內壓迫
             setTimeout(() => {
+                // 音樂在此精確時間點驟然中斷！
+                if (ytPlayer) {
+                    if (ytPlayer.pauseVideo) ytPlayer.pauseVideo();
+                    else if (ytPlayer.stopVideo) ytPlayer.stopVideo();
+                }
+
                 hideAllFrames();
                 const glitchScene = document.getElementById('frame-glitch-scene');
                 const container = document.getElementById('glitch-columns-container');
@@ -637,7 +673,7 @@
                 }
                 container.appendChild(wakeCol);
 
-                // 在 10s ~ 12s 這 2 秒內持續刷出 vertical no, not yet.
+                // 在 10s ~ 12s 這 2 秒內持續刷出 vertical no, not yet.，每次刷出播放專屬 Glitch 音效
                 let count = 0;
                 const interval = setInterval(() => {
                     spawnGlitchColumn(container);
@@ -647,7 +683,7 @@
 
             }, 10000);
 
-            // 12.0s: 音樂播放完畢，順暢接續 Puppet 選項
+            // 12.0s: 順暢接續 Puppet 選項
             setTimeout(() => {
                 showFrame('f7');
             }, 12000);
@@ -656,7 +692,7 @@
         function forceYes() {
             const btnNo = document.getElementById('opt-no');
             if (btnNo.textContent !== "2. Yes") {
-                playGlitchNoise(0.08, 0.3);
+                playGlitchPop();
                 btnNo.textContent = "2. Yes";
             }
         }
