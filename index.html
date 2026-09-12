@@ -50,7 +50,7 @@
             background: radial-gradient(circle at center, transparent 15%, rgba(0, 0, 0, 0.96) 90%);
         }
 
-        /* 畫面重震動與色散特效 */
+        /* 畫面震動與前搖抖動特效 */
         .shake-impact {
             animation: shakeImpact 0.22s cubic-bezier(.36,.07,.19,.97) both;
         }
@@ -62,6 +62,18 @@
             60% { transform: translate(-10px, 14px) scale(1.01); filter: none; }
             80% { transform: translate(8px, -6px) scale(1); }
             100% { transform: translate(0, 0) scale(1); filter: none; }
+        }
+
+        /* 換頁前搖（前衝 + 高頻閃爍）動畫 */
+        .pre-transition {
+            animation: preTransition 0.5s ease-in forwards !important;
+        }
+
+        @keyframes preTransition {
+            0% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.12); filter: brightness(2) drop-shadow(0 0 40px var(--blue-bright)); }
+            80% { transform: scale(1.25) rotate(2deg); opacity: 0.8; filter: invert(1); }
+            100% { transform: scale(1.5); opacity: 0; filter: brightness(3); }
         }
 
         /* Cutscene 畫布 */
@@ -106,8 +118,8 @@
         }
 
         @keyframes framePunchIn {
-            0% { transform: scale(1.4); opacity: 0; filter: blur(14px); }
-            60% { transform: scale(0.96); opacity: 1; filter: blur(0); }
+            0% { transform: scale(1.3); opacity: 0; filter: blur(10px); }
+            60% { transform: scale(0.98); opacity: 1; filter: blur(0); }
             100% { transform: scale(1); opacity: 1; filter: blur(0); }
         }
 
@@ -115,37 +127,36 @@
         .frame-white { background-color: #ffffff; color: var(--blue-pure); }
         .frame-black { background-color: #000000; color: var(--blue-pure); }
 
-        /* 天使圖騰通用容器與動態控制 */
-        .angel-icon-box {
-            width: 260px; height: 260px;
+        /* 精準復原的大天使圖騰容器 */
+        .seraphim-box {
+            width: 320px; height: 200px;
             margin-bottom: 25px;
             display: flex; justify-content: center; align-items: center;
-            filter: drop-shadow(0 0 30px var(--blue-bright));
             position: relative;
+            filter: drop-shadow(0 0 25px var(--blue-glow));
         }
 
-        .angel-icon-box svg { width: 100%; height: 100%; }
+        .seraphim-box svg { width: 100%; height: 100%; }
 
-        /* SVG 內部多層獨立旋轉與脈衝 */
-        .spin-cw { transform-origin: center; animation: spinCW 7s linear infinite; }
-        .spin-cw-fast { transform-origin: center; animation: spinCW 3s linear infinite; }
-        .spin-ccw { transform-origin: center; animation: spinCCW 5s linear infinite; }
-        .spin-ccw-slow { transform-origin: center; animation: spinCCW 12s linear infinite; }
-        .pulse-glow { animation: pulseGlow 1.1s ease-in-out infinite alternate; }
-        .float-icon { animation: floatIcon 2.8s ease-in-out infinite alternate; }
+        /* 翅膀與眼球的浮動/呼吸動畫 */
+        .float-anim { animation: floatAnim 2.6s ease-in-out infinite alternate; }
+        .pulse-eye { animation: pulseEye 1.2s ease-in-out infinite alternate; transform-origin: center; }
+        .rotate-halo { animation: rotateHalo 8s linear infinite; transform-origin: 50px 20px; }
 
-        @keyframes spinCW { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes spinCCW { 0% { transform: rotate(0deg); } 100% { transform: rotate(-360deg); } }
-        @keyframes pulseGlow {
-            0% { transform: scale(0.94); filter: drop-shadow(0 0 15px var(--blue-bright)); }
-            100% { transform: scale(1.08); filter: drop-shadow(0 0 50px var(--blue-bright)); }
+        @keyframes floatAnim {
+            0% { transform: translateY(-8px) scale(0.98); }
+            100% { transform: translateY(8px) scale(1.02); }
         }
-        @keyframes floatIcon {
-            0% { transform: translateY(-10px); }
-            100% { transform: translateY(10px); }
+        @keyframes pulseEye {
+            0% { transform: scale(0.9); }
+            100% { transform: scale(1.15); filter: drop-shadow(0 0 15px var(--blue-bright)); }
+        }
+        @keyframes rotateHalo {
+            0% { transform: rotateX(60deg) rotateZ(0deg); }
+            100% { transform: rotateX(60deg) rotateZ(360deg); }
         }
 
-        /* 10s~12s 暴走段落：藍框從最外緣極細平滑向內延伸變粗 */
+        /* 暴走段落 (藍框向內延伸 + 巨幅文字陣) */
         #frame-glitch-scene {
             background-color: var(--blue-pure) !important;
             position: absolute; inset: 0;
@@ -168,8 +179,8 @@
         .glitch-bg-angel {
             position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            width: 70vh; height: 70vh;
-            opacity: 0.18; z-index: 3; pointer-events: none;
+            width: 80vh; height: 50vh;
+            opacity: 0.22; z-index: 3; pointer-events: none;
             filter: drop-shadow(0 0 30px var(--blue-bright));
         }
 
@@ -203,7 +214,7 @@
             text-shadow: 0 0 16px rgba(255,255,255,0.95), 0 0 30px var(--blue-bright);
         }
 
-        /* 漸進式跳出動畫 (Puppet 選項頁) */
+        /* Puppet 選項頁動態 */
         .pop-item {
             opacity: 0;
             transform: scale(0.8) translateY(20px);
@@ -278,7 +289,7 @@
             100% { opacity: 0; transform: scale(25); border-width: 1px; }
         }
 
-        /* Profile 卡片 UI */
+        /* Profile UI */
         #profile-ui {
             position: fixed; inset: 0; z-index: 10;
             pointer-events: none;
@@ -395,90 +406,66 @@
 
         <button class="start-btn" id="start-btn" onclick="startIllusionaryCutscene()">ROLL ILLUSIONARY</button>
 
-        <!-- Frame 1: Seraphim 六翼熾天使 -->
+        <!-- 通用大天使 SVG 組件模組 -->
+        <template id="seraphim-svg-template">
+            <svg viewBox="0 0 200 120" style="width: 100%; height: 100%;">
+                <!-- 頂部幾何光環 -->
+                <ellipse cx="100" cy="22" rx="28" ry="8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="6 3" />
+                <ellipse cx="100" cy="22" rx="18" ry="5" fill="none" stroke="currentColor" stroke-width="1.5" />
+                
+                <!-- 翅膀群 (上/中/下 三對羽翼) -->
+                <g class="wings-group">
+                    <!-- 上羽翼 -->
+                    <path d="M 100 55 C 80 20, 30 10, 20 25 C 40 38, 75 48, 100 55 Z" fill="none" stroke="currentColor" stroke-width="2.5" />
+                    <path d="M 100 55 C 120 20, 170 10, 180 25 C 160 38, 125 48, 100 55 Z" fill="none" stroke="currentColor" stroke-width="2.5" />
+                    
+                    <!-- 中羽翼 -->
+                    <path d="M 100 58 C 70 45, 15 40, 10 52 C 35 60, 75 62, 100 58 Z" fill="none" stroke="currentColor" stroke-width="2.5" />
+                    <path d="M 100 58 C 130 45, 185 40, 190 52 C 165 60, 125 62, 100 58 Z" fill="none" stroke="currentColor" stroke-width="2.5" />
+
+                    <!-- 下羽翼 -->
+                    <path d="M 100 62 C 80 80, 40 110, 30 105 C 45 80, 78 70, 100 62 Z" fill="none" stroke="currentColor" stroke-width="2.5" />
+                    <path d="M 100 62 C 120 80, 160 110, 170 105 C 155 80, 122 70, 100 62 Z" fill="none" stroke="currentColor" stroke-width="2.5" />
+                </g>
+
+                <!-- 中央神聖獨眼 (Eye of Providence) -->
+                <g class="eye-group pulse-eye">
+                    <path d="M 70 58 Q 100 35 130 58 Q 100 81 70 58 Z" fill="none" stroke="currentColor" stroke-width="3" />
+                    <circle cx="100" cy="58" r="9" fill="currentColor" />
+                    <circle cx="102" cy="56" r="3" fill="#ffffff" />
+                </g>
+            </svg>
+        </template>
+
+        <!-- Frame 1: 列車が死ぬ (白色背景 + 藍色原版天使) -->
         <div class="cutscene-frame frame-white" id="f1">
-            <div class="angel-icon-box float-icon">
-                <svg viewBox="0 0 100 100" style="color: var(--blue-pure);">
-                    <circle class="spin-cw" cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="12 6" />
-                    <circle class="spin-ccw" cx="50" cy="50" r="36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="8 4" />
-                    <g class="spin-cw" style="animation-duration: 10s;">
-                        <path d="M50 4 L58 36 L92 46 L58 56 L50 88 L42 56 L8 46 L42 36 Z" fill="currentColor" opacity="0.85" />
-                        <path d="M50 14 L55 36 L77 41 L55 46 L50 68 L45 46 L23 41 L45 36 Z" fill="#fff" opacity="0.7" />
-                    </g>
-                    <circle cx="50" cy="46" r="6" fill="#fff"/>
-                    <path d="M 28 46 Q 50 24 72 46 Q 50 68 28 46 Z" fill="none" stroke="currentColor" stroke-width="2.5"/>
-                </svg>
-            </div>
-            <div class="jp-text pulse-glow">列車が死ぬ</div>
+            <div class="seraphim-box float-anim" style="color: var(--blue-pure);" id="svg-container-f1"></div>
+            <div class="jp-text">列車が死ぬ</div>
         </div>
 
-        <!-- Frame 2: Sacred Halo 聖十字幾何光環 -->
+        <!-- Frame 2: Is it time to wake up? (藍色背景 + 白色天使) -->
         <div class="cutscene-frame frame-blue" id="f2">
-            <div class="angel-icon-box float-icon">
-                <svg viewBox="0 0 100 100" style="color: #ffffff;">
-                    <circle class="spin-cw-fast" cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 4" />
-                    <circle class="spin-ccw-slow" cx="50" cy="50" r="38" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="20 10" />
-                    <g class="spin-cw" style="animation-duration: 15s;">
-                        <polygon points="50,8 55,45 92,50 55,55 50,92 45,55 8,50 45,45" fill="none" stroke="currentColor" stroke-width="2.5"/>
-                        <circle cx="50" cy="50" r="14" fill="none" stroke="currentColor" stroke-width="2" />
-                        <circle cx="50" cy="50" r="6" fill="currentColor" />
-                    </g>
-                </svg>
-            </div>
-            <div class="en-text pulse-glow">Is it time to wake up?</div>
+            <div class="seraphim-box float-anim" style="color: #ffffff;" id="svg-container-f2"></div>
+            <div class="en-text">Is it time to wake up?</div>
         </div>
 
-        <!-- Frame 3: Ophanim 智天使眼輪 -->
+        <!-- Frame 3: どこにいますか？ -->
         <div class="cutscene-frame frame-blue" id="f3">
-            <div class="angel-icon-box float-icon">
-                <svg viewBox="0 0 100 100" style="color: #ffffff;">
-                    <g class="spin-cw">
-                        <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="16 8" />
-                        <circle cx="50" cy="6" r="4" fill="currentColor" />
-                        <circle cx="50" cy="94" r="4" fill="currentColor" />
-                        <circle cx="6" cy="50" r="4" fill="currentColor" />
-                        <circle cx="94" cy="50" r="4" fill="currentColor" />
-                    </g>
-                    <g class="spin-ccw" style="animation-duration: 4s;">
-                        <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="10 5" />
-                        <circle cx="50" cy="20" r="3" fill="var(--blue-bright)" />
-                        <circle cx="50" cy="80" r="3" fill="var(--blue-bright)" />
-                        <circle cx="20" cy="50" r="3" fill="var(--blue-bright)" />
-                        <circle cx="80" cy="50" r="3" fill="var(--blue-bright)" />
-                    </g>
-                    <polygon points="50,16 64,50 50,84 36,50" fill="none" stroke="currentColor" stroke-width="2" class="spin-cw-fast"/>
-                    <circle cx="50" cy="50" r="6" fill="#fff" class="pulse-glow"/>
-                </svg>
-            </div>
-            <div class="jp-text pulse-glow">どこにいますか？</div>
+            <div class="seraphim-box float-anim" style="color: #ffffff;" id="svg-container-f3"></div>
+            <div class="jp-text">どこにいますか？</div>
         </div>
 
-        <!-- Frame 4: Celestial Crown 神聖冠冕 -->
+        <!-- Frame 4: you belong to here. -->
         <div class="cutscene-frame frame-white" id="f5">
-            <div class="angel-icon-box float-icon">
-                <svg viewBox="0 0 100 100" style="color: var(--blue-pure);">
-                    <g class="spin-cw" style="animation-duration: 9s;">
-                        <rect x="20" y="20" width="60" height="60" fill="none" stroke="currentColor" stroke-width="2" rx="4"/>
-                        <rect x="20" y="20" width="60" height="60" fill="none" stroke="currentColor" stroke-width="1.5" transform="rotate(45 50 50)"/>
-                    </g>
-                    <circle class="spin-ccw" cx="50" cy="50" r="28" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="14 6" />
-                    <circle cx="50" cy="50" r="10" fill="currentColor" class="pulse-glow" />
-                </svg>
-            </div>
-            <div class="en-text pulse-glow" style="color: var(--blue-pure);">you belong to here.</div>
+            <div class="seraphim-box float-anim" style="color: var(--blue-pure);" id="svg-container-f5"></div>
+            <div class="en-text" style="color: var(--blue-pure);">you belong to here.</div>
         </div>
 
         <!-- Frame 5: 暴走段落 (藍框延伸 + 巨幅文字陣) -->
         <div class="cutscene-frame" id="frame-glitch-scene">
             <div class="glitch-black-box" id="glitch-black-box"></div>
             
-            <div class="glitch-bg-angel">
-                <svg viewBox="0 0 100 100" style="color: #ffffff; width:100%; height:100%;">
-                    <circle class="spin-cw-fast" cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="8 8" />
-                    <polygon points="50,2 62,38 98,50 62,62 50,98 38,62 2,50 38,38" fill="none" stroke="currentColor" stroke-width="2" />
-                    <circle cx="50" cy="50" r="20" fill="none" stroke="currentColor" stroke-width="4" />
-                </svg>
-            </div>
+            <div class="glitch-bg-angel" id="svg-container-glitch" style="color: #ffffff;"></div>
 
             <div id="glitch-columns-container"></div>
         </div>
@@ -505,7 +492,7 @@
         </div>
     </div>
 
-    <!-- probaon UI -->
+    <!-- Profile UI -->
     <div id="profile-ui">
         <div class="profile-card">
             <div class="card-header">
@@ -559,12 +546,19 @@
             ytPlayer = new YT.Player('yt-player', {
                 height: '0',
                 width: '0',
-                videoId: 'JBgq8cG2D6o', // Sol's RNG Illusionary Music
-                playerVars: {
-                    'autoplay': 0,
-                    'controls': 0,
-                    'disablekb': 1,
-                    'playsinline': 1
+                videoId: 'JBgq8cG2D6o',
+                playerVars: { 'autoplay': 0, 'controls': 0, 'disablekb': 1, 'playsinline': 1 }
+            });
+        }
+
+        // 初始化所有大天使 SVG
+        function injectSeraphimSVGs() {
+            const tpl = document.getElementById('seraphim-svg-template').content;
+            ['f1', 'f2', 'f3', 'f5', 'glitch'].forEach(id => {
+                const target = document.getElementById(`svg-container-${id}`);
+                if (target) {
+                    target.innerHTML = '';
+                    target.appendChild(tpl.cloneNode(true));
                 }
             });
         }
@@ -610,7 +604,7 @@
 
         function hideAllFrames() {
             document.querySelectorAll('.cutscene-frame').forEach(el => {
-                el.classList.remove('active');
+                el.classList.remove('active', 'pre-transition');
                 el.style.display = 'none';
             });
         }
@@ -622,6 +616,15 @@
             void frame.offsetWidth;
             frame.classList.add('active');
             triggerFlashAndShake();
+        }
+
+        // 換頁前搖：在時間結束前 0.45s 觸發抖動與前衝動畫
+        function prepareTransition(id) {
+            const frame = document.getElementById(id);
+            if (frame) {
+                frame.classList.add('pre-transition');
+                playGlitchPop();
+            }
         }
 
         function spawnGlitchColumn(container) {
@@ -656,6 +659,7 @@
         /* 順暢動畫與時間軸 */
         function startIllusionaryCutscene() {
             initAudio();
+            injectSeraphimSVGs();
             document.getElementById('start-btn').style.display = "none";
 
             // 1. 音樂開始播放 (0.0s)
@@ -668,17 +672,27 @@
 
             // 0.0s ~ 2.5s: Frame 1
             showFrame('f1');
+            setTimeout(() => prepareTransition('f1'), 2050); // 切換前搖
 
             // 2.5s ~ 5.0s: Frame 2
-            setTimeout(() => { showFrame('f2'); }, 2500);
+            setTimeout(() => {
+                showFrame('f2');
+            }, 2500);
+            setTimeout(() => prepareTransition('f2'), 4550); // 切換前搖
 
             // 5.0s ~ 7.5s: Frame 3
-            setTimeout(() => { showFrame('f3'); }, 5000);
+            setTimeout(() => {
+                showFrame('f3');
+            }, 5000);
+            setTimeout(() => prepareTransition('f3'), 7050); // 切換前搖
 
-            // 7.5s ~ 10.0s: Frame 4
-            setTimeout(() => { showFrame('f5'); }, 7500);
+            // 7.5s ~ 10.0s: Frame 4 (you belong to here)
+            setTimeout(() => {
+                showFrame('f5');
+            }, 7500);
+            setTimeout(() => prepareTransition('f5'), 9550); // 極致暴走衝擊前搖！
 
-            // 10.0s ~ 12.0s: 暴走段落
+            // 10.0s ~ 12.0s: 暴走段落 (no, not yet)
             setTimeout(() => {
                 if (ytPlayer) {
                     if (ytPlayer.pauseVideo) ytPlayer.pauseVideo();
@@ -721,11 +735,10 @@
 
             }, 10000);
 
-            // 12.0s: 進入選項頁並「依次彈出文字」
+            // 12.0s: 進入 Puppet 選項頁
             setTimeout(() => {
                 if (coreBox) coreBox.scale.set(1, 1, 1);
                 
-                // 重置選項頁狀態
                 const opt2 = document.getElementById('puppet-opt2');
                 opt2.textContent = "2. No";
                 
@@ -738,21 +751,21 @@
 
                 showFrame('f7');
 
-                // 12.3s: 彈出 "will you be my puppet?"
+                // +0.3s: 彈出 "will you be my puppet?"
                 setTimeout(() => {
                     title.classList.add('show');
                     playGlitchPop();
                     triggerFlashAndShake();
                 }, 300);
 
-                // 12.9s: 彈出 "1. Yes"
+                // +0.9s: 彈出 "1. Yes"
                 setTimeout(() => {
                     opt1.classList.add('show');
                     playGlitchPop();
                     triggerFlashAndShake();
                 }, 900);
 
-                // 13.5s: 彈出 "2. No"
+                // +1.5s: 彈出 "2. No"
                 setTimeout(() => {
                     opt2.classList.add('show');
                     playGlitchPop();
@@ -762,7 +775,7 @@
             }, 12000);
         }
 
-        /* 滑鼠移上去強制將 2. No 改為 2. Yes 的靈魂細節 */
+        /* 2. No 強制變 2. Yes */
         function forceYes() {
             const btnNo = document.getElementById('puppet-opt2');
             if (btnNo.textContent !== "2. Yes") {
@@ -773,9 +786,7 @@
         }
 
         function choosePuppet() {
-            // 確保點擊瞬間一定是 Yes
             forceYes();
-
             hideAllFrames();
             
             const f8 = document.getElementById('f8');
@@ -880,6 +891,7 @@
             pLight.position.set(0, 15, 0);
             scene.add(pLight);
 
+            injectSeraphimSVGs();
             animate();
         }
 
