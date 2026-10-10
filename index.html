@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>probaon // Illusionary Cutscene [Refined Edition]</title>
+<title>probaon // Illusionary Terminal</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -79,7 +79,6 @@ body, html { width: 100%; height: 100%; background: var(--bg-void); color: #fff;
     100% { transform: scale(1.5); opacity: 0; filter: brightness(3); }
 }
 
-/* Cutscene 主框架 */
 #cutscene-overlay {
     position: fixed; inset: 0; z-index: 100; background: #000;
     display: flex; justify-content: center; align-items: center;
@@ -241,7 +240,6 @@ body, html { width: 100%; height: 100%; background: var(--bg-void); color: #fff;
 .text-wrap { position: relative; display: inline-block; }
 .color-strike { position: fixed; inset: 0; z-index: 195; pointer-events: none; opacity: 0; mix-blend-mode: difference; }
 
-/* 暴走段落 (已移除旋轉字環，改以純粹高壓排版呈現) */
 #frame-glitch-scene { background: var(--blue-pure) !important; position: absolute; inset: 0; overflow: hidden; }
 .glitch-black-box {
     position: absolute; inset: 2px; background: #000; z-index: 2;
@@ -308,56 +306,49 @@ body, html { width: 100%; height: 100%; background: var(--bg-void); color: #fff;
 .letterbox.top { top: 0; } .letterbox.bottom { bottom: 0; }
 body.cinema .letterbox { height: 9vh; }
 
-/* ===== 全新升級：高質感終端機風格個人檔案 (Profile UI) ===== */
+/* ===== Project Moon / Ruina Index Terminal 風格終端機介面 ===== */
 #profile-ui {
     position: fixed; inset: 0; z-index: 10; pointer-events: none;
     display: flex; justify-content: center; align-items: center;
-    opacity: 0; transform: scale(1.1) translateY(40px); perspective: 1200px;
-    transition: opacity .4s ease, transform .7s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0; transform: scale(1.05); filter: blur(10px);
+    transition: opacity .4s ease, transform .5s cubic-bezier(0.16, 1, 0.3, 1), filter .4s ease;
 }
-#profile-ui.active { opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; }
+#profile-ui.active { opacity: 1; transform: scale(1); filter: blur(0); pointer-events: auto; }
 
 .profile-card {
-    width: 92%; max-width: 540px; 
-    background: linear-gradient(135deg, rgba(3, 7, 20, 0.96) 0%, rgba(0, 3, 12, 0.94) 100%);
-    border: 1px solid rgba(0, 102, 255, 0.5);
-    box-shadow: 0 0 80px rgba(0, 18, 255, 0.4), inset 0 0 30px rgba(0, 85, 255, 0.15);
-    backdrop-filter: blur(24px); padding: 38px 42px; position: relative;
-    border-radius: 6px;
+    width: 90%; max-width: 560px; 
+    background: #000;
+    border: 2px solid var(--blue-bright);
+    box-shadow: 0 0 50px rgba(0, 102, 255, 0.35), inset 0 0 20px rgba(0, 18, 255, 0.2);
+    padding: 30px 35px; position: relative;
+    font-family: var(--font-mono);
 }
-/* 高科技四角 HUD 裝飾線 */
-.profile-card::before {
-    content: ''; position: absolute; top: 0; left: 0; width: 16px; height: 16px;
-    border-top: 2px solid var(--blue-bright); border-left: 2px solid var(--blue-bright);
+.card-header { 
+    display: flex; justify-content: space-between; align-items: center; 
+    border-bottom: 2px dashed rgba(0, 102, 255, 0.4); padding-bottom: 10px; margin-bottom: 20px; 
+    font-size: 0.7rem; color: var(--blue-ice); letter-spacing: 2px;
 }
-.profile-card::after {
-    content: ''; position: absolute; bottom: 0; right: 0; width: 16px; height: 16px;
-    border-bottom: 2px solid var(--blue-bright); border-right: 2px solid var(--blue-bright);
+.terminal-title { 
+    font-family: var(--font-mono); font-size: 1.4rem; font-weight: 700; 
+    letter-spacing: 3px; color: #fff; margin-bottom: 6px; text-transform: uppercase;
+    border-left: 4px solid var(--blue-bright); padding-left: 10px;
 }
+.terminal-subtitle { font-size: 0.75rem; color: rgba(255,255,255,0.4); letter-spacing: 3px; margin-bottom: 22px; }
 
-.card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.12); padding-bottom: 12px; margin-bottom: 22px; }
-.rarity-badge { color: #fff; font-weight: bold; font-size: 0.75rem; letter-spacing: 2.5px; background: linear-gradient(90deg, var(--blue-pure), var(--blue-bright)); padding: 4px 12px; border-radius: 3px; box-shadow: 0 0 15px rgba(0,18,255,0.6); }
-.biome-badge { color: var(--blue-ice); font-size: 0.75rem; letter-spacing: 1.5px; border: 1px solid rgba(0,138,255,0.4); padding: 4px 10px; border-radius: 3px; background: rgba(0,102,255,0.08); }
+.tab-menu { display: flex; gap: 6px; margin-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 8px; }
+.tab-btn { background: #000; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.5); font-family: var(--font-mono); font-size: 0.7rem; font-weight: bold; letter-spacing: 2px; cursor: pointer; padding: 5px 12px; transition: all 0.1s; }
+.tab-btn.active, .tab-btn:hover { color: #000; background: var(--blue-bright); border-color: var(--blue-bright); }
 
-.user-title { font-family: var(--font-serif); font-size: clamp(2.4rem, 6vw, 3.6rem); font-style: italic; font-weight: 900; letter-spacing: 4px; color: #fff; text-shadow: 0 0 25px var(--blue-pure), 0 0 50px rgba(255,255,255,0.4); line-height: 1.1; }
-.user-sub { font-size: 0.85rem; color: rgba(255,255,255,0.65); letter-spacing: 5px; margin-top: 6px; margin-bottom: 24px; text-transform: uppercase; }
+.tab-content { display: none; flex-direction: column; gap: 8px; font-size: 0.8rem; }
+.tab-content.active { display: flex; }
 
-.tab-menu { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
-.tab-btn { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.5); font-family: var(--font-mono); font-size: 0.75rem; font-weight: bold; letter-spacing: 2px; cursor: pointer; padding: 6px 14px; border-radius: 3px; transition: all 0.2s ease; }
-.tab-btn.active, .tab-btn:hover { color: #fff; background: rgba(0,102,255,0.25); border-color: var(--blue-bright); box-shadow: 0 0 15px rgba(0,102,255,0.3); }
+.data-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0, 18, 255, 0.05); border: 1px solid rgba(0, 102, 255, 0.2); padding: 9px 14px; }
+.data-key { color: rgba(255,255,255,0.5); letter-spacing: 2px; font-size: 0.75rem; }
+.data-val { color: #fff; font-weight: bold; letter-spacing: 1px; font-size: 0.8rem; }
 
-.tab-content { display: none; flex-direction: column; gap: 10px; font-size: 0.82rem; }
-.tab-content.active { display: flex; animation: tabFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-@keyframes tabFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-
-.data-row { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.04); padding: 11px 16px; border-left: 3px solid var(--blue-pure); border-radius: 2px; transition: background 0.2s; }
-.data-row:hover { background: rgba(0,102,255,0.08); border-left-color: var(--blue-bright); }
-.data-key { color: rgba(255,255,255,0.5); letter-spacing: 1.5px; }
-.data-val { color: #fff; font-weight: bold; letter-spacing: 1px; }
-
-.card-actions { margin-top: 28px; display: flex; gap: 12px; }
-.btn-ui { flex: 1; padding: 13px; background: rgba(0,18,255,0.1); border: 1px solid var(--blue-pure); color: #fff; font-family: var(--font-serif); font-weight: bold; letter-spacing: 2px; cursor: pointer; border-radius: 3px; transition: all 0.25s ease; }
-.btn-ui:hover { background: var(--blue-pure); box-shadow: 0 0 25px var(--blue-pure); transform: translateY(-2px); }
+.card-actions { margin-top: 25px; display: flex; gap: 10px; }
+.btn-ui { flex: 1; padding: 12px; background: #000; border: 1px solid var(--blue-bright); color: var(--blue-ice); font-family: var(--font-mono); font-size: 0.8rem; font-weight: bold; letter-spacing: 3px; cursor: pointer; transition: all 0.15s; text-transform: uppercase; }
+.btn-ui:hover { background: var(--blue-bright); color: #000; box-shadow: 0 0 20px var(--blue-bright); }
 </style>
 </head>
 <body>
@@ -378,9 +369,9 @@ body.cinema .letterbox { height: 9vh; }
 <div class="shockwave-ring" id="shockwave"></div>
 
 <div id="cutscene-overlay">
-    <button class="start-btn" id="start-btn" onclick="startIllusionaryCutscene()">ROLL ILLUSIONARY</button>
+    <button class="start-btn" id="start-btn" onclick="startIllusionaryCutscene()">EXECUTE PRESCRIPT</button>
 
-    <!-- 範本 Templates -->
+    <!-- Templates -->
     <template id="tpl-a">
         <svg viewBox="0 0 400 260">
             <g class="sv-ring-c" fill="none" stroke="currentColor" opacity=".35"><circle cx="200" cy="70" r="58" stroke-width="1" class="sv-dash"/></g>
@@ -450,7 +441,7 @@ body.cinema .letterbox { height: 9vh; }
         </svg>
     </template>
 
-    <!-- 幕畫面 -->
+    <!-- Cutscene Frames -->
     <div class="cutscene-frame frame-white" id="f1">
         <div class="rays" style="color:#0012ff"></div>
         <div class="bg-grid" style="color:#0012ff"></div>
@@ -477,14 +468,12 @@ body.cinema .letterbox { height: 9vh; }
         <div class="en-text" id="scramble-f5" data-final="you belong to here." style="color:var(--blue-pure)">&nbsp;</div>
     </div>
 
-    <!-- 暴走段落 (已乾淨俐落移除旋轉字環) -->
     <div class="cutscene-frame" id="frame-glitch-scene">
         <div class="glitch-black-box" id="glitch-black-box"></div>
         <div class="glitch-bg-angel" id="svg-container-glitch" style="color:#fff"></div>
         <div id="glitch-columns-container"></div>
     </div>
 
-    <!-- Puppet 選項頁 -->
     <div class="cutscene-frame frame-black" id="f7">
         <div class="puppet-eye" id="svg-container-puppet" style="color:var(--blue-pure)"></div>
         <div class="puppet-box">
@@ -494,7 +483,6 @@ body.cinema .letterbox { height: 9vh; }
         </div>
     </div>
 
-    <!-- 微笑爆發 -->
     <div class="cutscene-frame frame-black" id="f8">
         <div class="svg-icon-box" id="smile-box" style="width:170px;height:170px;filter:drop-shadow(0 0 30px var(--blue-pure));">
             <svg viewBox="0 0 100 100">
@@ -507,43 +495,45 @@ body.cinema .letterbox { height: 9vh; }
     </div>
 </div>
 
-<!-- 升級版個人檔案介面 (Profile UI) -->
+<!-- Ruina Prescript Terminal 風格介面（資料全數留空） -->
 <div id="profile-ui">
     <div class="profile-card">
         <div class="card-header">
-            <span class="rarity-badge">1 IN 100,000,000</span>
-            <span class="biome-badge">CYBERSPACE // ILLUSIONARY</span>
+            <span>[PRESCRIPT_TERMINAL // VER 2.06]</span>
+            <span>STATUS: STANDBY</span>
         </div>
-        <div class="user-title">probaon</div>
-        <div class="user-sub">Sles // System Terminal</div>
+        <div class="terminal-title">TERMINAL LOG</div>
+        <div class="terminal-subtitle">> SELECT DIRECTIVE TO PROCEED</div>
+        
         <div class="tab-menu">
-            <button class="tab-btn active" onclick="switchTab('profile', this)">PROFILE</button>
-            <button class="tab-btn" onclick="switchTab('skills', this)">SKILLS</button>
-            <button class="tab-btn" onclick="switchTab('projects', this)">PROJECTS</button>
+            <button class="tab-btn active" onclick="switchTab('profile', this)">LOGS</button>
+            <button class="tab-btn" onclick="switchTab('skills', this)">MODULES</button>
+            <button class="tab-btn" onclick="switchTab('projects', this)">RECORDS</button>
         </div>
+        
         <div class="tab-content active" id="tab-profile">
-            <div class="data-row"><span class="data-key">ALIAS</span><span class="data-val" data-target="Sles">-</span></div>
-            <div class="data-row"><span class="data-key">ROLE</span><span class="data-val" data-target="Gamer / Developer">-</span></div>
-            <div class="data-row"><span class="data-key">SPECIALTY</span><span class="data-val" data-target="Luau / JS / Three.js">-</span></div>
-            <div class="data-row"><span class="data-key">STATUS</span><span class="data-val" data-target="ACTIVE // OVERLOAD">-</span></div>
+            <div class="data-row"><span class="data-key">> SUBJECT</span><span class="data-val" data-target="---">---</span></div>
+            <div class="data-row"><span class="data-key">> DESIGNATION</span><span class="data-val" data-target="---">---</span></div>
+            <div class="data-row"><span class="data-key">> SPECIALTY</span><span class="data-val" data-target="---">---</span></div>
+            <div class="data-row"><span class="data-key">> CURRENT_STATE</span><span class="data-val" data-target="UNASSIGNED">UNASSIGNED</span></div>
         </div>
         <div class="tab-content" id="tab-skills">
-            <div class="data-row"><span class="data-key">SKILL I</span><span class="data-val" data-target="Roblox Luau Scripting">-</span></div>
-            <div class="data-row"><span class="data-key">SKILL II</span><span class="data-val" data-target="Discord.js & Bot Dev">-</span></div>
+            <div class="data-row"><span class="data-key">> MODULE_01</span><span class="data-val" data-target="[ NULL ]">[ NULL ]</span></div>
+            <div class="data-row"><span class="data-key">> MODULE_02</span><span class="data-val" data-target="[ NULL ]">[ NULL ]</span></div>
         </div>
         <div class="tab-content" id="tab-projects">
-            <div class="data-row"><span class="data-key">PROJECT I</span><span class="data-val" data-target="Angela Discord Bot">-</span></div>
-            <div class="data-row"><span class="data-key">PROJECT II</span><span class="data-val" data-target="Prescript Terminal Web">-</span></div>
+            <div class="data-row"><span class="data-key">> RECORD_A</span><span class="data-val" data-target="[ UNKNOWN ]">[ UNKNOWN ]</span></div>
+            <div class="data-row"><span class="data-key">> RECORD_B</span><span class="data-val" data-target="[ UNKNOWN ]">[ UNKNOWN ]</span></div>
         </div>
+
         <div class="card-actions">
-            <button class="btn-ui" onclick="replayCutscene()">ROLL AGAIN</button>
+            <button class="btn-ui" onclick="replayCutscene()">RE-EXECUTE</button>
             <button class="btn-ui" onclick="pulseCore()">PULSE CORE</button>
         </div>
     </div>
 </div>
 
 <script>
-/* ================= YouTube 背景音樂 ================= */
 let ytPlayer;
 const ytTag = document.createElement('script');
 ytTag.src = "https://www.youtube.com/iframe_api";
@@ -555,12 +545,10 @@ function onYouTubeIframeAPIReady() {
     });
 }
 
-/* ================= 計時器管理 ================= */
 let timers = [];
 function later(fn, ms) { const t = setTimeout(fn, ms); timers.push(t); return t; }
 function clearAllTimers() { timers.forEach(clearTimeout); timers = []; }
 
-/* ================= 大天使 SVG 注入 ================= */
 function injectInto(id, tplId) {
     const target = document.getElementById(`svg-container-${id}`);
     const tpl = document.getElementById(tplId);
@@ -590,7 +578,6 @@ function addShards(frame, color, n = 14) {
     }
 }
 
-/* ================= Web Audio (劇院級音效) ================= */
 let audioCtx;
 function initAudio() {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -664,7 +651,6 @@ function playNoiseBurst(dur = .12) {
     src.connect(gain); gain.connect(audioCtx.destination); src.start();
 }
 
-/* ================= 視覺特效邏輯 ================= */
 function triggerFlashAndShake() {
     document.body.classList.remove('shake-impact');
     void document.body.offsetWidth;
@@ -761,7 +747,6 @@ function spawnGlitchColumn(container, strike = false) {
     triggerFlashAndShake();
 }
 
-/* ================= 主時間軸 ================= */
 function startIllusionaryCutscene() {
     clearAllTimers();
     initAudio();
