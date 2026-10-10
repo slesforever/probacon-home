@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>probaon // Illusionary Terminal</title>
+<title>probaon // Illusionary Cutscene</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -51,15 +51,7 @@ body, html { width: 100%; height: 100%; background: var(--bg-void); color: #fff;
     50% { transform: translate(2%,-3%); } 75% { transform: translate(-2%,-1%); } 100% { transform: translate(0,0); }
 }
 
-.crt-glitch-overlay {
-    position: fixed; inset: 0; pointer-events: none; z-index: 92;
-    background: radial-gradient(circle, transparent 60%, rgba(0, 18, 255, 0.35) 100%);
-    mix-blend-mode: color-dodge; opacity: 0.85;
-}
-
-.seraphim-box, .rgb-split, .shard, .glitch-slice { will-change: transform, opacity; }
-
-/* 衝擊震動 */
+/* ===== 衝擊震動 ===== */
 .shake-impact { animation: shakeImpact .22s cubic-bezier(.36,.07,.19,.97) both; }
 @keyframes shakeImpact {
     0% { transform: translate(0,0) scale(1); filter: none; }
@@ -70,7 +62,7 @@ body, html { width: 100%; height: 100%; background: var(--bg-void); color: #fff;
     100% { transform: translate(0,0) scale(1); filter: none; }
 }
 
-/* 換頁前搖 */
+/* ===== 換頁前搖 ===== */
 .pre-transition { animation: preTransition .5s ease-in forwards !important; }
 @keyframes preTransition {
     0% { transform: scale(1); filter: brightness(1); }
@@ -79,6 +71,7 @@ body, html { width: 100%; height: 100%; background: var(--bg-void); color: #fff;
     100% { transform: scale(1.5); opacity: 0; filter: brightness(3); }
 }
 
+/* ===== Cutscene ===== */
 #cutscene-overlay {
     position: fixed; inset: 0; z-index: 100; background: #000;
     display: flex; justify-content: center; align-items: center;
@@ -130,6 +123,7 @@ body, html { width: 100%; height: 100%; background: var(--bg-void); color: #fff;
 .frame-white { background: radial-gradient(circle at 50% 45%, #fff 0%, #e8ecff 55%, #b9c4ff 120%); color: var(--blue-pure); }
 .frame-black { background: radial-gradient(circle at 50% 50%, #02041a 0%, #000 70%); color: var(--blue-pure); }
 
+/* 背景放射光芒 */
 .rays {
     position: absolute; left: 50%; top: 45%; width: 220vmax; height: 220vmax;
     margin: -110vmax 0 0 -110vmax; pointer-events: none; opacity: .22;
@@ -151,6 +145,7 @@ body, html { width: 100%; height: 100%; background: var(--bg-void); color: #fff;
 }
 @keyframes gridMove { to { background-position: 60px 60px; } }
 
+/* 漂浮碎片 */
 .shard {
     position: absolute; pointer-events: none; width: 0; height: 0; opacity: 0;
     border-left: 8px solid transparent; border-right: 8px solid transparent;
@@ -163,6 +158,7 @@ body, html { width: 100%; height: 100%; background: var(--bg-void); color: #fff;
     100% { transform: translateY(-120vh) rotate(540deg) scale(1.3); opacity: 0; }
 }
 
+/* ===== 大天使容器 ===== */
 .seraphim-box {
     width: min(460px, 82vw); height: min(300px, 52vw);
     margin-bottom: 25px; display: flex; justify-content: center; align-items: center;
@@ -175,6 +171,7 @@ body, html { width: 100%; height: 100%; background: var(--bg-void); color: #fff;
     100% { transform: translateY(10px) scale(1.03); }
 }
 
+/* SVG 內部動畫 */
 .sv-ring-a { transform-origin: 200px 70px; animation: ringSpin 9s linear infinite; }
 .sv-ring-b { transform-origin: 200px 70px; animation: ringSpin 6s linear infinite reverse; }
 .sv-ring-c { transform-origin: 200px 70px; animation: ringSpin 14s linear infinite; }
@@ -209,9 +206,11 @@ body, html { width: 100%; height: 100%; background: var(--bg-void); color: #fff;
 .sv-draw { stroke-dasharray: 600; stroke-dashoffset: 600; animation: drawIn 1.2s ease-out forwards; }
 @keyframes drawIn { to { stroke-dashoffset: 0; } }
 
+/* ===== 文字動畫 ===== */
 .jp-text { font-size: clamp(1.8rem, 6vw, 2.8rem); font-weight: bold; letter-spacing: 8px; position: relative; z-index: 3; }
 .en-text { font-size: clamp(1.4rem, 5vw, 2.2rem); letter-spacing: 6px; font-weight: bold; position: relative; z-index: 3; }
 
+/* RGB 分離（常駐微抖） */
 .rgb-split { position: relative; display: inline-block; animation: rgbJitter 2.8s steps(1) infinite; }
 .rgb-split::before, .rgb-split::after {
     content: attr(data-text); position: absolute; left: 0; top: 0; width: 100%;
@@ -223,8 +222,9 @@ body, html { width: 100%; height: 100%; background: var(--bg-void); color: #fff;
 .frame-white .rgb-split::after { color: #00b7ff; mix-blend-mode: multiply; }
 @keyframes rgbA { 0%,100% { transform: translate(-2px,0);} 20% { transform: translate(-7px,1px);} 22% { transform: translate(-2px,0);} 70% { transform: translate(-9px,-2px); clip-path: inset(30% 0 40% 0);} 72% { transform: translate(-2px,0); clip-path: none;} }
 @keyframes rgbB { 0%,100% { transform: translate(2px,0);} 20% { transform: translate(7px,-1px);} 22% { transform: translate(2px,0);} 70% { transform: translate(9px,2px); clip-path: inset(55% 0 10% 0);} 72% { transform: translate(2px,0); clip-path: none;} }
-@keyframes rgbJitter { 0%,100% { transform: translate(0,0);} 71% { transform: translate(2px,0);} 72% { transform: translate(0,0); } }
+@keyframes rgbJitter { 0%,100% { transform: translate(0,0);} 71% { transform: translate(2px,0);} 72% { transform: translate(0,0);} }
 
+/* 遮罩掃過 */
 .wipe-reveal { clip-path: inset(0 100% 0 0); }
 .active .wipe-reveal { animation: wipeReveal .7s cubic-bezier(.7,0,.2,1) .25s forwards; }
 @keyframes wipeReveal { to { clip-path: inset(0 0 0 0); } }
@@ -238,8 +238,21 @@ body, html { width: 100%; height: 100%; background: var(--bg-void); color: #fff;
 @keyframes wipeBar { 0% { transform: translateY(-50%) scaleX(0); transform-origin: left; } 50% { transform: translateY(-50%) scaleX(1); transform-origin: left;} 51% { transform-origin: right;} 100% { transform: translateY(-50%) scaleX(0); transform-origin: right; } }
 
 .text-wrap { position: relative; display: inline-block; }
-.color-strike { position: fixed; inset: 0; z-index: 195; pointer-events: none; opacity: 0; mix-blend-mode: difference; }
 
+/* 反差色閃擊 */
+.color-strike {
+    position: fixed; inset: 0; z-index: 195; pointer-events: none; opacity: 0; mix-blend-mode: difference;
+}
+
+/* 字母橫向掃描線 */
+.scan-bar {
+    position: absolute; left: 0; right: 0; height: 3px; top: 0; pointer-events: none; z-index: 5;
+    background: linear-gradient(90deg, transparent, #fff, transparent); opacity: .6;
+    animation: scanBar 3s linear infinite;
+}
+@keyframes scanBar { 0% { top: -2%; } 100% { top: 102%; } }
+
+/* ===== 暴走段落 ===== */
 #frame-glitch-scene { background: var(--blue-pure) !important; position: absolute; inset: 0; overflow: hidden; }
 .glitch-black-box {
     position: absolute; inset: 2px; background: #000; z-index: 2;
@@ -252,7 +265,6 @@ body, html { width: 100%; height: 100%; background: var(--bg-void); color: #fff;
     filter: drop-shadow(0 0 30px var(--blue-bright));
 }
 #glitch-columns-container { position: absolute; inset: 0; z-index: 10; pointer-events: none; }
-
 .text-column {
     position: absolute; top: -10%; display: flex; flex-direction: column; gap: 4px;
     font-family: var(--font-serif); font-weight: 900; color: #fff;
@@ -270,6 +282,7 @@ body, html { width: 100%; height: 100%; background: var(--bg-void); color: #fff;
 }
 @keyframes sliceFlash { 0% { transform: translateX(-4%);} 50% { transform: translateX(5%);} 100% { transform: translateX(0); opacity: 0; } }
 
+/* ===== Puppet ===== */
 .pop-item { opacity: 0; transform: scale(.8) translateY(20px); transition: opacity .25s ease-out, transform .25s cubic-bezier(.175,.885,.32,1.25); }
 .pop-item.show { opacity: 1; transform: scale(1) translateY(0); }
 .puppet-box { display: flex; flex-direction: column; gap: 20px; align-items: center; position: relative; z-index: 3; }
@@ -285,6 +298,7 @@ body, html { width: 100%; height: 100%; background: var(--bg-void); color: #fff;
     animation: floatAnim 4s ease-in-out infinite alternate;
 }
 
+/* ===== 微笑爆發 ===== */
 .smile-zoom-implode { animation: smileZoom .65s cubic-bezier(.7,0,.84,0) forwards; }
 @keyframes smileZoom {
     0% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 20px var(--blue-pure)); }
@@ -302,53 +316,42 @@ body, html { width: 100%; height: 100%; background: var(--bg-void); color: #fff;
 .shockwave-active { animation: shockwaveExpand .6s cubic-bezier(.1,.8,.3,1) forwards; }
 @keyframes shockwaveExpand { 0% { opacity: 1; transform: scale(.1); border-width: 20px; } 100% { opacity: 0; transform: scale(25); border-width: 1px; } }
 
+/* 黑邊電影遮幅 */
 .letterbox { position: fixed; left: 0; right: 0; height: 0; background: #000; z-index: 95; transition: height .8s cubic-bezier(.7,0,.2,1); pointer-events: none; }
 .letterbox.top { top: 0; } .letterbox.bottom { bottom: 0; }
 body.cinema .letterbox { height: 9vh; }
 
-/* ===== Project Moon / Ruina Index Terminal 風格終端機介面 ===== */
+/* ===== Profile UI ===== */
 #profile-ui {
     position: fixed; inset: 0; z-index: 10; pointer-events: none;
     display: flex; justify-content: center; align-items: center;
-    opacity: 0; transform: scale(1.05); filter: blur(10px);
-    transition: opacity .4s ease, transform .5s cubic-bezier(0.16, 1, 0.3, 1), filter .4s ease;
+    opacity: 0; transform: scale(1.6) rotateX(25deg) translateY(-80px); perspective: 1000px;
+    transition: opacity .3s ease, transform .6s cubic-bezier(.175,.885,.32,1.25);
 }
-#profile-ui.active { opacity: 1; transform: scale(1); filter: blur(0); pointer-events: auto; }
-
+#profile-ui.active { opacity: 1; transform: scale(1) rotateX(0) translateY(0); }
 .profile-card {
-    width: 90%; max-width: 560px; 
-    background: #000;
-    border: 2px solid var(--blue-bright);
-    box-shadow: 0 0 50px rgba(0, 102, 255, 0.35), inset 0 0 20px rgba(0, 18, 255, 0.2);
-    padding: 30px 35px; position: relative;
-    font-family: var(--font-mono);
+    pointer-events: auto; width: 90%; max-width: 520px; background: rgba(2,4,12,.92);
+    border: 1px solid var(--blue-pure);
+    box-shadow: 0 0 70px rgba(0,18,255,.5), inset 0 0 30px rgba(0,18,255,.25);
+    backdrop-filter: blur(16px); padding: 35px 40px;
+    clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
 }
-.card-header { 
-    display: flex; justify-content: space-between; align-items: center; 
-    border-bottom: 2px dashed rgba(0, 102, 255, 0.4); padding-bottom: 10px; margin-bottom: 20px; 
-    font-size: 0.7rem; color: var(--blue-ice); letter-spacing: 2px;
-}
-.terminal-title { 
-    font-family: var(--font-mono); font-size: 1.4rem; font-weight: 700; 
-    letter-spacing: 3px; color: #fff; margin-bottom: 6px; text-transform: uppercase;
-    border-left: 4px solid var(--blue-bright); padding-left: 10px;
-}
-.terminal-subtitle { font-size: 0.75rem; color: rgba(255,255,255,0.4); letter-spacing: 3px; margin-bottom: 22px; }
-
-.tab-menu { display: flex; gap: 6px; margin-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 8px; }
-.tab-btn { background: #000; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.5); font-family: var(--font-mono); font-size: 0.7rem; font-weight: bold; letter-spacing: 2px; cursor: pointer; padding: 5px 12px; transition: all 0.1s; }
-.tab-btn.active, .tab-btn:hover { color: #000; background: var(--blue-bright); border-color: var(--blue-bright); }
-
-.tab-content { display: none; flex-direction: column; gap: 8px; font-size: 0.8rem; }
+.card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,.15); padding-bottom: 10px; margin-bottom: 20px; font-size: .75rem; }
+.rarity-badge { color: #fff; font-weight: bold; letter-spacing: 2px; background: var(--blue-pure); padding: 3px 10px; box-shadow: 0 0 12px var(--blue-pure); }
+.biome-badge { color: var(--blue-bright); letter-spacing: 1px; border: 1px solid rgba(0,85,255,.6); padding: 3px 8px; }
+.user-title { font-family: var(--font-serif); font-size: clamp(2.5rem, 6vw, 3.8rem); font-style: italic; font-weight: 900; letter-spacing: 4px; color: #fff; text-shadow: 0 0 20px var(--blue-pure), 0 0 40px #fff; line-height: 1; }
+.user-sub { font-size: .9rem; color: rgba(255,255,255,.7); letter-spacing: 4px; margin-top: 6px; margin-bottom: 22px; }
+.tab-menu { display: flex; gap: 8px; margin-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,.1); padding-bottom: 8px; }
+.tab-btn { background: transparent; border: none; color: rgba(255,255,255,.5); font-family: var(--font-mono); font-size: .75rem; font-weight: bold; letter-spacing: 2px; cursor: pointer; padding: 4px 10px; }
+.tab-btn.active, .tab-btn:hover { color: #fff; background: rgba(0,85,255,.25); border-bottom: 2px solid var(--blue-bright); }
+.tab-content { display: none; flex-direction: column; gap: 10px; font-size: .8rem; }
 .tab-content.active { display: flex; }
-
-.data-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0, 18, 255, 0.05); border: 1px solid rgba(0, 102, 255, 0.2); padding: 9px 14px; }
-.data-key { color: rgba(255,255,255,0.5); letter-spacing: 2px; font-size: 0.75rem; }
-.data-val { color: #fff; font-weight: bold; letter-spacing: 1px; font-size: 0.8rem; }
-
-.card-actions { margin-top: 25px; display: flex; gap: 10px; }
-.btn-ui { flex: 1; padding: 12px; background: #000; border: 1px solid var(--blue-bright); color: var(--blue-ice); font-family: var(--font-mono); font-size: 0.8rem; font-weight: bold; letter-spacing: 3px; cursor: pointer; transition: all 0.15s; text-transform: uppercase; }
-.btn-ui:hover { background: var(--blue-bright); color: #000; box-shadow: 0 0 20px var(--blue-bright); }
+.data-row { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,.03); padding: 9px 14px; border-left: 3px solid var(--blue-pure); }
+.data-key { color: rgba(255,255,255,.5); }
+.data-val { color: #fff; font-weight: bold; }
+.card-actions { margin-top: 25px; display: flex; gap: 12px; }
+.btn-ui { flex: 1; padding: 12px; background: transparent; border: 1px solid var(--blue-pure); color: #fff; font-family: var(--font-serif); font-weight: bold; letter-spacing: 2px; cursor: pointer; transition: all .2s ease; }
+.btn-ui:hover { background: var(--blue-pure); box-shadow: 0 0 25px var(--blue-pure); }
 </style>
 </head>
 <body>
@@ -361,7 +364,6 @@ body.cinema .letterbox { height: 9vh; }
 <div class="scanlines"></div>
 <div class="grain"></div>
 <div class="vignette"></div>
-<div class="crt-glitch-overlay"></div>
 <div class="letterbox top"></div>
 <div class="letterbox bottom"></div>
 <div class="flash-bang" id="flash"></div>
@@ -369,41 +371,72 @@ body.cinema .letterbox { height: 9vh; }
 <div class="shockwave-ring" id="shockwave"></div>
 
 <div id="cutscene-overlay">
-    <button class="start-btn" id="start-btn" onclick="startIllusionaryCutscene()">EXECUTE PRESCRIPT</button>
 
-    <!-- Templates -->
+    <button class="start-btn" id="start-btn" onclick="startIllusionaryCutscene()">ROLL ILLUSIONARY</button>
+
+    <!-- ========== 大天使 SVG 模板（4 種變體，每幕不同） ========== -->
+    <!-- 變體 A：六翼熾天使 -->
     <template id="tpl-a">
         <svg viewBox="0 0 400 260">
-            <g class="sv-ring-c" fill="none" stroke="currentColor" opacity=".35"><circle cx="200" cy="70" r="58" stroke-width="1" class="sv-dash"/></g>
-            <g class="sv-ring-a" fill="none" stroke="currentColor"><ellipse cx="200" cy="70" rx="46" ry="12" stroke-width="2.5" stroke-dasharray="8 4"/></g>
+            <g class="sv-ring-c" fill="none" stroke="currentColor" opacity=".35">
+                <circle cx="200" cy="70" r="58" stroke-width="1" class="sv-dash"/>
+            </g>
+            <g class="sv-ring-a" fill="none" stroke="currentColor">
+                <ellipse cx="200" cy="70" rx="46" ry="12" stroke-width="2.5" stroke-dasharray="8 4"/>
+            </g>
             <g class="sv-ring-b" fill="none" stroke="currentColor">
                 <circle cx="200" cy="70" r="30" stroke-width="1.5" stroke-dasharray="2 6"/>
                 <path d="M200 36 L206 70 L200 104 L194 70 Z" stroke-width="1.5"/>
             </g>
             <g class="sv-wings-flap" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round">
+                <!-- 上羽 -->
                 <path class="sv-wing L" style="animation-delay:.05s;--rot:-25deg" d="M196 125 C170 60 90 20 30 44 C70 62 90 70 120 92 C90 84 70 90 54 106 C100 104 150 112 196 125 Z"/>
                 <path class="sv-wing R" style="animation-delay:.05s;--rot:25deg" d="M204 125 C230 60 310 20 370 44 C330 62 310 70 280 92 C310 84 330 90 346 106 C300 104 250 112 204 125 Z"/>
+                <!-- 中羽 -->
                 <path class="sv-wing L" style="animation-delay:.2s;--rot:-15deg" d="M194 132 C150 112 70 112 14 138 C60 146 90 150 130 154 C90 160 60 168 40 184 C110 176 160 156 194 140 Z"/>
                 <path class="sv-wing R" style="animation-delay:.2s;--rot:15deg" d="M206 132 C250 112 330 112 386 138 C340 146 310 150 270 154 C310 160 340 168 360 184 C290 176 240 156 206 140 Z"/>
+                <!-- 下羽 -->
                 <path class="sv-wing L" style="animation-delay:.35s;--rot:-8deg" d="M196 144 C170 180 120 224 70 238 C90 212 104 196 128 180 C106 186 92 196 80 210 C124 190 160 170 196 144 Z"/>
                 <path class="sv-wing R" style="animation-delay:.35s;--rot:8deg" d="M204 144 C230 180 280 224 330 238 C310 212 296 196 272 180 C294 186 308 196 320 210 C276 190 240 170 204 144 Z"/>
             </g>
             <g class="sv-eye-outer">
                 <path d="M146 130 Q200 84 254 130 Q200 176 146 130 Z" fill="none" stroke="currentColor" stroke-width="3.5" class="sv-draw"/>
-                <g class="sv-pupil"><circle cx="200" cy="130" r="17" fill="currentColor"/><circle cx="206" cy="124" r="5.5" fill="#fff"/></g>
+                <g class="sv-pupil">
+                    <circle cx="200" cy="130" r="17" fill="currentColor"/>
+                    <circle cx="206" cy="124" r="5.5" fill="#fff"/>
+                </g>
                 <path class="sv-lid" d="M146 130 Q200 84 254 130 Q200 176 146 130 Z" fill="currentColor"/>
+            </g>
+            <g class="sv-orbit" fill="currentColor">
+                <circle cx="200" cy="40" r="3" class="sv-spark"/>
+                <circle cx="260" cy="130" r="2.5" class="sv-spark" style="animation-delay:.4s"/>
+                <circle cx="200" cy="220" r="3" class="sv-spark" style="animation-delay:.8s"/>
+                <circle cx="140" cy="130" r="2.5" class="sv-spark" style="animation-delay:1.1s"/>
             </g>
         </svg>
     </template>
 
+    <!-- 變體 B：幾何曼陀羅眼 -->
     <template id="tpl-b">
         <svg viewBox="0 0 400 260">
-            <g class="sv-ring-c" fill="none" stroke="currentColor" opacity=".5"><circle cx="200" cy="130" r="120" stroke-width="1" class="sv-dash"/></g>
-            <g class="sv-ring-a" fill="none" stroke="currentColor" stroke-width="2"><polygon points="200,28 288,180 112,180"/><polygon points="200,232 112,80 288,80" opacity=".6"/></g>
-            <g class="sv-ring-b" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="200" cy="130" r="86" stroke-dasharray="3 9"/><circle cx="200" cy="130" r="70"/></g>
+            <g class="sv-ring-c" fill="none" stroke="currentColor" opacity=".5">
+                <circle cx="200" cy="130" r="120" stroke-width="1" class="sv-dash"/>
+            </g>
+            <g class="sv-ring-a" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="200,28 288,180 112,180"/>
+                <polygon points="200,232 112,80 288,80" opacity=".6"/>
+            </g>
+            <g class="sv-ring-b" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="200" cy="130" r="86" stroke-dasharray="3 9"/>
+                <circle cx="200" cy="130" r="70"/>
+            </g>
             <g fill="none" stroke="currentColor" stroke-width="2.2" class="sv-wings-flap">
                 <path class="sv-wing L" style="animation-delay:.1s" d="M120 130 L10 90 L50 130 L10 170 Z"/>
                 <path class="sv-wing R" style="animation-delay:.1s" d="M280 130 L390 90 L350 130 L390 170 Z"/>
+                <path class="sv-wing L" style="animation-delay:.3s" d="M130 110 L40 40 L80 100 Z"/>
+                <path class="sv-wing R" style="animation-delay:.3s" d="M270 110 L360 40 L320 100 Z"/>
+                <path class="sv-wing L" style="animation-delay:.45s" d="M130 150 L40 220 L80 160 Z"/>
+                <path class="sv-wing R" style="animation-delay:.45s" d="M270 150 L360 220 L320 160 Z"/>
             </g>
             <g class="sv-eye-outer">
                 <path d="M140 130 Q200 78 260 130 Q200 182 140 130 Z" fill="none" stroke="currentColor" stroke-width="3.5" class="sv-draw"/>
@@ -411,28 +444,47 @@ body.cinema .letterbox { height: 9vh; }
                 <g class="sv-pupil"><circle cx="200" cy="130" r="14" fill="currentColor"/><circle cx="205" cy="125" r="4.5" fill="#fff"/></g>
                 <path class="sv-lid" d="M140 130 Q200 78 260 130 Q200 182 140 130 Z" fill="currentColor"/>
             </g>
+            <g class="sv-orbit" fill="currentColor">
+                <rect x="196" y="6" width="8" height="8" class="sv-spark"/>
+                <rect x="196" y="246" width="8" height="8" class="sv-spark" style="animation-delay:.6s"/>
+            </g>
         </svg>
     </template>
 
+    <!-- 變體 C：鋒利刃翼 -->
     <template id="tpl-c">
         <svg viewBox="0 0 400 260">
-            <g class="sv-ring-a" fill="none" stroke="currentColor" stroke-width="2.4"><ellipse cx="200" cy="52" rx="52" ry="11" stroke-dasharray="14 5"/></g>
+            <g class="sv-ring-a" fill="none" stroke="currentColor" stroke-width="2.4">
+                <ellipse cx="200" cy="52" rx="52" ry="11" stroke-dasharray="14 5"/>
+            </g>
+            <g class="sv-ring-b" fill="none" stroke="currentColor" stroke-width="1.4">
+                <ellipse cx="200" cy="52" rx="34" ry="7"/>
+            </g>
             <g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="miter" class="sv-wings-flap">
                 <path class="sv-wing L" style="animation-delay:.05s" d="M192 128 L8 30 L110 100 L20 78 L120 128 L36 128 L132 150 L60 182 L150 164 L192 150 Z"/>
                 <path class="sv-wing R" style="animation-delay:.05s" d="M208 128 L392 30 L290 100 L380 78 L280 128 L364 128 L268 150 L340 182 L250 164 L208 150 Z"/>
+                <path class="sv-wing L" style="animation-delay:.3s" d="M196 150 L90 244 L176 192 Z"/>
+                <path class="sv-wing R" style="animation-delay:.3s" d="M204 150 L310 244 L224 192 Z"/>
             </g>
             <g class="sv-eye-outer">
                 <path d="M150 130 Q200 92 250 130 Q200 168 150 130 Z" fill="none" stroke="currentColor" stroke-width="3.5" class="sv-draw"/>
                 <g class="sv-pupil"><ellipse cx="200" cy="130" rx="7" ry="20" fill="currentColor"/><circle cx="202" cy="122" r="3.5" fill="#fff"/></g>
                 <path class="sv-lid" d="M150 130 Q200 92 250 130 Q200 168 150 130 Z" fill="currentColor"/>
             </g>
+            <g class="sv-orbit" fill="currentColor">
+                <circle cx="200" cy="30" r="2.5" class="sv-spark"/>
+                <circle cx="290" cy="130" r="2.5" class="sv-spark" style="animation-delay:.5s"/>
+                <circle cx="110" cy="130" r="2.5" class="sv-spark" style="animation-delay:1s"/>
+            </g>
         </svg>
     </template>
 
+    <!-- 變體 D：純光環之眼（暴走背景/選項頁用） -->
     <template id="tpl-d">
         <svg viewBox="0 0 400 260">
             <g class="sv-ring-c" fill="none" stroke="currentColor"><circle cx="200" cy="130" r="124" stroke-width="1.2" class="sv-dash"/></g>
             <g class="sv-ring-a" fill="none" stroke="currentColor" stroke-width="2"><circle cx="200" cy="130" r="100" stroke-dasharray="20 10"/></g>
+            <g class="sv-ring-b" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="200" cy="130" r="78" stroke-dasharray="2 8"/></g>
             <g class="sv-eye-outer">
                 <path d="M110 130 Q200 50 290 130 Q200 210 110 130 Z" fill="none" stroke="currentColor" stroke-width="4"/>
                 <g class="sv-pupil"><circle cx="200" cy="130" r="26" fill="currentColor"/><circle cx="209" cy="121" r="8" fill="#fff"/></g>
@@ -441,7 +493,7 @@ body.cinema .letterbox { height: 9vh; }
         </svg>
     </template>
 
-    <!-- Cutscene Frames -->
+    <!-- Frame 1 -->
     <div class="cutscene-frame frame-white" id="f1">
         <div class="rays" style="color:#0012ff"></div>
         <div class="bg-grid" style="color:#0012ff"></div>
@@ -449,12 +501,14 @@ body.cinema .letterbox { height: 9vh; }
         <div class="text-wrap"><div class="jp-text wipe-reveal"><span class="rgb-split" data-text="列車が死ぬ">列車が死ぬ</span></div><div class="wipe-bar"></div></div>
     </div>
 
+    <!-- Frame 2 -->
     <div class="cutscene-frame frame-blue" id="f2">
         <div class="rays reverse" style="color:#fff"></div>
         <div class="seraphim-box float-anim" style="color:#fff" id="svg-container-f2"></div>
         <div class="en-text" id="scramble-f2" data-final="Is it time to wake up?">&nbsp;</div>
     </div>
 
+    <!-- Frame 3（長鏡頭，緩慢推進） -->
     <div class="cutscene-frame frame-blue" id="f3">
         <div class="rays" style="color:#7fd0ff"></div>
         <div class="bg-grid" style="color:#fff"></div>
@@ -462,18 +516,21 @@ body.cinema .letterbox { height: 9vh; }
         <div class="text-wrap"><div class="jp-text wipe-reveal"><span class="rgb-split" data-text="どこにいますか？">どこにいますか？</span></div><div class="wipe-bar"></div></div>
     </div>
 
+    <!-- Frame 4 -->
     <div class="cutscene-frame frame-white" id="f5">
         <div class="rays reverse" style="color:#0012ff"></div>
         <div class="seraphim-box float-anim" style="color:var(--blue-pure)" id="svg-container-f5"></div>
         <div class="en-text" id="scramble-f5" data-final="you belong to here." style="color:var(--blue-pure)">&nbsp;</div>
     </div>
 
+    <!-- 暴走段落 -->
     <div class="cutscene-frame" id="frame-glitch-scene">
         <div class="glitch-black-box" id="glitch-black-box"></div>
         <div class="glitch-bg-angel" id="svg-container-glitch" style="color:#fff"></div>
         <div id="glitch-columns-container"></div>
     </div>
 
+    <!-- Puppet 選項頁 -->
     <div class="cutscene-frame frame-black" id="f7">
         <div class="puppet-eye" id="svg-container-puppet" style="color:var(--blue-pure)"></div>
         <div class="puppet-box">
@@ -483,6 +540,7 @@ body.cinema .letterbox { height: 9vh; }
         </div>
     </div>
 
+    <!-- 微笑爆發 -->
     <div class="cutscene-frame frame-black" id="f8">
         <div class="svg-icon-box" id="smile-box" style="width:170px;height:170px;filter:drop-shadow(0 0 30px var(--blue-pure));">
             <svg viewBox="0 0 100 100">
@@ -495,45 +553,43 @@ body.cinema .letterbox { height: 9vh; }
     </div>
 </div>
 
-<!-- Ruina Prescript Terminal 風格介面（資料全數留空） -->
+<!-- Profile UI -->
 <div id="profile-ui">
     <div class="profile-card">
         <div class="card-header">
-            <span>[PRESCRIPT_TERMINAL // VER 2.06]</span>
-            <span>STATUS: STANDBY</span>
+            <span class="rarity-badge">1 IN 100,000,000</span>
+            <span class="biome-badge">CYBERSPACE // ILLUSIONARY</span>
         </div>
-        <div class="terminal-title">TERMINAL LOG</div>
-        <div class="terminal-subtitle">> SELECT DIRECTIVE TO PROCEED</div>
-        
+        <div class="user-title">probaon</div>
+        <div class="user-sub">-</div>
         <div class="tab-menu">
-            <button class="tab-btn active" onclick="switchTab('profile', this)">LOGS</button>
-            <button class="tab-btn" onclick="switchTab('skills', this)">MODULES</button>
-            <button class="tab-btn" onclick="switchTab('projects', this)">RECORDS</button>
+            <button class="tab-btn active" onclick="switchTab('profile', this)">PROFILE</button>
+            <button class="tab-btn" onclick="switchTab('skills', this)">SKILLS</button>
+            <button class="tab-btn" onclick="switchTab('projects', this)">PROJECTS</button>
         </div>
-        
         <div class="tab-content active" id="tab-profile">
-            <div class="data-row"><span class="data-key">> SUBJECT</span><span class="data-val" data-target="---">---</span></div>
-            <div class="data-row"><span class="data-key">> DESIGNATION</span><span class="data-val" data-target="---">---</span></div>
-            <div class="data-row"><span class="data-key">> SPECIALTY</span><span class="data-val" data-target="---">---</span></div>
-            <div class="data-row"><span class="data-key">> CURRENT_STATE</span><span class="data-val" data-target="UNASSIGNED">UNASSIGNED</span></div>
+            <div class="data-row"><span class="data-key">ALIAS</span><span class="data-val">-</span></div>
+            <div class="data-row"><span class="data-key">ROLE</span><span class="data-val">-</span></div>
+            <div class="data-row"><span class="data-key">SPECIALTY</span><span class="data-val">-</span></div>
+            <div class="data-row"><span class="data-key">STATUS</span><span class="data-val">-</span></div>
         </div>
         <div class="tab-content" id="tab-skills">
-            <div class="data-row"><span class="data-key">> MODULE_01</span><span class="data-val" data-target="[ NULL ]">[ NULL ]</span></div>
-            <div class="data-row"><span class="data-key">> MODULE_02</span><span class="data-val" data-target="[ NULL ]">[ NULL ]</span></div>
+            <div class="data-row"><span class="data-key">SKILL I</span><span class="data-val">-</span></div>
+            <div class="data-row"><span class="data-key">SKILL II</span><span class="data-val">-</span></div>
         </div>
         <div class="tab-content" id="tab-projects">
-            <div class="data-row"><span class="data-key">> RECORD_A</span><span class="data-val" data-target="[ UNKNOWN ]">[ UNKNOWN ]</span></div>
-            <div class="data-row"><span class="data-key">> RECORD_B</span><span class="data-val" data-target="[ UNKNOWN ]">[ UNKNOWN ]</span></div>
+            <div class="data-row"><span class="data-key">PROJECT I</span><span class="data-val">-</span></div>
+            <div class="data-row"><span class="data-key">PROJECT II</span><span class="data-val">-</span></div>
         </div>
-
         <div class="card-actions">
-            <button class="btn-ui" onclick="replayCutscene()">RE-EXECUTE</button>
+            <button class="btn-ui" onclick="replayCutscene()">ROLL AGAIN</button>
             <button class="btn-ui" onclick="pulseCore()">PULSE CORE</button>
         </div>
     </div>
 </div>
 
 <script>
+/* ================= YouTube 背景音樂 ================= */
 let ytPlayer;
 const ytTag = document.createElement('script');
 ytTag.src = "https://www.youtube.com/iframe_api";
@@ -545,10 +601,12 @@ function onYouTubeIframeAPIReady() {
     });
 }
 
+/* ================= 計時器管理（避免重播時殘留） ================= */
 let timers = [];
 function later(fn, ms) { const t = setTimeout(fn, ms); timers.push(t); return t; }
 function clearAllTimers() { timers.forEach(clearTimeout); timers = []; }
 
+/* ================= 大天使 SVG 注入 ================= */
 function injectInto(id, tplId) {
     const target = document.getElementById(`svg-container-${id}`);
     const tpl = document.getElementById(tplId);
@@ -563,6 +621,7 @@ function injectSeraphimSVGs() {
     injectInto('puppet', 'tpl-d');
 }
 
+/* 漂浮碎片 */
 function addShards(frame, color, n = 14) {
     frame.querySelectorAll('.shard').forEach(s => s.remove());
     for (let i = 0; i < n; i++) {
@@ -578,6 +637,7 @@ function addShards(frame, color, n = 14) {
     }
 }
 
+/* ================= Web Audio ================= */
 let audioCtx;
 function initAudio() {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -596,36 +656,20 @@ function playGlitchPop() {
     osc.connect(gain); gain.connect(audioCtx.destination);
     osc.start(); osc.stop(t + .06);
 }
-
-function playExtremeImpact(strength = 1) {
+/* 低頻衝擊 */
+function playImpact(strength = 1) {
     if (!audioCtx) return;
     const t = audioCtx.currentTime;
     const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
-    const distortion = audioCtx.createWaveShaper();
-
-    function makeCurve(amount) {
-        let k = amount, n = 44100, curve = new Float32Array(n);
-        for (let i = 0; i < n; ++i) {
-            let x = i * 2 / n - 1;
-            curve[i] = (3 + k) * x * 20 * (Math.PI / 180) / (Math.PI + k * Math.abs(x));
-        }
-        return curve;
-    }
-    distortion.curve = makeCurve(300);
-
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(280, t);
-    osc.frequency.exponentialRampToValueAtTime(22, t + 0.45);
-
-    gain.gain.setValueAtTime(0.9 * strength, t);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
-
-    osc.connect(distortion);
-    distortion.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start(); osc.stop(t + 0.52);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(140, t);
+    osc.frequency.exponentialRampToValueAtTime(30, t + .35);
+    gain.gain.setValueAtTime(.7 * strength, t);
+    gain.gain.exponentialRampToValueAtTime(.001, t + .4);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(); osc.stop(t + .42);
 }
-
+/* 上升掃頻（前搖） */
 function playRiser(dur = .5) {
     if (!audioCtx) return;
     const t = audioCtx.currentTime;
@@ -639,7 +683,7 @@ function playRiser(dur = .5) {
     osc.connect(gain); gain.connect(audioCtx.destination);
     osc.start(); osc.stop(t + dur);
 }
-
+/* 白噪音爆裂（glitch） */
 function playNoiseBurst(dur = .12) {
     if (!audioCtx) return;
     const len = Math.floor(audioCtx.sampleRate * dur);
@@ -651,6 +695,7 @@ function playNoiseBurst(dur = .12) {
     src.connect(gain); gain.connect(audioCtx.destination); src.start();
 }
 
+/* ================= 視覺特效 ================= */
 function triggerFlashAndShake() {
     document.body.classList.remove('shake-impact');
     void document.body.offsetWidth;
@@ -659,18 +704,21 @@ function triggerFlashAndShake() {
     flash.style.opacity = '.4';
     setTimeout(() => flash.style.opacity = '0', 50);
 }
+/* 反差色閃擊（洋紅 / 酸黃，約 0.1s） */
 function colorStrike(color = '#ff2bd6', ms = 110) {
     const el = document.getElementById('strike');
     el.style.background = color;
     el.style.opacity = '1';
     setTimeout(() => el.style.opacity = '0', ms);
 }
+
 function hideAllFrames() {
     document.querySelectorAll('.cutscene-frame').forEach(el => {
         el.classList.remove('active', 'pre-transition', 'slow-in', 'zoom-in');
         el.style.display = 'none';
     });
 }
+/* style: 'punch' | 'slow' | 'zoom' */
 function showFrame(id, style = 'punch') {
     hideAllFrames();
     const frame = document.getElementById(id);
@@ -679,7 +727,7 @@ function showFrame(id, style = 'punch') {
     if (style === 'slow') frame.classList.add('slow-in');
     if (style === 'zoom') frame.classList.add('zoom-in');
     frame.classList.add('active');
-    if (style !== 'slow') { triggerFlashAndShake(); playExtremeImpact(style === 'zoom' ? 1 : .7); }
+    if (style !== 'slow') { triggerFlashAndShake(); playImpact(style === 'zoom' ? 1 : .6); }
     const isWhite = frame.classList.contains('frame-white');
     addShards(frame, isWhite ? '#0012ff' : '#7fd0ff');
     const scr = frame.querySelector('[data-final]');
@@ -690,6 +738,7 @@ function prepareTransition(id) {
     if (frame) { frame.classList.add('pre-transition'); playGlitchPop(); playRiser(.5); }
 }
 
+/* 亂碼洗牌後定格 */
 const SCR = 'abcdefghijklmnopqrstuvwxyz#@%&01?/\\';
 function scrambleText(el, finalText) {
     let frame = 0;
@@ -707,13 +756,7 @@ function scrambleText(el, finalText) {
     }, 34);
 }
 
-function animateProfileData() {
-    document.querySelectorAll('.data-val').forEach(el => {
-        const target = el.getAttribute('data-target');
-        if (target) scrambleText(el, target);
-    });
-}
-
+/* ================= 暴走文字柱 ================= */
 function spawnGlitchColumn(container, strike = false) {
     const col = document.createElement('div');
     col.className = 'text-column';
@@ -735,6 +778,7 @@ function spawnGlitchColumn(container, strike = false) {
     }
     container.appendChild(col);
 
+    /* 隨機切片位移 */
     if (Math.random() > .5) {
         const sl = document.createElement('div');
         sl.className = 'glitch-slice';
@@ -747,6 +791,7 @@ function spawnGlitchColumn(container, strike = false) {
     triggerFlashAndShake();
 }
 
+/* ================= 主時間軸 ================= */
 function startIllusionaryCutscene() {
     clearAllTimers();
     initAudio();
@@ -759,18 +804,23 @@ function startIllusionaryCutscene() {
         try { ytPlayer.seekTo(0); ytPlayer.playVideo(); } catch (e) { console.log(e); }
     }
 
+    /* 0.0 ~ 2.0s  快切：Frame 1（zoom 衝出） */
     showFrame('f1', 'zoom');
     later(() => prepareTransition('f1'), 1550);
 
+    /* 2.0 ~ 4.0s  快切：Frame 2（亂碼定格） */
     later(() => { showFrame('f2', 'punch'); camKick(-5); }, 2000);
     later(() => prepareTransition('f2'), 3550);
 
+    /* 4.0 ~ 7.4s  長鏡頭：Frame 3（緩推，留白呼吸） */
     later(() => { showFrame('f3', 'slow'); camKick(6, true); }, 4000);
     later(() => prepareTransition('f3'), 6900);
 
+    /* 7.4 ~ 9.6s  Frame 4 → 反差色刺擊 */
     later(() => { showFrame('f5', 'zoom'); colorStrike('#ff2bd6', 120); camKick(-10); }, 7400);
     later(() => prepareTransition('f5'), 9100);
 
+    /* 9.6 ~ 12s  暴走 */
     later(() => {
         if (ytPlayer) { if (ytPlayer.pauseVideo) ytPlayer.pauseVideo(); else if (ytPlayer.stopVideo) ytPlayer.stopVideo(); }
         hideAllFrames();
@@ -780,7 +830,7 @@ function startIllusionaryCutscene() {
         container.innerHTML = '';
         blackBox.classList.remove('expand-inward');
         glitchScene.style.display = 'block';
-        triggerFlashAndShake(); colorStrike('#d4ff00', 90); playExtremeImpact(1.3);
+        triggerFlashAndShake(); colorStrike('#d4ff00', 90); playImpact(1.3);
         if (coreBox) coreBox.scale.set(1.4, 1.4, 1.4);
         requestAnimationFrame(() => blackBox.classList.add('expand-inward'));
 
@@ -799,6 +849,7 @@ function startIllusionaryCutscene() {
         timers.push(interval);
     }, 9600);
 
+    /* 12s  Puppet 選項頁（先黑一拍，再逐行彈出） */
     later(() => {
         if (coreBox) coreBox.scale.set(1, 1, 1);
         const opt2 = document.getElementById('puppet-opt2');
@@ -807,7 +858,7 @@ function startIllusionaryCutscene() {
         const opt1 = document.getElementById('puppet-opt1');
         [title, opt1, opt2].forEach(e => e.classList.remove('show'));
         showFrame('f7', 'slow');
-        later(() => { title.classList.add('show'); playGlitchPop(); triggerFlashAndShake(); playExtremeImpact(.6); }, 500);
+        later(() => { title.classList.add('show'); playGlitchPop(); triggerFlashAndShake(); playImpact(.5); }, 500);
         later(() => { opt1.classList.add('show'); playGlitchPop(); triggerFlashAndShake(); }, 1100);
         later(() => { opt2.classList.add('show'); playGlitchPop(); triggerFlashAndShake(); colorStrike('#ff2bd6', 80); }, 1700);
     }, 12000);
@@ -830,13 +881,11 @@ function choosePuppet() {
     const smileBox = document.getElementById('smile-box');
     f8.style.display = 'flex';
     smileBox.classList.remove('smile-zoom-implode');
-    
-    playRiser(.7);
-    if (coreBox) coreBox.scale.set(0.15, 0.15, 0.15);
+    playRiser(.8);
 
     later(() => smileBox.classList.add('smile-zoom-implode'), 200);
     later(() => {
-        trigger3DExplosion(); playExtremeImpact(1.8); playNoiseBurst(.35);
+        trigger3DExplosion(); playImpact(1.6); playNoiseBurst(.3);
         document.body.classList.add('shake-impact');
         const shockwave = document.getElementById('shockwave');
         const flash = document.getElementById('flash');
@@ -853,7 +902,6 @@ function choosePuppet() {
             document.getElementById('cutscene-overlay').style.display = 'none';
             document.body.classList.remove('shake-impact');
             document.getElementById('profile-ui').classList.add('active');
-            animateProfileData();
         }, 250);
     }, 800);
 }
@@ -878,12 +926,8 @@ function switchTab(tabName, btn) {
 let scene, camera, renderer, coreBox, coreInner, ringA, ringB;
 let particleSystem, particleVelocities = [];
 let camTargetZ = 30, camTargetX = 0, camTargetRoll = 0, camSlowPush = false;
-let isPageActive = true;
 
-document.addEventListener('visibilitychange', () => {
-    isPageActive = !document.hidden;
-});
-
+/* 鏡頭踢動：負值 = 往前衝，正值 = 後拉；slow = 緩慢推進 */
 function camKick(z, slow = false) {
     if (!camera) return;
     camSlowPush = slow;
@@ -929,6 +973,7 @@ function init3D() {
     coreBox.position.set(0, 4, 0);
     scene.add(coreBox);
 
+    /* 內核二十面體 */
     coreInner = new THREE.Mesh(
         new THREE.IcosahedronGeometry(2.4, 0),
         new THREE.MeshStandardMaterial({ color: 0x7fd0ff, wireframe: true, emissive: 0x0066ff, emissiveIntensity: 1 })
@@ -936,11 +981,13 @@ function init3D() {
     coreInner.position.set(0, 4, 0);
     scene.add(coreInner);
 
+    /* 環繞光環 */
     ringA = new THREE.Mesh(new THREE.TorusGeometry(7, .05, 8, 80), new THREE.MeshBasicMaterial({ color: 0x0066ff }));
     ringB = new THREE.Mesh(new THREE.TorusGeometry(9, .04, 8, 80), new THREE.MeshBasicMaterial({ color: 0x7fd0ff }));
     ringA.position.set(0, 4, 0); ringB.position.set(0, 4, 0);
     scene.add(ringA); scene.add(ringB);
 
+    /* 漂浮星塵 */
     const dustGeo = new THREE.BufferGeometry();
     const dp = new Float32Array(300 * 3);
     for (let i = 0; i < 300; i++) {
@@ -968,11 +1015,7 @@ function init3D() {
 }
 
 function trigger3DExplosion() {
-    if (particleSystem) {
-        scene.remove(particleSystem);
-        particleSystem.geometry.dispose();
-        particleSystem.material.dispose();
-    }
+    if (particleSystem) scene.remove(particleSystem);
     const count = 450;
     const geo = new THREE.BufferGeometry();
     const positions = new Float32Array(count * 3);
@@ -998,8 +1041,6 @@ function trigger3DExplosion() {
 
 function animate() {
     requestAnimationFrame(animate);
-    if (!isPageActive) return;
-
     const t = Date.now() * .001;
 
     if (coreBox) {
@@ -1015,6 +1056,7 @@ function animate() {
     }
     if (window.dust) window.dust.rotation.y = t * .02;
 
+    /* 鏡頭：緩推時慢，衝擊時快回彈 */
     const ease = camSlowPush ? .012 : .07;
     camera.position.z += (camTargetZ - camera.position.z) * ease;
     camera.rotation.z += (camTargetRoll - camera.rotation.z) * .15;
@@ -1030,18 +1072,13 @@ function animate() {
         }
         particleSystem.geometry.attributes.position.needsUpdate = true;
         particleSystem.material.opacity -= .015;
-        if (particleSystem.material.opacity <= 0) {
-            scene.remove(particleSystem);
-            particleSystem.geometry.dispose();
-            particleSystem.material.dispose();
-            particleSystem = null;
-        }
+        if (particleSystem.material.opacity <= 0) { scene.remove(particleSystem); particleSystem = null; }
     }
     renderer.render(scene, camera);
 }
 
 function pulseCore() {
-    initAudio(); trigger3DExplosion(); playExtremeImpact(.9);
+    initAudio(); trigger3DExplosion(); playImpact(.8);
     const flash = document.getElementById('flash');
     flash.style.opacity = '.6';
     setTimeout(() => flash.style.opacity = '0', 100);
